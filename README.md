@@ -1,8 +1,10 @@
 # Modelación de sistemas multiagentes con gráficas computacionales
 
-### Situación problema
+### 💥 Situación problema
 
 Proponer una solución al problema de movilidad urbana en México, mediante un enfoque que reduzca la congestión vehicular al simular de manera gráfica el tráfico, representando la salida de un **sistema multiagentes**.
+
+### 🌐 Creación de una simulación
 
 Desarrollar una solución que implemente una de las siguientes estrategias de ejemplo:
 
