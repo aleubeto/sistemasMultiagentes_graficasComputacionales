@@ -1,3 +1,9 @@
+/*
+Omar Jiménez Armendáriz - A01732097
+Francisco Rocha Juárez - A01730560
+Alejandro Ubeto Yañez - A01734977
+*/
+
 class Rectangle{
     public static void main(String[] args){
         int nFilas = Integer.valueOf(args[0]);
