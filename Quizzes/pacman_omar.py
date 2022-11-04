@@ -216,7 +216,7 @@ def agent_portrayal(agent):
     elif type(agent) == Ghost:
         
         #Se le otorga una figura, que es un png, y la capa en la que se encuentra, para manejar su visibilidad (tal vez colisiones también?)
-        return {"Shape": "../Imagenes/ghost.png", "Layer": 0}
+        return {"Shape": "Imagenes/ghost.png", "Layer": 0}
 
 #Aquí se define cómo se mostrara la grid de la simulación. Primero va la apariencia de los agentes, después el tamaño
 #de la grid en x y y. Después va el tamaño del recuadro que se mostrará en la representación web.
