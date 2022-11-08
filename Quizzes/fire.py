@@ -55,6 +55,8 @@ class Forest(Model):
     def step(self):
         self.schedule.step()
         self.datacollector.collect(self)
+        if self.count_type(self, Tree.BURNING) == 0:
+            self.running = False
 
 # Coloreado de agentes
 def agent_portrayal(agent):
