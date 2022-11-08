@@ -15,26 +15,27 @@ class Tree(Agent):
     FINE = 0
     BURNING = 1
     BURNED_OUT = 2
-    def __init__(self, model: Model):
+    def __init__(self, model: Model, probability_of_spread):
         super().__init__(model.next_id(), model)
         self.condition = self.FINE
+        self.probability_of_spread = probability_of_spread
 
     def step(self):
         if self.condition == self.BURNING:
             for neighbor in self.model.grid.neighbor_iter(self.pos, moore=False):
-                if neighbor.condition == self.FINE:
+                if neighbor.condition == self.FINE and self.random.random() * 100 < self.probability_of_spread:
                     neighbor.condition = self.BURNING
             self.condition = self.BURNED_OUT
 
 # Clase Modelo: Forest
 class Forest(Model):
-    def __init__(self, height=50, width=50, density=0.90):
+    def __init__(self, height=50, width=50, density=0.90, probability_of_spread=50):
         super().__init__()
         self.schedule = RandomActivation(self)
         self.grid = Grid(height, width, torus=False)
         for _,x,y in self.grid.coord_iter():
             if self.random.random() < density:
-                tree = Tree(self)
+                tree = Tree(self, probability_of_spread)
                 if x == 0:
                     tree.condition = Tree.BURNING
                 self.grid.place_agent(tree, (x,y))
@@ -76,12 +77,15 @@ grid = CanvasGrid(agent_portrayal, 50, 50, 450, 450)
 # Creación de tabla que grafica datacollector
 chart = ChartModule([{"Label": "Percent burned", "Color": "Black"}], data_collector_name='datacollector')
 
-# Implementación de Slider para manipular densidad de bosque
+# Implementación de Slider para manipular densidad de bosque y la probabilidad de incendio
 server = ModularServer(Forest,[grid, chart],"Forest",
                        {"density": UserSettableParameter(
                             "slider", "Tree density", 0.45, 0.01, 1.0, 0.01),
-                            "width":20,
-                            "height":20})
+                       "probability_of_spread": UserSettableParameter(
+                            "slider", "Spread probability", 50, 0, 100, 1),
+                        "width":20,
+                        "height":20
+                        })
 
 server.port = 8522 # The default
 server.launch()
