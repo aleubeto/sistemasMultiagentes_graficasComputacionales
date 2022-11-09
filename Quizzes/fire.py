@@ -15,32 +15,58 @@ class Tree(Agent):
     FINE = 0
     BURNING = 1
     BURNED_OUT = 2
-    def __init__(self, model: Model, probability_of_spread):
+    def __init__(self, model: Model, probability_of_spread, south_wind_speed, west_wind_speed):
         super().__init__(model.next_id(), model)
         self.condition = self.FINE
         self.probability_of_spread = probability_of_spread
+        self.south_wind_speed = south_wind_speed
+        self.west_wind_speed = west_wind_speed
 
     def step(self):
         if self.condition == self.BURNING:
-            for neighbor in self.model.grid.neighbor_iter(self.pos, moore=False):
-                if neighbor.condition == self.FINE and self.random.random() * 100 < self.probability_of_spread:
+            neighbors = self.model.grid.neighbor_iter(self.pos, moore=False)
+            for neighbor in neighbors:
+
+                # Condiciones de propagación
+                neighbor_fine = neighbor.condition == self.FINE
+                spread_rand = self.random.random() * 100
+                wind_condition = False
+
+                # Velocidad del viento Sur
+                if self.south_wind_speed > 0 and self.pos[1] < neighbor.pos[1]: # Sur
+                    wind_condition = True
+                    spread_rand -= self.south_wind_speed
+                elif self.south_wind_speed < 0 and self.pos[1] > neighbor.pos[1]:   # Norte
+                    wind_condition = True
+                    spread_rand += self.south_wind_speed
+
+                # Velocidad del viento Oeste
+                if self.west_wind_speed > 0 and self.pos[0] > neighbor.pos[0]:  # Oeste
+                    wind_condition = True
+                    spread_rand -= (self.west_wind_speed ** -1)
+                elif self.west_wind_speed < 0 and self.pos[0] < neighbor.pos[0]:    # Este
+                    wind_condition = True
+                    spread_rand -= self.west_wind_speed
+
+                # Cambio de estado
+                if neighbor_fine and spread_rand < self.probability_of_spread and wind_condition:
                     neighbor.condition = self.BURNING
             self.condition = self.BURNED_OUT
 
 # Clase Modelo: Forest
 class Forest(Model):
-    def __init__(self, height=50, width=50, density=0.90, probability_of_spread=50):
+    def __init__(self, height=50, width=50, density=0.90, probability_of_spread=50, south_wind_speed=0, west_wind_speed=0):
         super().__init__()
         self.schedule = RandomActivation(self)
         self.grid = Grid(height, width, torus=False)
         for _,x,y in self.grid.coord_iter():
             if self.random.random() < density:
-                tree = Tree(self, probability_of_spread)
+                tree = Tree(self, probability_of_spread, south_wind_speed, west_wind_speed)
                 if x == 0:
                     tree.condition = Tree.BURNING
                 self.grid.place_agent(tree, (x,y))
                 self.schedule.add(tree)
-            
+
         # Recolector de información: procentaje de arboles quemados
         self.datacollector = DataCollector({"Percent burned": lambda m: self.count_type(m, Tree.BURNED_OUT) / len(self.schedule.agents)})
 
@@ -83,8 +109,12 @@ server = ModularServer(Forest,[grid, chart],"Forest",
                             "slider", "Tree density", 0.45, 0.01, 1.0, 0.01),
                        "probability_of_spread": UserSettableParameter(
                             "slider", "Spread probability", 50, 0, 100, 1),
-                        "width":20,
-                        "height":20
+                        "south_wind_speed": UserSettableParameter(
+                            "slider", "South wind speed", 0, -25, 25, 1),
+                        "west_wind_speed": UserSettableParameter(
+                            "slider", "West wind speed", 0, -25, 25, 1),
+                        "width":50,
+                        "height":50
                         })
 
 server.port = 8522 # The default
