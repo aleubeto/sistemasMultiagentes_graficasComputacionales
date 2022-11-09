@@ -31,23 +31,23 @@ class Tree(Agent):
                 neighbor_fine = neighbor.condition == self.FINE
                 spread_rand = self.random.random() * 100
                 wind_condition = False
-
+                
                 # Velocidad del viento Sur
-                if self.south_wind_speed > 0 and self.pos[1] < neighbor.pos[1]: # Sur
+                if self.south_wind_speed > 0 and self.pos[1] > neighbor.pos[1]: # Sur
                     wind_condition = True
                     spread_rand -= self.south_wind_speed
-                elif self.south_wind_speed < 0 and self.pos[1] > neighbor.pos[1]:   # Norte
+                elif self.south_wind_speed < 0 and self.pos[1] < neighbor.pos[1]:   # Norte
                     wind_condition = True
                     spread_rand += self.south_wind_speed
 
                 # Velocidad del viento Oeste
                 if self.west_wind_speed > 0 and self.pos[0] > neighbor.pos[0]:  # Oeste
                     wind_condition = True
-                    spread_rand -= (self.west_wind_speed ** -1)
+                    spread_rand -= self.west_wind_speed
                 elif self.west_wind_speed < 0 and self.pos[0] < neighbor.pos[0]:    # Este
                     wind_condition = True
-                    spread_rand -= self.west_wind_speed
-
+                    spread_rand += self.west_wind_speed
+                                
                 # Cambio de estado
                 if neighbor_fine and spread_rand < self.probability_of_spread and wind_condition:
                     neighbor.condition = self.BURNING
@@ -88,11 +88,11 @@ class Forest(Model):
 # Coloreado de agentes
 def agent_portrayal(agent):
     if agent.condition == Tree.FINE:
-        portrayal = {"Shape": "circle", "Filled": "true", "Color": "Green", "r": 0.75, "Layer": 0}
+        portrayal = {"Shape": "circle", "Filled": "true", "Color": "Blue", "r": 0.75, "Layer": 0}
     elif agent.condition == Tree.BURNING:
         portrayal = {"Shape": "circle", "Filled": "true", "Color": "Red", "r": 0.75, "Layer": 0}
     elif agent.condition == Tree.BURNED_OUT:
-        portrayal = {"Shape": "circle", "Filled": "true", "Color": "Gray", "r": 0.75, "Layer": 0}
+        portrayal = {"Shape": "circle", "Filled": "true", "Color": "Black", "r": 0.75, "Layer": 0}
     else:
         portrayal = {}
 
