@@ -3,9 +3,6 @@ from mesa.space import *
 from mesa.time import *
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
-from pathfinding.core.diagonal_movement import DiagonalMovement
-from pathfinding.core.grid import Grid as pathGrid
-from pathfinding.finder.a_star import AStarFinder
 from mesa.visualization.UserParam import UserSettableParameter
 from mesa.datacollection import DataCollector
 from mesa.visualization.modules import ChartModule
@@ -68,6 +65,18 @@ class Maze(Model):
                 self.grid.place_agent(wall, wall.pos)
                 self.schedule.add(wall)
 
+         # Recolector de información: procentaje de celdas limpiadas
+        self.datacollector = DataCollector({"Porcentaje de celdas limpiadas": lambda m: self.count_type(m) / len(self.schedule.agents)})
+
+    # Método para contar cantidad de celdas en cierto estado
+    @staticmethod
+    def count_type(model):
+        count = 0
+        for dirty in model.schedule.agents:
+            if type(dirty) == WallBlock:
+                count += 1
+        return count
+
     def step(self):
         self.step_counter += 1
         self.schedule.step()
@@ -83,7 +92,10 @@ def agent_portrayal(agent):
 
 grid = CanvasGrid(agent_portrayal, 50, 50, 450, 450)
 
-server = ModularServer(Maze, [grid], "Equipo 10 - M1. Actividad",
+# Creación de tabla que grafica datacollector
+chart = ChartModule([{"Label": "Porcentaje de celdas limpiadas", "Color": "Black"}], data_collector_name='datacollector')
+
+server = ModularServer(Maze, [grid,chart], "Equipo 10 - M1. Actividad",
                         {"dirtiness": UserSettableParameter(
                             "slider", "Suciedad", 0.50, 0.01, 1.0, 0.01),
                         "agents": UserSettableParameter(
@@ -93,6 +105,6 @@ server = ModularServer(Maze, [grid], "Equipo 10 - M1. Actividad",
                         "width": UserSettableParameter(
                             "number", "Anchura", 50),
                         "time_limit": UserSettableParameter(
-                            "number", "Tiempo máximo de ejecución", 10)})
+                            "number", "Tiempo máximo de ejecución", 30)})
 server.port = 8522
 server.launch()
