@@ -84,7 +84,8 @@ class Maze(Model):
                 self.schedule.add(wall)
     
     def step(self):
-        print(self.schedule.time)
+        if self.schedule.time == 25:
+            self.running = False
         self.schedule.step()
 
 def agent_portrayal(agent):
