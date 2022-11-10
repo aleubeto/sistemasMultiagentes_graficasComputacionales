@@ -236,11 +236,11 @@ public class KeyboardAndFocusDemo extends JApplet
       if (key == KeyEvent.VK_LEFT) {
          //translate(-10, 0);
          //translateWithAngle(polygonAngle, -10);
-         translateWithAngle((-Math.PI / 2)+polygonAngle, -10);
+         translateWithAngle((-Math.PI / 2)+polygonAngle, 10);
       } else if (key == KeyEvent.VK_RIGHT) {
          //translate(10, 0);
          //translateWithAngle(polygonAngle, 10);
-         translateWithAngle((-Math.PI / 2)+polygonAngle, 10);
+         translateWithAngle((-Math.PI / 2)+polygonAngle, -10);
       } else if (key == KeyEvent.VK_UP) {
          //translate(0, -10);
          //translateWithAngle((-Math.PI / 2)+polygonAngle, 10);
