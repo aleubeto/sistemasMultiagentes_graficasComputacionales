@@ -32,6 +32,8 @@ public class KeyboardAndFocusDemo extends JApplet
 
    int POLYGON_POINTS = xPuntos.length;
 
+   double polygonAngle = 0; // The polygon's rotation angle, in radians.
+
 
    boolean focussed = false; // True when this applet has input focus.
 
@@ -150,8 +152,12 @@ public class KeyboardAndFocusDemo extends JApplet
          canvas.repaint();
       } else if (ch == 'E' || ch == 'e') {
          rotateAtOrigin(0.1);
+         //We increase the angle by 0.1 radians
+         polygonAngle += 0.1;
       } else if (ch == 'D' || ch == 'd') {
          rotateAtOrigin(-0.1);
+         //We decrease the angle by 0.1 radians
+         polygonAngle -= 0.1;
       } else if (ch == 'F' || ch == 'f') {
          scaleAtOrigin(0.9);
       } 
@@ -229,16 +235,16 @@ public class KeyboardAndFocusDemo extends JApplet
       int key = evt.getKeyCode();
       if (key == KeyEvent.VK_LEFT) {
          //translate(-10, 0);
-         translateWithAngle(0, -10);
+         translateWithAngle(polygonAngle, -10);
       } else if (key == KeyEvent.VK_RIGHT) {
          //translate(10, 0);
-         translateWithAngle(0, 10);
+         translateWithAngle(polygonAngle, 10);
       } else if (key == KeyEvent.VK_UP) {
          //translate(0, -10);
-         translateWithAngle(-Math.PI / 2, 10);
+         translateWithAngle((-Math.PI / 2)+polygonAngle, 10);
       } else if (key == KeyEvent.VK_DOWN) {
          //translate(0, 10);
-         translateWithAngle(-Math.PI / 2, -10);
+         translateWithAngle((-Math.PI / 2)+polygonAngle, -10);
       }
       canvas.repaint();
    }
