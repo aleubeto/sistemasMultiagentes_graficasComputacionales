@@ -50,7 +50,7 @@ class Maze(Model):
         self.step_counter = step_counter
         self.time_limit = time_limit
 
-        self.grid = MultiGrid(height, width, torus=False)
+        self.grid = MultiGrid(width, height, torus=False)
 
         for i in range(agents):
             robot = Robot(self, (1, 1))
@@ -96,14 +96,14 @@ grid = CanvasGrid(agent_portrayal, 50, 50, 450, 450)
 chart = ChartModule([{"Label": "Porcentaje de celdas limpiadas", "Color": "Black"}], data_collector_name='datacollector')
 
 server = ModularServer(Maze, [grid,chart], "Equipo 10 - M1. Actividad",
-                        {"dirtiness": UserSettableParameter(
-                            "slider", "Suciedad", 0.50, 0.01, 1.0, 0.01),
-                        "agents": UserSettableParameter(
-                            "number", "Número de agentes", 10),
+                        {"width": UserSettableParameter(
+                            "number", "Anchura", 50),
                         "height": UserSettableParameter(
                             "number", "Altura", 50),
-                        "width": UserSettableParameter(
-                            "number", "Anchura", 50),
+                        "agents": UserSettableParameter(
+                            "number", "Número de agentes", 10),
+                        "dirtiness": UserSettableParameter(
+                            "slider", "Suciedad", 0.50, 0.01, 1.0, 0.01),
                         "time_limit": UserSettableParameter(
                             "number", "Tiempo máximo de ejecución", 30)})
 server.port = 8522
