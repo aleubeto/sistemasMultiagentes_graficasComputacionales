@@ -50,14 +50,11 @@ class Maze(Model):
         self.schedule = RandomActivation(self)
         
         self.grid = MultiGrid(17, 14, torus=False)
-
-        robot = Robot(self, (1, 1))
-        robot2 = Robot(self, (1, 1))
         
-        self.grid.place_agent(robot, robot.pos)
-        self.grid.place_agent(robot2, robot2.pos)
-        self.schedule.add(robot)
-        self.schedule.add(robot2)
+        for i in range(10):
+            robot = Robot(self, (1, 1))
+            self.grid.place_agent(robot, robot.pos)
+            self.schedule.add(robot)
         
         matrix = [
             [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -87,40 +84,18 @@ class Maze(Model):
                 self.schedule.add(wall)
     
     def step(self):
-        
+        print(self.schedule.time)
         self.schedule.step()
 
-#Aquí se define la apariencia que tendrá cada agente.
 def agent_portrayal(agent):
-    
-    #Caso en que se trata de un Agente WallBlock.
     if type(agent) == WallBlock:
-        
-        #Se le otorga una figura, que es un rectangulo de 1x1, lleno y de color gris, y la capa en la que se encuentra, para manejar su visibilidad (tal vez colisiones también?)
         return {"Shape": "rect", "w": 1, "h": 1, "Filled": "true", "Color": "Gray", "Layer": 0}
     
-    #Caso en que se trata de un Agente Ghost.
     elif type(agent) == Robot:
-        
-        #Se le otorga una figura, que es un png, y la capa en la que se encuentra, para manejar su visibilidad (tal vez colisiones también?)
         return {"Shape": "Imagenes/ghost.png", "Layer": 0}
 
-#Aquí se define cómo se mostrara la grid de la simulación. Primero va la apariencia de los agentes, después el tamaño
-#de la grid en x y y. Después va el tamaño del recuadro que se mostrará en la representación web.
 grid = CanvasGrid(agent_portrayal, 17, 14, 450, 450)
 
-#------------------------ TERMINA LA PARTE "DE ESTILO", AQUÍ SE DEFINE LA APARIENCIA DE LA SIMULACIÓN ---------------------
-
-
-#------------------------ INICIA LA PARTE "DEL SERVIDOR", AQUÍ SE DEFINE EN QUÉ MEDIO SE DESPLIEGA LA SIMULACIÓN ---------------------
-
-#Crea un servidor modular utilizando como modelo Maze (el cual también incluye sus Agentes), la grid que se va a emplear, el nombre
-#del sitio que se va a generar y no sé que haga '{}'.
 server = ModularServer(Maze, [grid], "PacMan", {})
-
-#Se asigna un puerto en el que se va a mostrar la simulación.
 server.port = 8522
-
-#Finalmente se lanza la simulación.
 server.launch()
-#------------------------ TERMINA LA PARTE "DEL SERVIDOR", AQUÍ SE DEFINE EN QUÉ MEDIO SE DESPLIEGA LA SIMULACIÓN ---------------------
