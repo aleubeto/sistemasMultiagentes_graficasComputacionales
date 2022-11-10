@@ -194,6 +194,13 @@ public class KeyboardAndFocusDemo extends JApplet
       transform(matrix);
    }
 
+   //Function to perform translation taking angle as parameter
+   public void translateWithAngle(double angle, double distance) {
+      double x = Math.cos(angle) * distance;
+      double y = Math.sin(angle) * distance;
+      translate(x, y);
+   }
+
    //Function to perform scaling
    public void scale(double x, double y) {
       double[][] matrix = { { x, 0, 0 }, { 0, y, 0 } };
@@ -221,13 +228,17 @@ public class KeyboardAndFocusDemo extends JApplet
    public void keyPressed(KeyEvent evt) {
       int key = evt.getKeyCode();
       if (key == KeyEvent.VK_LEFT) {
-         translate(-10, 0);
+         //translate(-10, 0);
+         translateWithAngle(0, -10);
       } else if (key == KeyEvent.VK_RIGHT) {
-         translate(10, 0);
+         //translate(10, 0);
+         translateWithAngle(0, 10);
       } else if (key == KeyEvent.VK_UP) {
-         translate(0, -10);
+         //translate(0, -10);
+         translateWithAngle(-Math.PI / 2, 10);
       } else if (key == KeyEvent.VK_DOWN) {
-         translate(0, 10);
+         //translate(0, 10);
+         translateWithAngle(-Math.PI / 2, -10);
       }
       canvas.repaint();
    }
