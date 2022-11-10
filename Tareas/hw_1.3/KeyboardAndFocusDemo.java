@@ -14,6 +14,11 @@ public class KeyboardAndFocusDemo extends JApplet
    Color squareColor;  // The color of the square.
    
    int squareTop, squareLeft;  // Coordinates of top-left corner of square.
+   int[] xPuntos = {82, 90, 95, 105, 104, 104, 102, 97, 50, 50, 95, 105, 116, 124, 170, 170, 123, 118, 116, 120, 127, 131, 135,
+      135, 131, 127, 120, 116, 118, 123, 170, 170, 124, 116, 105, 95, 50, 50, 97, 102, 104, 104, 105, 95, 90, 82,};
+
+   int[] yPuntos = {95, 90, 85, 80, 55, 51, 51, 30, 29, 25, 24, 20, 20, 24, 25, 29, 30, 51, 51, 80, 85, 91, 100, 
+               120, 129, 135, 140, 169, 169, 190, 191, 195, 196, 200, 200, 196, 195, 191, 190, 169, 169, 165, 140, 135, 130, 125};
    
    boolean focussed = false;   // True when this applet has input focus.
    
@@ -80,7 +85,8 @@ public class KeyboardAndFocusDemo extends JApplet
          /* Draw the square. */
 
          g.setColor(squareColor);
-         g.fillRect(squareLeft, squareTop, SQUARE_SIZE, SQUARE_SIZE);
+         g.fillPolygon(xPuntos, yPuntos, 46);
+         //g.fillRect(squareLeft, squareTop, SQUARE_SIZE, SQUARE_SIZE);
 
          /* If the applet does not have input focus, print a message. */
 
@@ -147,29 +153,62 @@ public class KeyboardAndFocusDemo extends JApplet
           // 3-pixel border all around the applet).
           
       int key = evt.getKeyCode();  // keyboard code for the key that was pressed
+      char keyCh = evt.getKeyChar();
       
       if (key == KeyEvent.VK_LEFT) {
-         squareLeft -= 8;
-         if (squareLeft < 3)
-            squareLeft = 3;
+         for (int i = 0; i < xPuntos.length; i++){
+            xPuntos[i] -= 8;
+         }
+         //squareLeft -= 8;
+         //if (squareLeft < 3)
+         //   squareLeft = 3;
          canvas.repaint();
       }
       else if (key == KeyEvent.VK_RIGHT) {
-         squareLeft += 8;
-         if (squareLeft > getSize().width - 3 - SQUARE_SIZE)
-            squareLeft = getSize().width - 3 - SQUARE_SIZE;
+         for (int i = 0; i < xPuntos.length; i++){
+            xPuntos[i] += 8;
+         }
+         //squareLeft += 8;
+         //if (squareLeft > getSize().width - 3 - SQUARE_SIZE)
+         //   squareLeft = getSize().width - 3 - SQUARE_SIZE;
          canvas.repaint();
       }
       else if (key == KeyEvent.VK_UP) {
-         squareTop -= 8;
-         if (squareTop < 3)
-            squareTop = 3;
+         for (int i = 0; i < yPuntos.length; i++){
+            yPuntos[i] -= 8;
+         }
+         //squareTop -= 8;
+         //if (squareTop < 3)
+         //   squareTop = 3;
          canvas.repaint();
       }
       else if (key == KeyEvent.VK_DOWN) {
-         squareTop += 8;
-         if (squareTop > getSize().height - 3 - SQUARE_SIZE)
-            squareTop = getSize().height - 3 - SQUARE_SIZE;
+         for (int i = 0; i < yPuntos.length; i++){
+            yPuntos[i] += 8;
+         }
+         //squareTop += 8;
+         //if (squareTop > getSize().height - 3 - SQUARE_SIZE)
+         //   squareTop = getSize().height - 3 - SQUARE_SIZE;
+         canvas.repaint();
+      }
+      else if (keyCh == 'R') {
+         for (int i = 0; i < yPuntos.length; i++){
+            xPuntos[i] *= 10;
+            yPuntos[i] *= 10;
+         }
+         //squareTop += 8;
+         //if (squareTop > getSize().height - 3 - SQUARE_SIZE)
+         //   squareTop = getSize().height - 3 - SQUARE_SIZE;
+         canvas.repaint();
+      }
+      else if (keyCh == 'F') {
+         for (int i = 0; i < yPuntos.length; i++){
+            xPuntos[i] /= 10;
+            yPuntos[i] /= 10;
+         }
+         //squareTop += 8;
+         //if (squareTop > getSize().height - 3 - SQUARE_SIZE)
+         //   squareTop = getSize().height - 3 - SQUARE_SIZE;
          canvas.repaint();
       }
 
