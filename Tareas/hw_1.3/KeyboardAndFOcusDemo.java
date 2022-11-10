@@ -3,7 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class KeyboardAndFocusDemo extends JApplet 
+public class KeyboardAndFOcusDemo extends JApplet 
                   implements KeyListener, FocusListener, MouseListener {
                       // (Note:  MouseListener is implemented only so that
                       //         the applet can request the input focus when

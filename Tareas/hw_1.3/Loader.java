@@ -3,7 +3,7 @@ import javax.swing.JPanel;
 
 class Loader{
       public static void main(String[] args) {
-      KeyboardAndFocusDemo applet = new KeyboardAndFocusDemo();
+      KeyboardAndFOcusDemo applet = new KeyboardAndFOcusDemo();
       applet.init();
 
       // Construct a JFrame.
