@@ -44,16 +44,19 @@ class DirtyCell(Agent):
 
 class Room(Model):
 
-    def __init__(self, height=50, width=50, agents=10, dirtiness=0.50, step_counter=1, time_limit=10):
+    def __init__(self, height=30, width=30, agents=10, dirtiness=0.50, step_counter=1, time_limit=50):
 
         super().__init__()
 
         self.schedule = RandomActivation(self)
 
+        self.h = height
+        self.w = width
+
         self.step_counter = step_counter
         self.time_limit = time_limit
 
-        self.grid = MultiGrid(width, height, torus=False)
+        self.grid = MultiGrid(self.w, self.h, torus=False)
 
         for i in range(agents):
             robot = Robot(self, (1, 1))
@@ -70,12 +73,12 @@ class Room(Model):
 
          # Recolector de información: procentaje de celdas limpiadas
         self.dirtycells = self.count_type(self)
-        self.time_datacollector = DataCollector({"Tiempo transcurrido": lambda m: self.step_counter})        
+        self.time_datacollector = DataCollector({"Tiempo transcurrido": lambda m: self.step_counter})
         #self.datacollector = DataCollector({"Porcentaje de celdas limpias": lambda m: ((width*height)-self.count_type(m)) * 100 / (width*height)})
         self.cleaned_datacollector = DataCollector({"Porcentaje de celdas limpiadas": lambda m: (self.dirtycells-self.count_type(m)) * 100 / self.dirtycells})
         self.move_datacollector = DataCollector({"Movimientos realizados": lambda m: self.count_moves(m)})
     # Método para contar cantidad de celdas en cierto estado
-    
+
     @staticmethod
     def count_type(model):
         count = 0
@@ -108,7 +111,7 @@ def agent_portrayal(agent):
     elif type(agent) == Robot:
         return {"Shape": "Imagenes/robot-vacuum-cleaner.png", "Layer": 0}
 
-grid = CanvasGrid(agent_portrayal, 50, 50)
+grid = CanvasGrid(agent_portrayal, 30, 30, 450, 450)
 
 # Creación de tabla que grafica datacollector
 chart_tiempo = ChartModule([{"Label": "Tiempo transcurrido", "Color": "Black"}], data_collector_name='time_datacollector')
@@ -119,14 +122,14 @@ chart_movimientos = ChartModule([{"Label": "Movimientos realizados", "Color": "B
 
 server = ModularServer(Room, [grid,chart_tiempo, chart_limpiadas, chart_movimientos], "Equipo 10 - M1. Actividad",
                         {"width": UserSettableParameter(
-                            "number", "Anchura", 50),
+                            "number", "Anchura", 30),
                         "height": UserSettableParameter(
-                            "number", "Altura", 50),
+                            "number", "Altura", 30),
                         "agents": UserSettableParameter(
                             "number", "Número de agentes", 10),
                         "dirtiness": UserSettableParameter(
                             "slider", "Suciedad", 0.50, 0.01, 1.0, 0.01),
                         "time_limit": UserSettableParameter(
-                            "number", "Tiempo máximo de ejecución", 30)})
+                            "number", "Tiempo máximo de ejecución", 50)})
 server.port = 8522
 server.launch()
