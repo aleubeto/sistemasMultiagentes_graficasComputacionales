@@ -12,10 +12,11 @@ class Robot(Agent):
     def __init__(self, model, pos):
         super().__init__(model.next_id(), model)
         self.pos = pos
+        self.move_counter = 0
 
     def step(self):
         for element in self.model.grid.iter_cell_list_contents(self.pos):
-            if type(element) == WallBlock:
+            if type(element) == DirtyCell:
                 self.model.grid.remove_agent(element)
                 self.model.schedule.remove(element)
                 return
@@ -30,8 +31,9 @@ class Robot(Agent):
 
         if step:
             self.model.grid.move_agent(self, next_move)
+            self.move_counter += 1
 
-class WallBlock(Agent):
+class DirtyCell(Agent):
 
     def __init__(self, model, pos):
         super().__init__(model.next_id(), model)
@@ -40,7 +42,7 @@ class WallBlock(Agent):
     def step(self):
         pass
 
-class Maze(Model):
+class Room(Model):
 
     def __init__(self, height=50, width=50, agents=10, dirtiness=0.50, step_counter=1, time_limit=10):
 
@@ -62,33 +64,45 @@ class Maze(Model):
 
             if self.random.random() < dirtiness:
 
-                wall = WallBlock(self, (x, y))
-                self.grid.place_agent(wall, wall.pos)
-                self.schedule.add(wall)
+                dirt = DirtyCell(self, (x, y))
+                self.grid.place_agent(dirt, dirt.pos)
+                self.schedule.add(dirt)
 
          # Recolector de información: procentaje de celdas limpiadas
         self.dirtycells = self.count_type(self)
+        self.time_datacollector = DataCollector({"Tiempo transcurrido": lambda m: self.step_counter})        
         #self.datacollector = DataCollector({"Porcentaje de celdas limpias": lambda m: ((width*height)-self.count_type(m)) * 100 / (width*height)})
-        self.datacollector = DataCollector({"Porcentaje de celdas limpiadas": lambda m: (self.dirtycells-self.count_type(m)) * 100 / self.dirtycells})
-
+        self.cleaned_datacollector = DataCollector({"Porcentaje de celdas limpiadas": lambda m: (self.dirtycells-self.count_type(m)) * 100 / self.dirtycells})
+        self.move_datacollector = DataCollector({"Movimientos realizados": lambda m: self.count_moves(m)})
     # Método para contar cantidad de celdas en cierto estado
+    
     @staticmethod
     def count_type(model):
         count = 0
         for dirty in model.schedule.agents:
-            if type(dirty) == WallBlock:
+            if type(dirty) == DirtyCell:
                 count += 1
+        return count
+
+    @staticmethod
+    def count_moves(model):
+        count = 0
+        for robot in model.schedule.agents:
+            if type(robot) == Robot:
+                count += robot.move_counter
         return count
 
     def step(self):
         self.step_counter += 1
         self.schedule.step()
-        self.datacollector.collect(self)
+        self.time_datacollector.collect(self)
+        self.cleaned_datacollector.collect(self)
+        self.move_datacollector.collect(self)
         if self.step_counter >= self.time_limit or self.count_type(self)==0:
             self.running = False
 
 def agent_portrayal(agent):
-    if type(agent) == WallBlock:
+    if type(agent) == DirtyCell:
         return {"Shape": "rect", "w": 1, "h": 1, "Filled": "true", "Color": "Gray", "Layer": 0}
 
     elif type(agent) == Robot:
@@ -97,9 +111,13 @@ def agent_portrayal(agent):
 grid = CanvasGrid(agent_portrayal, 50, 50)
 
 # Creación de tabla que grafica datacollector
-chart = ChartModule([{"Label": "Porcentaje de celdas limpiadas", "Color": "Black"}], data_collector_name='datacollector')
+chart_tiempo = ChartModule([{"Label": "Tiempo transcurrido", "Color": "Black"}], data_collector_name='time_datacollector')
 
-server = ModularServer(Maze, [grid,chart], "Equipo 10 - M1. Actividad",
+chart_limpiadas = ChartModule([{"Label": "Porcentaje de celdas limpiadas", "Color": "Black"}], data_collector_name='cleaned_datacollector')
+
+chart_movimientos = ChartModule([{"Label": "Movimientos realizados", "Color": "Black"}], data_collector_name='move_datacollector')
+
+server = ModularServer(Room, [grid,chart_tiempo, chart_limpiadas, chart_movimientos], "Equipo 10 - M1. Actividad",
                         {"width": UserSettableParameter(
                             "number", "Anchura", 50),
                         "height": UserSettableParameter(
