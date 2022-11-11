@@ -1,3 +1,6 @@
+/* Omar Jiménez Armendáriz - A01732097
+Francisco Rocha Juárez - A01730560
+Alejandro Ubeto Yañez - A01734977 */
 
 import java.awt.*;
 import java.awt.event.*;
