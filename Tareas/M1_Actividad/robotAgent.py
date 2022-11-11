@@ -17,6 +17,7 @@ class Robot(Agent):
         for element in self.model.grid.iter_cell_list_contents(self.pos):
             if type(element) == WallBlock:
                 self.model.grid.remove_agent(element)
+                self.model.schedule.remove(element)
                 return
 
         next_moves = self.model.grid.get_neighborhood(self.pos, moore=True)
@@ -66,7 +67,9 @@ class Maze(Model):
                 self.schedule.add(wall)
 
          # Recolector de información: procentaje de celdas limpiadas
-        self.datacollector = DataCollector({"Porcentaje de celdas limpiadas": lambda m: self.count_type(m) / len(self.schedule.agents)})
+        self.dirtycells = self.count_type(self)
+        #self.datacollector = DataCollector({"Porcentaje de celdas limpias": lambda m: ((width*height)-self.count_type(m)) * 100 / (width*height)})
+        self.datacollector = DataCollector({"Porcentaje de celdas limpiadas": lambda m: (self.dirtycells-self.count_type(m)) * 100 / self.dirtycells})
 
     # Método para contar cantidad de celdas en cierto estado
     @staticmethod
@@ -80,7 +83,8 @@ class Maze(Model):
     def step(self):
         self.step_counter += 1
         self.schedule.step()
-        if self.step_counter >= self.time_limit:
+        self.datacollector.collect(self)
+        if self.step_counter >= self.time_limit or self.count_type(self)==0:
             self.running = False
 
 def agent_portrayal(agent):
@@ -90,7 +94,7 @@ def agent_portrayal(agent):
     elif type(agent) == Robot:
         return {"Shape": "Imagenes/robot-vacuum-cleaner.png", "Layer": 0}
 
-grid = CanvasGrid(agent_portrayal, 50, 50, 450, 450)
+grid = CanvasGrid(agent_portrayal, 50, 50)
 
 # Creación de tabla que grafica datacollector
 chart = ChartModule([{"Label": "Porcentaje de celdas limpiadas", "Color": "Black"}], data_collector_name='datacollector')
