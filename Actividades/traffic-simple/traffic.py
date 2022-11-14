@@ -14,8 +14,9 @@ class Car(Agent):
         self.speed = speed
 
     def step(self):
-        # pos_actual+ (factor de escala * speed)
-        new_pos = self.pos + np.array([0.5,0.5]) * self.speed
+        if (self.unique_id == 1):
+            print(self.pos)
+        new_pos = self.pos + np.array([0.5,0]) * self.speed
         self.model.space.move_agent(self, new_pos)
 
 class Street(Model):
@@ -25,7 +26,7 @@ class Street(Model):
         self.schedule = RandomActivation(self)
 
         for px in np.random.choice(25 + 1, 5, replace=False):
-            car = Car(self, np.array([px, 5]), np.array([1.0, 0.0]))
+            car = Car(self, np.array([px, 5]), np.array([self.random.random(), 0.0]))
             self.space.place_agent(car, car.pos)
             self.schedule.add(car)
 
