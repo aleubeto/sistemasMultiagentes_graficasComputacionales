@@ -56,27 +56,22 @@ class Tree(Agent):
                 #We need to chceck if big jumps is enabled
                 if self.big_jumps == True:
                     # Big Jump
-                    jumpX = int((self.pos[0] + self.west_wind_speed))
-                    jumpY = int((self.pos[1] + self.south_wind_speed))
+                    jumpX = int(self.pos[0] + ((self.west_wind_speed * -1) / 8))
+                    jumpY = int(self.pos[1] + ((self.south_wind_speed * -1) / 8))
 
                     #We need to check if the jump is valid
                     if jumpX >= 0 and jumpX < self.model.grid.width and jumpY >= 0 and jumpY < self.model.grid.height:
                         #We need to check if the grid position contains a tree
-                        if self.big_jumps and self.model.grid.is_cell_empty((jumpX, jumpY)) == False:
-                            jumpTree = self.model.grid.get_cell_list_contents([{jumpX,jumpY}])[0]
+                        if self.model.grid.is_cell_empty((jumpX, jumpY)) == False:
+                            jumpTree = self.model.grid.get_cell_list_contents((jumpX, jumpY))[0]
                             #We need to check if the tree is fine
                             if jumpTree.condition == self.FINE:
-                                jumpTree.condition == self.BURNING
+                                jumpTree.condition = self.BURNING
 
             # Se apaga el arbol emisor
             self.condition = self.BURNED_OUT
 
 # Clase Modelo: Forest
-
-'''def getAgentFromModel(model, pos):
-                    for agent in model.schedule.agents:
-                        if agent.pos == pos:
-                            return agent'''
 class Forest(Model):
     def __init__(self, height=50, width=50, density=0.90, probability_of_spread=50, south_wind_speed=0, west_wind_speed=0, big_jumps=False):
         super().__init__()
@@ -85,7 +80,7 @@ class Forest(Model):
         for _,x,y in self.grid.coord_iter():
             if self.random.random() < density:
                 tree = Tree(self, probability_of_spread, south_wind_speed, west_wind_speed, big_jumps)
-                if x == 0:
+                if x == 15:
                     tree.condition = Tree.BURNING
                 self.grid.place_agent(tree, (x,y))
                 self.schedule.add(tree)
@@ -129,7 +124,7 @@ chart = ChartModule([{"Label": "Percent burned", "Color": "Black"}], data_collec
 # Implementación de Slider para manipular densidad de bosque y la probabilidad de incendio
 server = ModularServer(Forest,[grid, chart],"Forest",
                        {"density": UserSettableParameter(
-                            "slider", "Tree density", 0.45, 0.01, 1.0, 0.01),
+                            "slider", "Tree density", 0.75, 0.01, 1.0, 0.01),
                        "probability_of_spread": UserSettableParameter(
                             "slider", "Spread probability", 50, 0, 100, 1),
                         "south_wind_speed": UserSettableParameter(
