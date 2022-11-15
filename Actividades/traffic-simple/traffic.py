@@ -32,11 +32,6 @@ class Car(Agent):
             new_speed = 0.0
             self.accelerating = True
 
-        # Cambio de velocidad
-        self.speed = np.array([new_speed,0.0])
-        new_pos = self.pos + np.array([0.5,0.0]) * self.speed
-        self.model.space.move_agent(self, new_pos)
-
         # Movimiento de vehículos
         self.speed = np.array([new_speed, 0.0])
         new_pos = self.pos + np.array([0.5,0]) * self.speed
