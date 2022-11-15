@@ -1,6 +1,7 @@
 # Advertencia: ejecutar archivo dentro de la carpeta traffic-simple
 
 import numpy as np
+import random
 
 from mesa import Agent, Model
 from mesa.space import ContinuousSpace
@@ -14,6 +15,7 @@ class Car(Agent):
         super().__init__(model.next_id(), model)
         self.pos = pos
         self.speed = speed
+        self.accelerating = True
 
     def step(self):
 
@@ -21,9 +23,32 @@ class Car(Agent):
         if (self.unique_id == 1):
             print(self.pos)
 
+        # Aceleración y desaceleración
+        new_speed = self.accelerate() if self.accelerating else self.decelerate()
+        if new_speed >= 1.0:
+            new_speed = 1.0
+            self.accelerating = False
+        elif new_speed <= 0.0:
+            new_speed = 0.0
+            self.accelerating = True
+
+        # Cambio de velocidad
+        self.speed = np.array([new_speed,0.0])
+        new_pos = self.pos + np.array([0.5,0.0]) * self.speed
+        self.model.space.move_agent(self, new_pos)
+
         # Movimiento de vehículos
+        self.speed = np.array([new_speed, 0.0])
         new_pos = self.pos + np.array([0.5,0]) * self.speed
         self.model.space.move_agent(self, new_pos)
+
+    # Método de aceleración
+    def accelerate(self):
+        return self.speed[0] + 0.05
+
+    # Método de desaceleración
+    def decelerate(self):
+        return self.speed[0] - 0.1
 
 class Street(Model):
     def __init__(self):
@@ -31,9 +56,18 @@ class Street(Model):
         self.space = ContinuousSpace(25, 10, True)
         self.schedule = RandomActivation(self)
 
+        # Creación de carro inicial de color azul
+        first = True
+        py = 1
+
         for px in np.random.choice(25 + 1, 5, replace=False):
+            if first:
+                car = Car(self, np.array([px,py]), np.array([1.0,0.0]))
+                first = False
+            else:
+                car = Car(self, np.array([px,py]), np.array([random.randrange(2,7,2)/10,0.0]))
             # self.random.random() para velocidades aleatorias
-            car = Car(self, np.array([px, 5]), np.array([self.random.random(), 0.0]))
+            py+=2
             self.space.place_agent(car, car.pos)
             self.schedule.add(car)
 
