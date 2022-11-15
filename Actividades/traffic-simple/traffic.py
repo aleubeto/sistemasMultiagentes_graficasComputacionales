@@ -23,8 +23,11 @@ class Car(Agent):
         if (self.unique_id == 1):
             print(self.pos)
 
+        # Detección de autos en frente
+        car_ahead = self.car_ahead()
+
         # Aceleración y desaceleración
-        new_speed = self.accelerate() if self.accelerating else self.decelerate()
+        new_speed = self.accelerate() if car_ahead == None else self.decelerate(car_ahead)
         if new_speed >= 1.0:
             new_speed = 1.0
             self.accelerating = False
@@ -36,6 +39,12 @@ class Car(Agent):
         self.speed = np.array([new_speed, 0.0])
         new_pos = self.pos + np.array([0.5,0]) * self.speed
         self.model.space.move_agent(self, new_pos)
+
+    def car_ahead(self):
+        for neighbor in self.model.space.get_neighbors(self.pos,1):
+            if neighbor.pos[0] > self.pos[0]:
+                return neighbor
+            return None
 
     # Método de aceleración
     def accelerate(self):
