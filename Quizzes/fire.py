@@ -40,6 +40,8 @@ class Tree(Agent):
                 elif self.south_wind_speed < 0 and self.pos[1] < neighbor.pos[1]:   # Norte
                     wind_condition = True
                     spread_rand += self.south_wind_speed
+                elif self.south_wind_speed == 0 and self.pos[0] == neighbor.pos[0]:
+                    wind_condition = True
 
                 # Velocidad del viento Oeste
                 if self.west_wind_speed > 0 and self.pos[0] > neighbor.pos[0]:  # Oeste
@@ -48,6 +50,8 @@ class Tree(Agent):
                 elif self.west_wind_speed < 0 and self.pos[0] < neighbor.pos[0]:    # Este
                     wind_condition = True
                     spread_rand += self.west_wind_speed
+                elif self.west_wind_speed == 0 and self.pos[1] == neighbor.pos[1]:
+                    wind_condition = True
 
                 # Cambio de estado
                 if neighbor_fine and spread_rand < self.probability_of_spread and wind_condition:
