@@ -42,12 +42,17 @@ public class Sphere extends JApplet
    double azimuth = 0, elevation = 0;  // angles of rotation of the sphere
 
    boolean focussed = false;   // True when this applet has input focus.
+
+   //We create a vector of vertices
+   Vector<Point3D> vertices = new Vector<Point3D>();
+
+   //We create a vector of edges
+   Vector<Edge> edges = new Vector<Edge>();
    
    DisplayPanel canvas;  
 
    public void init() {
-      //We create a vector of vertices
-      Vector<Point3D> vertices = new Vector<Point3D>();
+      
       //We fill the vector with the vertices of the sphere
       double radius = Double.parseDouble( getParameter("radius") ); //radius of the sphere
       int meridians = Integer.parseInt( getParameter("meridians") ); //number of meridians
@@ -65,8 +70,6 @@ public class Sphere extends JApplet
          }
       }
 
-      //We create a vector of edges
-      Vector<Edge> edges = new Vector<Edge>();
       //We fill the vector with the edges of the sphere
       for ( int i = 0; i < meridians; i++ ) {
          //We add the edges of the meridian
@@ -129,7 +132,7 @@ public class Sphere extends JApplet
             double nearToObj = 1.5;  // distance from near plane to center of object
 
             // We project the vertices
-            for ( int i = 0; i < vertices.length; ++i ) {
+            for ( int i = 0; i < vertices.size(); ++i ) {
                double x0 = vertices[i].x;
                double y0 = vertices[i].y;
                double z0 = vertices[i].z;
@@ -159,9 +162,10 @@ public class Sphere extends JApplet
             g.setColor( Color.black ); //We set the color to black
             g.fillRect( 0, 0, (int)width, (int)height ); //We fill the background
             g.setColor( Color.white ); //We set the color to white for the edges of the sphere
-            for ( int i = 0; i < edges.length; ++i ) { //We loop over the edges
-               int p1 = edges[i].p1; //We get the first vertex of the edge
-               int p2 = edges[i].p2; //We get the second vertex of the edge
+            // We draw the sphere
+            for ( int i = 0; i < edges.size(); ++i ) {
+               int p1 = edges[i].p1; //We get the first point of the edge
+               int p2 = edges[i].p2; //We get the second point of the edge
                g.drawLine( pointsInt.get(p1).x, pointsInt.get(p1).y, pointsInt.get(p2).x, pointsInt.get(p2).y ); //We draw the edge
             }
          } 
