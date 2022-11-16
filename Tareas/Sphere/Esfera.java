@@ -1,3 +1,8 @@
+// Team Integrants:
+// Francisco Rocha A01730560
+// Alejandro Ubeto Yañez A01734977
+// Omar Jiménez Armendáriz A01732097
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
