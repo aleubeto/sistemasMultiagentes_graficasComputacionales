@@ -27,11 +27,6 @@ class Car(Agent):
             #print(f'{self.unique_id}: {self.pos}, {self.speed[0]}, {neigbors}')
             print(f'{self.unique_id}: {neigbors}')'''
 
-        neigbors = []
-        for i in self.model.space.get_neighbors(self.pos,2):
-            neigbors.append(i.unique_id)
-        #print(f'{self.unique_id}: {self.pos}, {self.speed[0]}, {neigbors}')
-        print(f'{self.unique_id}: {neigbors}')
 
         # Detección de autos en frente
         #car_ahead = self.car_ahead()
@@ -50,6 +45,12 @@ class Car(Agent):
         self.speed = np.array([new_speed, 0.0])
         new_pos = self.pos + np.array([0.5,0]) * self.speed
         self.model.space.move_agent(self, new_pos)
+
+        neigbors = []
+        for i in self.model.space.get_neighbors(self.pos,1):
+            neigbors.append(i.unique_id)
+        #print(f'{self.unique_id}: {self.pos}, {self.speed[0]}, {neigbors}')
+        print(f'{self.unique_id}: {neigbors}')
 
     def car_ahead(self):
         for neighbor in self.model.space.get_neighbors(self.pos,1):
@@ -79,16 +80,16 @@ class Street(Model):
         car = Car(self, np.array([px,py]), np.array([1.0,0.0]))
         self.space.place_agent(car, car.pos)
         self.schedule.add(car)
-        car2 = Car(self, np.array([px,py-2]), np.array([1.0,0.0]))
+        car2 = Car(self, np.array([px,py-1]), np.array([1.0,0.0]))
         self.space.place_agent(car2, car2.pos)
         self.schedule.add(car2)
-        car3 = Car(self, np.array([px+2,py]), np.array([1.0,0.0]))
+        car3 = Car(self, np.array([px+1,py]), np.array([1.0,0.0]))
         self.space.place_agent(car3, car3.pos)
         self.schedule.add(car3)
-        car4 = Car(self, np.array([px,py+2]), np.array([1.0,0.0]))
+        car4 = Car(self, np.array([px,py+1]), np.array([1.0,0.0]))
         self.space.place_agent(car4, car4.pos)
         self.schedule.add(car4)
-        car5 = Car(self, np.array([px-2,py]), np.array([1.0,0.0]))
+        car5 = Car(self, np.array([px-1,py]), np.array([1.0,0.0]))
         self.space.place_agent(car5, car5.pos)
         self.schedule.add(car5)
 
@@ -108,7 +109,7 @@ class Street(Model):
 
 def car_draw(agent):
     color = "Blue" if agent.unique_id == 1 else "Brown"
-    return {"Shape": "rect", "w": 0.034, "h": 0.02, "Filled": "true", "Color": color}
+    return {"Shape": "rect", "w": 0.03, "h": 0.03, "Filled": "true", "Color": color}
 
 canvas = SimpleCanvas(car_draw, 500, 500)
 
