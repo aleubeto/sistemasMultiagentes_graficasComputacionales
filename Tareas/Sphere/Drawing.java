@@ -33,7 +33,7 @@ class Edge {
    }
 }
 
-public class Sphere extends JApplet 
+public class Drawing extends JApplet 
                   implements KeyListener, FocusListener, MouseListener {
                       
    double width, height;
@@ -51,12 +51,8 @@ public class Sphere extends JApplet
    
    DisplayPanel canvas;  
 
-   public void init() {
+   public void init(double radius, int meridians, int parallels) {
       
-      //We fill the vector with the vertices of the sphere
-      double radius = 2;
-      int meridians = 36;
-      int parallels = 32;
       double dphi = 2*Math.PI/meridians; // angle between meridians
       double dtheta = Math.PI/parallels; // angle between parallels
       for ( int i = 0; i <= meridians; i++ ) { // loop over meridians

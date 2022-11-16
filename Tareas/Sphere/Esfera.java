@@ -1,12 +1,15 @@
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-class Loader{
+class Esfera{
       //We receive as parameters the radius of the sphere, the number of meridians and the number of parallels
       public static void main(String[] args) {
-
-            Sphere applet = new Sphere();
-            applet.init();
+            double radius = Double.parseDouble(args[0]);
+            int meridians = Integer.parseInt(args[1]);
+            int parallels = Integer.parseInt(args[2]);
+            System.out.println("Radius: " + radius + " Meridians: " + meridians + " Parallels: " + parallels);
+            Drawing applet = new Drawing();
+            applet.init(radius, meridians, parallels);
             final JFrame frame = new JFrame("Sphere Viewer");
             frame.setContentPane(applet.getContentPane());
             frame.setJMenuBar(applet.getJMenuBar());
