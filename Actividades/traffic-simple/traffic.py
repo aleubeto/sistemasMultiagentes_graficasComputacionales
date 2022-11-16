@@ -20,14 +20,25 @@ class Car(Agent):
     def step(self):
 
         # Imprimir coordenadas de auto azul
-        if (self.unique_id == 1):
-            print(self.pos)
+        '''if (self.unique_id == 1):
+            neigbors = []
+            for i in self.model.space.get_neighbors(self.pos,1):
+                neigbors.append(i.unique_id)
+            #print(f'{self.unique_id}: {self.pos}, {self.speed[0]}, {neigbors}')
+            print(f'{self.unique_id}: {neigbors}')'''
+
+        neigbors = []
+        for i in self.model.space.get_neighbors(self.pos,2):
+            neigbors.append(i.unique_id)
+        #print(f'{self.unique_id}: {self.pos}, {self.speed[0]}, {neigbors}')
+        print(f'{self.unique_id}: {neigbors}')
 
         # Detección de autos en frente
-        car_ahead = self.car_ahead()
+        #car_ahead = self.car_ahead()
 
         # Aceleración y desaceleración
-        new_speed = self.accelerate() if car_ahead == None else self.decelerate(car_ahead)
+        #new_speed = self.accelerate() if car_ahead == None else self.decelerate(car_ahead)
+        new_speed = self.accelerate()
         if new_speed >= 1.0:
             new_speed = 1.0
             self.accelerating = False
@@ -57,14 +68,31 @@ class Car(Agent):
 class Street(Model):
     def __init__(self):
         super().__init__()
-        self.space = ContinuousSpace(25, 10, True)
+        self.space = ContinuousSpace(25, 25, True)
         self.schedule = RandomActivation(self)
 
         # Creación de carro inicial de color azul
         first = True
-        py = 1
+        px = 12
+        py = 12
 
-        for px in np.random.choice(25 + 1, 5, replace=False):
+        car = Car(self, np.array([px,py]), np.array([1.0,0.0]))
+        self.space.place_agent(car, car.pos)
+        self.schedule.add(car)
+        car2 = Car(self, np.array([px,py-2]), np.array([1.0,0.0]))
+        self.space.place_agent(car2, car2.pos)
+        self.schedule.add(car2)
+        car3 = Car(self, np.array([px+2,py]), np.array([1.0,0.0]))
+        self.space.place_agent(car3, car3.pos)
+        self.schedule.add(car3)
+        car4 = Car(self, np.array([px,py+2]), np.array([1.0,0.0]))
+        self.space.place_agent(car4, car4.pos)
+        self.schedule.add(car4)
+        car5 = Car(self, np.array([px-2,py]), np.array([1.0,0.0]))
+        self.space.place_agent(car5, car5.pos)
+        self.schedule.add(car5)
+
+        '''for px in np.random.choice(25 + 1, 5, replace=False):
             if first:
                 car = Car(self, np.array([px,py]), np.array([1.0,0.0]))
                 first = False
@@ -73,7 +101,7 @@ class Street(Model):
             # self.random.random() para velocidades aleatorias
             py+=2
             self.space.place_agent(car, car.pos)
-            self.schedule.add(car)
+            self.schedule.add(car)'''
 
     def step(self):
         self.schedule.step()
