@@ -54,9 +54,9 @@ public class Sphere extends JApplet
    public void init() {
       
       //We fill the vector with the vertices of the sphere
-      double radius = Double.parseDouble( getParameter("radius") ); //radius of the sphere
-      int meridians = Integer.parseInt( getParameter("meridians") ); //number of meridians
-      int parallels = Integer.parseInt( getParameter("parallels") ); //number of parallels
+      double radius = 2;
+      int meridians = 36;
+      int parallels = 32;
       double dphi = 2*Math.PI/meridians; // angle between meridians
       double dtheta = Math.PI/parallels; // angle between parallels
       for ( int i = 0; i <= meridians; i++ ) { // loop over meridians
@@ -133,9 +133,9 @@ public class Sphere extends JApplet
 
             // We project the vertices
             for ( int i = 0; i < vertices.size(); ++i ) {
-               double x0 = vertices[i].x;
-               double y0 = vertices[i].y;
-               double z0 = vertices[i].z;
+               double x0 = vertices.get(i).x;
+               double y0 = vertices.get(i).y;
+               double z0 = vertices.get(i).z;
 
                // compute an orthographic projection
                double x1 = cosT*x0 + sinT*z0;
@@ -162,11 +162,11 @@ public class Sphere extends JApplet
             g.setColor( Color.black ); //We set the color to black
             g.fillRect( 0, 0, (int)width, (int)height ); //We fill the background
             g.setColor( Color.white ); //We set the color to white for the edges of the sphere
-            // We draw the sphere
-            for ( int i = 0; i < edges.size(); ++i ) {
-               int p1 = edges[i].p1; //We get the first point of the edge
-               int p2 = edges[i].p2; //We get the second point of the edge
-               g.drawLine( pointsInt.get(p1).x, pointsInt.get(p1).y, pointsInt.get(p2).x, pointsInt.get(p2).y ); //We draw the edge
+            for (int i = 0; i < edges.size(); ++i ) {
+               g.drawLine(
+                  pointsInt.get((int)edges.get(i).a).x, pointsInt.get((int)edges.get(i).a).y,
+                  pointsInt.get((int)edges.get(i).b).x, pointsInt.get((int)edges.get(i).b).y
+               );
             }
          } 
       }  // end paintComponent()    
