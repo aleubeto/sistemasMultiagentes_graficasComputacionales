@@ -1,4 +1,3 @@
 *.zip
 *.DS_Store
 *.class
-__pycache__/
