@@ -1,0 +1,66 @@
+<html>
+    <head>
+        <title> My first Three.js app </title>
+        <style>
+            canvas { width: 100%; height: 100% }
+        </style>
+    </head>
+    <body>
+        <script src="three.min.js"> </script>
+        <script>
+
+            window.addEventListener('keydown',doKeyDown,true);
+            var zpos = 2.0;
+            function doKeyDown(evt){
+                switch (evt.keyCode) {
+                    case 38:  /* Up arrow was pressed */
+                        zpos -= 0.5;
+                        break;
+                    case 40:  /* Down arrow was pressed */
+                        zpos += 0.5;
+                        break;
+                    case 37:  /* Left arrow was pressed */
+                        break;
+                    case 39:  /* Right arrow was pressed */
+                    break;
+                }
+            }
+            // three basic components of a scene : scene, camera, and render
+            // (lights)
+
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            var renderer = new THREE.WebGLRenderer();
+
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            var geometry  = new THREE.CubeGeometry(1,1,1);
+            var geometry2 = new THREE.CylinderGeometry(2,1,5,16,4,false);
+
+            var material  = new THREE.MeshBasicMaterial({color: 0x0000ff, wireframe: true});
+            var material2 = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true});
+
+            var cube = new THREE.Mesh(geometry, material);
+            var cone = new THREE.Mesh(geometry2, material2);
+
+            cone.position.set(0,0,-5);
+
+            scene.add(cube);
+            scene.add(cone);
+
+            camera.position.z = zpos;
+
+            var render = function () {
+                requestAnimationFrame(render);
+                cube.rotation.x += 0.01;
+                cone.rotation.y += 0.025;
+                camera.position.z = zpos;
+                renderer.render(scene, camera);
+            };
+            render();
+
+        </script>
+    </body>
+</html>
