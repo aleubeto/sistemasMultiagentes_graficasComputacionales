@@ -1,0 +1,199 @@
+<html>
+    <head>
+        <title> My Lambert and phong example</title>
+        <style>
+            canvas { width: 100%; height: 100% }
+        </style>
+    </head>
+    <body>
+        <script src="three.min.js"> </script>
+
+        <script>
+            window.addEventListener('keydown',doKeyDown,true);
+            var cam_zpos = 100.0;
+            var cam_xpos = 0.0;
+            var Pi = 3.1415926535;
+            var ang_rad = 0;
+            var up_down_ang = 0;
+
+            function doKeyDown(evt){
+                console.log("Tecla picada: "+evt.keyCode);
+                switch (evt.keyCode) {
+                    case 38:  /* Up arrow was pressed */
+                        var dx = 0.5 * Math.sin(ang_rad);
+                        var dz = 0.5 * Math.cos(ang_rad);
+                        cam_zpos -= dz;
+                        cam_xpos -= dx;
+                        break;
+                    case 40:  /* Down arrow was pressed */
+                        var dx = 0.5 * Math.sin(ang_rad);
+                        var dz = 0.5 * Math.cos(ang_rad);
+                        cam_zpos += dz;
+                        cam_xpos += dx;
+                        break;
+                    case 37:  /* Left arrow was pressed */
+                        ang_rad += (5* Pi / 180);
+                        break;
+                    case 39:  /* Right arrow was pressed */
+                        ang_rad -= (5* Pi / 180);
+                    break;
+                    case 87:  /* W was pressed */
+                        camera.position.y += 0.5;
+                    break;
+                    case 83:  /* S was pressed */
+                        camera.position.y -= 0.5;
+                    break;
+                    case 65:  /* A was pressed */
+                        var dx = 0.5 * Math.sin(ang_rad+(Pi/2));
+                        var dz = 0.5 * Math.cos(ang_rad+(Pi/2));
+                        cam_zpos -= dz;
+                        cam_xpos -= dx;
+                    break;
+                    case 68:  /* D was pressed */
+                        var dx = 0.5 * Math.sin(ang_rad-(Pi/2));
+                        var dz = 0.5 * Math.cos(ang_rad-(Pi/2));
+                        cam_zpos -= dz;
+                        cam_xpos -= dx;
+                    break;
+                    case 82:  /* R was pressed */
+                    break;
+                    case 70:  /* F was pressed */
+                    break;
+                }
+            }
+
+            // three basic components of a scene
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.01, 1000); 
+            var renderer = new THREE.WebGLRenderer();
+
+            var radius = 10.0;
+            // Cambiar estos dos valores para apreciar mejor las diferencias
+            var segments = 8;
+            var rings = 8;
+
+            var lambMaterial = new THREE.MeshLambertMaterial    ({
+                            color: 0xFF0000                     });
+
+            var phongMaterial = new THREE.MeshPhongMaterial     ({
+                            color: 0xFF0000                     });
+
+            var textureMaterial = new THREE.MeshLambertMaterial ({
+                            map: THREE.ImageUtils.loadTexture("Imagenes/alum.jpg")
+                                                                });
+
+            var phong2Material = new THREE.MeshPhongMaterial    ({
+                            ambient: 0x050505,
+                            color: 0xFF0000,
+                            specular: 0x555555,
+                            transparent: true,
+                            opacity: 0.5,
+                            shininess: 30                       });
+
+            var transMaterial = new THREE.MeshBasicMaterial     ({
+                            color: 0xff0000,
+                            transparent: true,
+                            opacity: 0.5                        });
+
+
+
+            var sphere0 = new THREE.Mesh(
+                new THREE.SphereGeometry(
+                    radius,
+                    segments,
+                    rings),
+                lambMaterial
+            );
+
+            var sphere1 = new THREE.Mesh(
+                new THREE.SphereGeometry(
+                    radius,
+                    segments,
+                    rings),
+                phongMaterial
+            );
+
+            var sphere2 = new THREE.Mesh(
+                new THREE.SphereGeometry(
+                    radius,
+                    segments,
+                    rings),
+                textureMaterial
+            );
+
+            var sphere3 = new THREE.Mesh(
+                new THREE.SphereGeometry(
+                    radius,
+                    segments,
+                    rings),
+                phong2Material
+            );
+
+            var sphere4 = new THREE.Mesh(
+                new THREE.SphereGeometry(
+                    radius,
+                    segments,
+                    rings),
+                transMaterial
+            );
+
+
+            sphere0.position.x -= 15;
+            sphere0.position.z -= 15;
+
+            sphere1.position.x += 15;
+            sphere1.position.z -= 15;
+
+            sphere3.position.x -= 15;
+            sphere3.position.z += 15;
+
+            sphere4.position.x += 15;
+            sphere4.position.z += 15;
+
+            scene.add(sphere0);
+            scene.add(sphere1);
+            scene.add(sphere2);
+            scene.add(sphere3);
+            scene.add(sphere4);
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            camera.position.z = cam_zpos;
+
+            // create  point lights
+            var pointLight = new THREE.PointLight( 0xFFFFFF );
+            var pointLight2 = new THREE.PointLight( 0xFFFFAA );
+
+            pointLight.position.x = 10;
+            pointLight.position.y = 50;
+            pointLight.position.z = 130;
+
+            scene.add(pointLight);
+
+            pointLight2.position.x = 10;
+            pointLight2.position.y = 50;
+            pointLight2.position.z = -130;
+
+            scene.add(pointLight2);
+
+            renderer.setClearColor(0x000000, 1);
+
+            var render = function () {
+                requestAnimationFrame(render);
+                camera.position.x = cam_xpos;
+                camera.position.z = cam_zpos;
+                camera.rotation.y = ang_rad;
+                sphere0.rotation.y += 0.01;
+                sphere1.rotation.y += 0.01;
+                sphere2.rotation.y += 0.01;
+                sphere3.rotation.y += 0.01;
+                sphere4.rotation.y += 0.01;
+                renderer.render(scene, camera);
+            };
+            render();
+
+
+        </script>
+    </body>
+</html>
