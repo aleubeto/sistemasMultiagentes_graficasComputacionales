@@ -1,0 +1,173 @@
+<html>
+    <head>
+        <title> Creating groups </title>
+        <style>
+            canvas { width: 100%; height: 100% }
+        </style>
+    </head>
+    <body>
+        <script src="three.min.js"> </script>
+        <script>
+
+            window.addEventListener('keydown',doKeyDown,true);
+            var cam_zpos = 10.0;
+            var cam_xpos = 0.0;
+            var Pi = 3.14159265358;
+            // x grados a radianes -        x * Pi / 180
+            // x radianes a grados -        x * 180 / Pi
+            var ang_rad = 0;
+
+            function doKeyDown(evt){
+                console.log("Tecla picada: "+evt.keyCode);
+                switch (evt.keyCode) {
+                    case 38:  /* Up arrow was pressed */
+                        var dx = 0.5 * Math.sin(ang_rad);
+                        var dz = 0.5 * Math.cos(ang_rad);
+                        cam_zpos -= dz;
+                        cam_xpos -= dx;
+                        break;
+                    case 40:  /* Down arrow was pressed */
+                        var dx = 0.5 * Math.sin(ang_rad);
+                        var dz = 0.5 * Math.cos(ang_rad);
+                        cam_zpos += dz;
+                        cam_xpos += dx;
+                        break;
+                    case 37:  /* Left arrow was pressed */
+                        ang_rad += (5* Pi / 180);
+                        break;
+                    case 39:  /* Right arrow was pressed */
+                        ang_rad -= (5* Pi / 180);
+                        break;
+
+                    /* - - - - - - - Controls - - - - - - - */
+                    case 74: /*J pressed  - - - left arm down*/
+                        gbrazoi.rotation.x+=.1;
+                    break;
+                    case 85: /*U pressed  - - - left arm up*/
+                        gbrazoi.rotation.x-=.1;
+                    break;
+                    case 70: /*F pressed  - - - right arm down*/
+                        gbrazod.rotation.x+=.1;
+                    break;
+                    case 82: /*R pressed  - - - right arm up*/
+                        gbrazod.rotation.x-=.1;
+                    break;
+                    case 84: /*T pressed  - - - */
+                        gcabeza.rotation.y-=.1;
+                    break;
+                    case 89: /*Y pressed  - - - */
+                        gcabeza.rotation.y+=.1;
+                    break;
+                    case 71: /*G pressed  - - - */
+                        gtorzo.rotation.y-=.1;
+                    break;
+                    case 72: /*H pressed  - - - */
+                        gtorzo.rotation.y+=.1;
+                    break;
+                    break;
+                    case 73: /*I pressed  - - - */
+                        gpierni.rotation.x-=.1;
+                    break;
+                    case 75: /*K pressed  - - - */
+                        gpierni.rotation.x+=.1;
+                    break;
+                    case 69: /*E pressed  - - - */
+                        gpiernd.rotation.x-=.1;
+                    break;
+                    case 68: /*D pressed  - - - */
+                        gpiernd.rotation.x+=.1;
+                    break;
+                }
+            }
+
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.01, 1000); 
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            var redMaterial = new THREE.MeshLambertMaterial({
+                color: 0xaaaaaa                             });
+
+            /*Creacion de los grupos*/
+            groboto = new THREE.Object3D();
+            gsuperi = new THREE.Object3D();
+            ginferi = new THREE.Object3D();
+            gcabeza = new THREE.Object3D();
+            gtorzo  = new THREE.Object3D();
+            gtronco = new THREE.Object3D();
+            gbrazoi = new THREE.Object3D();
+            gbrazod = new THREE.Object3D();
+            gpierni = new THREE.Object3D();
+            gpiernd = new THREE.Object3D();
+
+            var cabeza = new THREE.Mesh(new THREE.CubeGeometry(1,1,1), redMaterial);
+                gcabeza.add(cabeza);
+                    cabeza.position.y += 2.0;
+            var tronco = new THREE.Mesh(new THREE.CubeGeometry(3,3,1.5), redMaterial);
+            var brazod = new THREE.Mesh(new THREE.CubeGeometry(1,3.5,1), redMaterial);
+                gbrazod.add(brazod);
+                   brazod.position.x-= 2;
+                   brazod.position.y-= 1.5;
+                gbrazod.position.y+=1;
+            var brazoi = new THREE.Mesh(new THREE.CubeGeometry(1,3.5,1), redMaterial);
+                gbrazoi.add(brazoi);
+                   brazoi.position.x+= 2;
+                   brazoi.position.y-= 1.5;
+                gbrazoi.position.y+=1;
+            gtorzo.add(gcabeza);
+            gtorzo.add(tronco);
+            gtorzo.add(gbrazoi);
+            gtorzo.add(gbrazod);
+
+            var pierni = new THREE.Mesh(new THREE.CubeGeometry(1,4.5,1.5), redMaterial);
+                gpierni.add(pierni);
+                gpierni.position.y -= 1;
+                pierni.position.y-= 2.5;
+                pierni.position.x-= 1;
+
+
+            var piernd = new THREE.Mesh(new THREE.CubeGeometry(1,4.5,1.5), redMaterial);
+                gpiernd.add(piernd);
+                gpiernd.position.y -= 1;
+                piernd.position.y-= 2.5;
+                piernd.position.x+= 1;
+
+            group = new THREE.Object3D();
+
+            group.add(gtorzo);
+            group.add(gpiernd);
+            group.add(gpierni);
+            scene.add( group );
+            camera.position.y = 0;
+            camera.position.z = cam_zpos;
+
+            // create a point light
+            var pointLight = new THREE.PointLight( 0xFFFFFF );
+            pointLight.position.x = 150;
+            pointLight.position.y = 50;
+            pointLight.position.z = 130;
+
+            var pointLight2 = new THREE.PointLight( 0xFFFFFF );
+            pointLight2.position.x = -150;
+            pointLight2.position.y = -50;
+            pointLight2.position.z = -130;
+
+            scene.add(pointLight);
+            scene.add(pointLight2);
+
+            renderer.setClearColor(0x000000, 1);
+            var render = function () {
+                requestAnimationFrame(render);
+                group.rotation.y += 0.01;
+
+                camera.position.z = cam_zpos;
+                camera.position.x = cam_xpos;
+                camera.rotation.y = ang_rad;
+                renderer.render(scene, camera);
+            };
+            render();
+
+        </script>
+    </body>
+</html>
