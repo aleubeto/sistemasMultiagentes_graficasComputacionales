@@ -47,7 +47,7 @@ class Car(Agent):
         self.model.space.move_agent(self, new_pos)
 
         neigbors = []
-        for i in self.model.space.get_neighbors(self.pos,1):
+        for i in self.model.space.get_neighbors(self.pos,2.1):
             neigbors.append(i.unique_id)
         #print(f'{self.unique_id}: {self.pos}, {self.speed[0]}, {neigbors}')
         print(f'{self.unique_id}: {neigbors}')
