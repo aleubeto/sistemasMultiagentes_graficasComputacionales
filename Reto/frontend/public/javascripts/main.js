@@ -1,1 +1,0 @@
-// implementación webGL
