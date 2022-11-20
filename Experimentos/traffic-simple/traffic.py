@@ -1,129 +1,178 @@
-#importa numpy como np
 import numpy as np
 
-#Todas las librerias que usamos de mesa
 from mesa import Agent, Model
-#Esta es nueva y sustituye a grid
 from mesa.space import ContinuousSpace
 from mesa.time import RandomActivation
 from mesa.visualization.ModularVisualization import ModularServer
 
-#Del archivo de python homonimo
+
 from SimpleContinuousModule import SimpleCanvas
 
-#Clase de auto
 class Car(Agent):
-    #Su constructor. Recibe el modelo, la posicion y la velocidad.
-    def __init__(self, model: Model, pos, speed):
-        #Cuando se llama al constructor, crea un auto con la siguiente ID que tenga
-        #disponible el modelo y lo asigna a ese mismo modelo.
+    def __init__(self, model: Model, pos, speed, inicial, final):
         super().__init__(model.next_id(), model)
-        #Asigna los valores de posicion y velocidad
         self.pos = pos
         self.speed = speed
+        #self.objetivos = objetivos
+        self.contador = 0;
+        self.contadorNodos = 0;
+        self.openList = []
+        self.closedList = []
+        self.aStar(inicial, final)
         
-    #Step del auto 
     def step(self):
-        #Crea una variable donde va a guardar al auto que tenga en frente este auto, si
-        #es que hay uno o None si no no hay.
         car_ahead = self.car_ahead()
         
-        #Crea una nueva velocidad para el auto. Para eso usa dos funciones, accelerate y
-        #decelerate. Si accelerating es verdadero, acelera. En caso contrario desacelera.
         new_speed = self.accelerate() if car_ahead == None else self.decelerate(car_ahead)
-        #Las siguientes dos condiciones lo que hacen es mantener la velocidad del auto
-        #siempre entre 0 y 1.
-        #Si la nueva velocidad es igual o mayor a uno, la fija en uno.
         if new_speed >= 1.0:
             new_speed = 1.0
-        #Si la nueva velocidad es igual o menor a cero, la fija en cero y comienza a acelerar.
         elif new_speed <= 0.0:
             new_speed = 0.0
-            
-        #La velocidad actual ahora es igual a esa nueva velocidad.
-        self.speed = np.array([new_speed, 0.0])
+         
+        self.speed = np.array([new_speed, new_speed])
         
-        #Crea una nueva posicion del auto.
-        #Para eso, lo que hace es que  a la posicion actual le suma la multiplicacion de
-        #vectores de la velocidad por un factor de escala. Ojo, en x es 0.3 y 0 en y porque
-        #solo se mueve en un eje.
-        new_pos = self.pos + np.array([0.3, 0.0]) * self.speed
-        #Coloca el agente en esa nueva posicion
-        self.model.space.move_agent(self, new_pos)
+        if self.contadorNodos >= len(self.closedList):
+            return
         
-    #funcion para detectar si hay un auto al frente.
+        if self.model.space.get_distance(self.pos, self.closedList[self.contadorNodos].pos) > 0.1:
+            if self.pos[0] >= 0 and self.pos[0] < self.model.width and self.pos[1] >= 0 and self.pos[1] < self.model.height:
+                self.pos += (self.closedList[self.contadorNodos].pos - self.pos) * self.speed * self.contador
+                self.model.space.move_agent(self, self.pos)
+                self.contador += 0.1
+        else:
+            self.contadorNodos += 1
+            self.contador = 0
+
+    def encontrar_adyacentes(self, actual):
+        indice_actual = actual.unique_id - 1
+        for i in range(len(self.model.matrix[indice_actual])):
+            if self.model.matrix[indice_actual][i] == 1:
+                if self.model.nodos[i] in self.closedList:
+                    continue
+                    
+                self.openList.append(self.model.nodos[i])
+
+
+    def encontrar_menor(self, final):
+        menor = 25
+        for nodo in self.openList:
+            comparar = nodo.model.space.get_distance(nodo.pos, final.pos) 
+            if comparar < menor:
+                nodoMenor = nodo
+                menor = comparar
+        return nodoMenor
+
+    def aStar(self, inicial, final):
+        actual = inicial
+        self.openList.append(inicial)
+        while (len(self.openList) > 0 and actual != final):
+            actual = self.encontrar_menor(final)
+            self.openList.clear()
+            self.encontrar_adyacentes(actual)
+            self.closedList.append(actual)
+                
     def car_ahead(self):
-        #escanea todos los vecinos de este auto en un radio de 1 unidad.
         for neighbor in self.model.space.get_neighbors(self.pos, 1):
-            #si la posicion en x del vecino es mayor que la posicion en x del auto,
-            #significa que esta en frente del mismo.
-            if neighbor.pos[0] > self.pos[0]:
-                #regresa al vecino
-                return neighbor
-        #en caso contrario, regresa None
+            if type(neighbor) == Car:
+                if neighbor.pos[0] > self.pos[0] or neighbor.pos[1] > self.pos[1]:
+                    return neighbor
         return None
     
-    #funcion de acelerar. Regresa la velocidad de x incrementada en 0.05.
     def accelerate(self):
         return self.speed[0] + 0.05
     
-    #funcion de acelerar. Regresa la velocidad de x disminuida en 0.1.
     def decelerate(self, car_ahead):
         return car_ahead.speed[0] - 0.1
-
-#Modelo de la calle
+    
+class Nodo(Agent):
+    def __init__(self, model: Model, pos):
+        super().__init__(model.next_id(), model)
+        self.pos = pos
+        
+    def step(self):
+        pass
+        
 class Street(Model):
-    #Constructor de la calle.
     def __init__(self):
         super().__init__()
-        
-        #Va a crear un continuous space de 25 x 10 con toroide verdadero
-        self.space = ContinuousSpace(25, 10, True)
-        #El schedule va a tener el modo de RandomActivation
+        self.width = 25
+        self.height = 10
+        self.space = ContinuousSpace(self.width, self.height, False)
         self.schedule = RandomActivation(self)
+        self.matrix = [
+            [0, 1, 0, 0, 0, 0, 0],
+            [1, 0, 1, 0, 0, 1, 0],
+            [0, 1, 0, 1, 0, 0, 0],
+            [0, 0, 1, 0, 1, 0, 0],
+            [0, 0, 0, 1, 0, 0, 0],
+            [0, 1, 0, 0, 0, 0, 1],
+            [0, 0, 0, 0, 0, 1, 0]
+        ]
+        self.nodos = []
         
-        #crea un booleano y lo declara como verdadero. Este booleano
-        #se va a usar para detectar al primer auto.
+        """
         first = True
-        #posicion en y guardada como variable. Ahora empieza en 1 y va a incrementar.
         py = 1
         
-        #por cada posicion en x generada aleatoriamente:
-        #px - posicion en x generada aleatoriamente. Elegida de entre 5 numeros del 0 al 25 sin repetir.
         for px in np.random.choice(25 + 1, 5, replace=False):
-            #si la variable true es verdadera:
             if first:
-                #crea un auto con una posicion de (px, py). Es decir, este auto va a estar sobre el 1 en el
-                #eje y. Va a tener una velocidad de 1 en el eje x y 0 en el y.
                 car = Car(self, np.array([px, py]), np.array([1.0, 0.0]))
-                #cambia a falso first porque ya se creo el primer auto
                 first = False
             else:
-                #Crea un auto con una posicion de (px, py). Es decir, este auto va a estar sobre el py en el
-                # eje y. Como velocidad, le asigna un numero aleatorio del 2 al 7 con pasos de 2 y dividido
-                #entre 10. Es decir, las velocidades posibles van a ser 0.2, 0.4 y 0.6
                 car = Car(self, np.array([px, py]), np.array([self.random.randrange(2, 7, 2)/10, 0.0]))
-            #Incrementa py en 2. Esto es para ir construyendo los autos cada vez mas abajo
-            #py += 2
+            py += 2
             
-            #Coloca al agente en el espacio en la posicion asignada.
             self.space.place_agent(car, car.pos)
-            #Agrega el auto al schedule
             self.schedule.add(car)
-
-    #Step del modelo
+        """
+        
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        nodo1 = Nodo(self, np.array([12.5, 6]))
+        self.space.place_agent(nodo1, nodo1.pos)
+        self.schedule.add(nodo1)
+        nodo2 = Nodo(self, np.array([6, 4]))
+        self.space.place_agent(nodo2, nodo2.pos)
+        self.schedule.add(nodo2)
+        nodo3 = Nodo(self, np.array([4, 8]))
+        self.space.place_agent(nodo3, nodo3.pos)
+        self.schedule.add(nodo3)
+        nodo4 = Nodo(self, np.array([10, 9]))
+        self.space.place_agent(nodo4, nodo4.pos)
+        self.schedule.add(nodo4)
+        nodo5 = Nodo(self, np.array([16, 5]))
+        self.space.place_agent(nodo5, nodo5.pos)
+        self.schedule.add(nodo5)
+        nodo6 = Nodo(self, np.array([21, 4]))
+        self.space.place_agent(nodo6, nodo6.pos)
+        self.schedule.add(nodo6)
+        
+        self.nodos = [nodo, nodo1, nodo2, nodo3, nodo4, nodo5, nodo6]
+        
+        car = Car(self, np.array([12.5, 1]), np.array([0.1, 0.1]), nodo4, nodo6)
+        self.space.place_agent(car, car.pos)
+        self.schedule.add(car)
+        
+        """
+        for i in range(len(self.matrix)):
+            for j in range(len(self.matrix[i])):
+                if self.matrix[i][j] == 1:
+                    self.matrix[i][j] = self.space.get_distance(self.nodos[i].pos, self.nodos[j].pos)
+                    
+        print(self.matrix)
+        """
+        
     def step(self):
-        #Simplemente lo propaga
         self.schedule.step()
 
-#Forma en que el modelo representa a los agentes
 def car_draw(agent):
-    #Basicamente, al auto con la ID de 1 le asigna el color azul. Los demas son cafes
-    color = "Blue" if agent.unique_id == 1 else "Brown"
-    #Los crea como rectangulos de 0.034 * 0.02
-    return {"Shape": "rect", "w": 0.034, "h": 0.02, "Filled": "true", "Color": color}
+    if type(agent) == Car:
+        color = "Blue" if agent.unique_id == 1 else "Brown"
+        return {"Shape": "rect", "w": 0.034, "h": 0.02, "Filled": "true", "Color": color}
+    elif type(agent) == Nodo:
+        return {"Shape": "rect", "w": 0.02, "h": 0.02, "Filled": "true", "Color": "Red"}
 
-#Lo de siempre todo de aqui para abajo
 canvas = SimpleCanvas(car_draw, 500, 500)
 
 model_params = {}
