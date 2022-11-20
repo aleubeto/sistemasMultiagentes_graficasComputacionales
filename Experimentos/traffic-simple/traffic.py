@@ -13,6 +13,7 @@ from SimpleContinuousModule import SimpleCanvas
 
 #Clase de auto
 class Car(Agent):
+    
     #Su constructor. Recibe el modelo, la posicion y la velocidad.
     def __init__(self, model: Model, pos, speed):
         #Cuando se llama al constructor, crea un auto con la siguiente ID que tenga
@@ -21,33 +22,82 @@ class Car(Agent):
         #Asigna los valores de posicion y velocidad
         self.pos = pos
         self.speed = speed
+        #Crea un booleano llamado accelerating, el cual va a dictaminar cuando el auto se encuentra
+        #acelerando.
+        self.accelerating = True
         
-    #Step del auto
+    #Step del auto 
     def step(self):
+        #Crea una nueva velocidad para el auto. Para eso usa dos funciones, accelerate y
+        #decelerate. Si accelerating es verdadero, acelera. En caso contrario desacelera.
+        new_speed = self.accelerate() if self.accelerating else self.decelerate()
+        
+        #Las siguientes dos condiciones lo que hacen es mantener la velocidad del auto
+        #siempre entre 0 y 1. Si comienza a irse a negativo, la incrementa. Si comienza a 
+        #pasarse de 1, la decrementa.
+        #Si la nueva velocidad es igual o mayor a uno, la fija en uno y deja de acelerar.
+        if new_speed >= 1.0:
+            new_speed = 1.0
+            self.accelerating = False
+        #Si la nueva velocidad es igual o menor a cero, la fija en cero y comienza a acelerar.
+        elif new_speed <= 0.0:
+            new_speed = 0.0
+            self.accelerating = True
+            
+        #La velocidad actual ahora es igual a esa nueva velocidad.
+        self.speed = np.array([new_speed, 0.0])
+
         #Crea una nueva posicion del auto.
         #Para eso, lo que hace es que  a la posicion actual le suma la multiplicacion de
         #vectores de la velocidad por un factor de escala. Ojo, en x es 0.5 y 0 en y porque
         #solo se mueve en un eje.
-        new_pos = self.pos + np.array([1,0]) * self.speed
+        new_pos = self.pos + np.array([0.5, 0.0]) * self.speed
         #Coloca el agente en esa nueva posicion
         self.model.space.move_agent(self, new_pos)
+        
+    #funcion de acelerar. Regresa la velocidad de x incrementada en 0.05.
+    def accelerate(self):
+        return self.speed[0] + 0.05
+    
+    #funcion de acelerar. Regresa la velocidad de x disminuida en 0.1.
+    def decelerate(self):
+        return self.speed[0] - 0.1
 
 #Modelo de la calle
 class Street(Model):
     #Constructor de la calle.
     def __init__(self):
         super().__init__()
+        
         #Va a crear un continuous space de 25 x 10 con toroide verdadero
-        self.space = ContinuousSpace(1000, 1000, True)
+        self.space = ContinuousSpace(25, 10, True)
         #El schedule va a tener el modo de RandomActivation
         self.schedule = RandomActivation(self)
         
+        #crea un booleano y lo declara como verdadero. Este booleano
+        #se va a usar para detectar al primer auto.
+        first = True
+        #posicion en y guardada como variable. Ahora empieza en 1 y va a incrementar.
+        py = 1
+        
         #por cada posicion en x generada aleatoriamente:
         #px - posicion en x generada aleatoriamente. Elegida de entre 5 numeros del 0 al 25 sin repetir.
-        for px in np.random.choice(1000 + 1, 5, replace=False):
-            #Crea un auto con una posicion de (px, 5). Es decir, todos van a estar fijos en el eje y.
-            #Como velocidad, le asigna 1 en el eje x y 0 en el y.
-            car = Car(self, np.array([px, 5]), np.array([1.0, 0.0]))
+        for px in np.random.choice(25 + 1, 5, replace=False):
+            #si la variable true es verdadera:
+            if first:
+                #crea un auto con una posicion de (px, py). Es decir, este auto va a estar sobre el 1 en el
+                #eje y. Va a tener una velocidad de 1 en el eje x y 0 en el y.
+                car = Car(self, np.array([px, py]), np.array([1.0, 0.0]))
+                #cambia a falso first porque ya se creo el primer auto
+                first = False
+            else:
+                #Crea un auto con una posicion de (px, py). Es decir, este auto va a estar sobre el py en el
+                # eje y. Como velocidad, le asigna un numero aleatorio del 2 al 7 con pasos de 2 y dividido
+                #entre 10. Es decir, las velocidades posibles van a ser 0.2, 0.4 y 0.6
+                car = Car(self, np.array([px, py]), np.array([self.random.randrange(2, 7, 2)/10, 0.0]))
+            #Incrementa py en 2. Esto es para ir construyendo los autos cada vez mas abajo
+            py += 2
+            
             #Coloca al agente en el espacio en la posicion asignada.
             self.space.place_agent(car, car.pos)
             #Agrega el auto al schedule
@@ -66,7 +116,7 @@ def car_draw(agent):
     return {"Shape": "rect", "w": 0.034, "h": 0.02, "Filled": "true", "Color": color}
 
 #Lo de siempre todo de aqui para abajo
-canvas = SimpleCanvas(car_draw, 1000, 1000)
+canvas = SimpleCanvas(car_draw, 500, 500)
 
 model_params = {}
 
