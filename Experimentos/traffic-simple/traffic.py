@@ -13,7 +13,6 @@ from SimpleContinuousModule import SimpleCanvas
 
 #Clase de auto
 class Car(Agent):
-    
     #Su constructor. Recibe el modelo, la posicion y la velocidad.
     def __init__(self, model: Model, pos, speed):
         #Cuando se llama al constructor, crea un auto con la siguiente ID que tenga
@@ -22,46 +21,55 @@ class Car(Agent):
         #Asigna los valores de posicion y velocidad
         self.pos = pos
         self.speed = speed
-        #Crea un booleano llamado accelerating, el cual va a dictaminar cuando el auto se encuentra
-        #acelerando.
-        self.accelerating = True
         
     #Step del auto 
     def step(self):
+        #Crea una variable donde va a guardar al auto que tenga en frente este auto, si
+        #es que hay uno o None si no no hay.
+        car_ahead = self.car_ahead()
+        
         #Crea una nueva velocidad para el auto. Para eso usa dos funciones, accelerate y
         #decelerate. Si accelerating es verdadero, acelera. En caso contrario desacelera.
-        new_speed = self.accelerate() if self.accelerating else self.decelerate()
-        
+        new_speed = self.accelerate() if car_ahead == None else self.decelerate(car_ahead)
         #Las siguientes dos condiciones lo que hacen es mantener la velocidad del auto
-        #siempre entre 0 y 1. Si comienza a irse a negativo, la incrementa. Si comienza a 
-        #pasarse de 1, la decrementa.
-        #Si la nueva velocidad es igual o mayor a uno, la fija en uno y deja de acelerar.
+        #siempre entre 0 y 1.
+        #Si la nueva velocidad es igual o mayor a uno, la fija en uno.
         if new_speed >= 1.0:
             new_speed = 1.0
-            self.accelerating = False
         #Si la nueva velocidad es igual o menor a cero, la fija en cero y comienza a acelerar.
         elif new_speed <= 0.0:
             new_speed = 0.0
-            self.accelerating = True
             
         #La velocidad actual ahora es igual a esa nueva velocidad.
         self.speed = np.array([new_speed, 0.0])
-
+        
         #Crea una nueva posicion del auto.
         #Para eso, lo que hace es que  a la posicion actual le suma la multiplicacion de
-        #vectores de la velocidad por un factor de escala. Ojo, en x es 0.5 y 0 en y porque
+        #vectores de la velocidad por un factor de escala. Ojo, en x es 0.3 y 0 en y porque
         #solo se mueve en un eje.
-        new_pos = self.pos + np.array([0.5, 0.0]) * self.speed
+        new_pos = self.pos + np.array([0.3, 0.0]) * self.speed
         #Coloca el agente en esa nueva posicion
         self.model.space.move_agent(self, new_pos)
         
+    #funcion para detectar si hay un auto al frente.
+    def car_ahead(self):
+        #escanea todos los vecinos de este auto en un radio de 1 unidad.
+        for neighbor in self.model.space.get_neighbors(self.pos, 1):
+            #si la posicion en x del vecino es mayor que la posicion en x del auto,
+            #significa que esta en frente del mismo.
+            if neighbor.pos[0] > self.pos[0]:
+                #regresa al vecino
+                return neighbor
+        #en caso contrario, regresa None
+        return None
+    
     #funcion de acelerar. Regresa la velocidad de x incrementada en 0.05.
     def accelerate(self):
         return self.speed[0] + 0.05
     
     #funcion de acelerar. Regresa la velocidad de x disminuida en 0.1.
-    def decelerate(self):
-        return self.speed[0] - 0.1
+    def decelerate(self, car_ahead):
+        return car_ahead.speed[0] - 0.1
 
 #Modelo de la calle
 class Street(Model):
@@ -96,7 +104,7 @@ class Street(Model):
                 #entre 10. Es decir, las velocidades posibles van a ser 0.2, 0.4 y 0.6
                 car = Car(self, np.array([px, py]), np.array([self.random.randrange(2, 7, 2)/10, 0.0]))
             #Incrementa py en 2. Esto es para ir construyendo los autos cada vez mas abajo
-            py += 2
+            #py += 2
             
             #Coloca al agente en el espacio en la posicion asignada.
             self.space.place_agent(car, car.pos)
