@@ -18,9 +18,15 @@ class Car(Agent):
         self.contadorNodos = 0;
         self.openList = []
         self.closedList = []
+        
+        """
         self.aStar(inicial, final)
+        for nodo in self.closedList:
+            print(nodo.unique_id)
+        """
         
     def step(self):
+        """
         car_ahead = self.car_ahead()
         
         new_speed = self.accelerate() if car_ahead == None else self.decelerate(car_ahead)
@@ -42,6 +48,7 @@ class Car(Agent):
         else:
             self.contadorNodos += 1
             self.contador = 0
+        """
 
     def encontrar_adyacentes(self, actual):
         indice_actual = actual.unique_id - 1
@@ -95,10 +102,12 @@ class Nodo(Agent):
 class Street(Model):
     def __init__(self):
         super().__init__()
-        self.width = 25
-        self.height = 10
+        self.width = 1800
+        self.height = 1200
         self.space = ContinuousSpace(self.width, self.height, False)
         self.schedule = RandomActivation(self)
+        self.nodos = []
+        """
         self.matrix = [
             [0, 1, 0, 0, 0, 0, 0],
             [1, 0, 1, 0, 0, 1, 0],
@@ -108,7 +117,99 @@ class Street(Model):
             [0, 1, 0, 0, 0, 0, 1],
             [0, 0, 0, 0, 0, 1, 0]
         ]
-        self.nodos = []
+        """
+        
+        self.matrix = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ]
+        
+        """
+        for i in range(len(self.matrix)):
+            nodo = Nodo(self, np.array([12.5, 2]))
+            self.space.place_agent(nodo, nodo.pos)
+            self.schedule.add(nodo)
+            self.nodos.append(nodo)
+        
+        
+        for i in range(len(self.matrix)):
+            print("----------------------------")
+            print(i + 1)
+            for j in range(len(self.matrix[i])):
+                if self.matrix[i][j] == 1:
+                    print(j + 1)
+            print("----------------------------")
+        """
         
         """
         first = True
@@ -125,7 +226,369 @@ class Street(Model):
             self.space.place_agent(car, car.pos)
             self.schedule.add(car)
         """
+        #nodo 1
+        nodo = Nodo(self, np.array([906.22 , 15.85 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 2
+        nodo = Nodo(self, np.array([943.29, 17.21 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 3
+        nodo = Nodo(self, np.array([1283.53 , 14.65 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 4
+        nodo = Nodo(self, np.array([1311.69  , 41.11 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 5
+        nodo = Nodo(self, np.array([1761.60  , 204.91 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 6
+        nodo = Nodo(self, np.array([1779.89 , 238.23  ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 7
+        nodo = Nodo(self, np.array([1780.44 , 582.76 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 8
+        nodo = Nodo(self, np.array([1778.62 , 621.12 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 9
+        nodo = Nodo(self, np.array([1736.14 , 1154.79 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 10
+        nodo = Nodo(self, np.array([1707.37 , 1180.24 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 11
+        nodo = Nodo(self, np.array([1099.87 , 1170.77 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 12
+        nodo = Nodo(self, np.array([1060.94 , 1177.68 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 13
+        nodo = Nodo(self, np.array([822.37 , 1175.17 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 14
+        nodo = Nodo(self, np.array([784.07 , 1171.40 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 15
+        nodo = Nodo(self, np.array([386.15 , 1185.39 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 16
+        nodo = Nodo(self, np.array([352.48 , 1170.86 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 17
+        nodo = Nodo(self, np.array([25.40 , 882.06 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 18
+        nodo = Nodo(self, np.array([16.11 , 848.49 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 19
+        nodo = Nodo(self, np.array([20.40 , 521.63 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 20
+        nodo = Nodo(self, np.array([21.25 , 485.63 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 21
+        nodo = Nodo(self, np.array([170.33 , 40.06 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 22
+        nodo = Nodo(self, np.array([198.62 , 15.21 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 23
+        nodo = Nodo(self, np.array([675.42 , 21.78 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 24
+        nodo = Nodo(self, np.array([712.58 , 9.78 ]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 25
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 26
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 27
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 28
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 29
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 30
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 31
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 32
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 33
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 34
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 35
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 36
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 37
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 38
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 39
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 40
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 41
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 42
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 43
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 44
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 45
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 46
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 47
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 48
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 49
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 50
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 51
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 52
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 53
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 54
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 55
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 56
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 57
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 58
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 59
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 60
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 61
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 62
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 63
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 64
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 65
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 66
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 67
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 68
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 69
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 70
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 71
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
+        #nodo 72
+        nodo = Nodo(self, np.array([12.5, 2]))
+        self.space.place_agent(nodo, nodo.pos)
+        self.schedule.add(nodo)
+        self.nodos.append(nodo)
         
+        
+        """
         nodo = Nodo(self, np.array([12.5, 2]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
@@ -148,9 +611,11 @@ class Street(Model):
         self.space.place_agent(nodo6, nodo6.pos)
         self.schedule.add(nodo6)
         
-        self.nodos = [nodo, nodo1, nodo2, nodo3, nodo4, nodo5, nodo6]
         
-        car = Car(self, np.array([12.5, 1]), np.array([0.1, 0.1]), nodo4, nodo6)
+        self.nodos = [nodo, nodo1, nodo2, nodo3, nodo4, nodo5, nodo6]
+        """
+        
+        car = Car(self, np.array([12.5, 1]), np.array([0.1, 0.1]), self.nodos[0], self.nodos[12])
         self.space.place_agent(car, car.pos)
         self.schedule.add(car)
         

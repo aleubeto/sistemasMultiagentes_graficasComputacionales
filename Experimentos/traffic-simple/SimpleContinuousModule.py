@@ -9,11 +9,11 @@ class SimpleCanvas(VisualizationElement):
     #No asume ningun metodo de representacion predeterminado
     portrayal_method = None
     #asigna las dimensiones del canvas
-    canvas_height = 500
-    canvas_width = 500
+    canvas_height = 1200
+    canvas_width = 1800
     
     #constructor del canvas. Recibe self, un metodo de representacion y las dimensiones.
-    def __init__(self, portrayal_method, canvas_height=500, canvas_width=500):
+    def __init__(self, portrayal_method, canvas_height=1200, canvas_width=1800):
         """
         Instantiate a new SimpleCanvas
         """
