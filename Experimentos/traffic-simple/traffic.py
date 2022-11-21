@@ -18,15 +18,14 @@ class Car(Agent):
         self.contadorNodos = 0;
         self.openList = []
         self.closedList = []
+        self.color = self.random.choice(["Brown", "Blue", "Red", "Yellow", "Green"])
         
-        """
         self.aStar(inicial, final)
         for nodo in self.closedList:
             print(nodo.unique_id)
-        """
         
     def step(self):
-        """
+        
         car_ahead = self.car_ahead()
         
         new_speed = self.accelerate() if car_ahead == None else self.decelerate(car_ahead)
@@ -38,6 +37,8 @@ class Car(Agent):
         self.speed = np.array([new_speed, new_speed])
         
         if self.contadorNodos >= len(self.closedList):
+            self.model.schedule.remove(self)
+            self.model.space.remove_agent(self)
             return
         
         if self.model.space.get_distance(self.pos, self.closedList[self.contadorNodos].pos) > 0.1:
@@ -48,7 +49,6 @@ class Car(Agent):
         else:
             self.contadorNodos += 1
             self.contador = 0
-        """
 
     def encontrar_adyacentes(self, actual):
         indice_actual = actual.unique_id - 1
@@ -61,7 +61,7 @@ class Car(Agent):
 
 
     def encontrar_menor(self, final):
-        menor = 25
+        menor = 180000000
         for nodo in self.openList:
             comparar = nodo.model.space.get_distance(nodo.pos, final.pos) 
             if comparar < menor:
@@ -77,11 +77,14 @@ class Car(Agent):
             self.openList.clear()
             self.encontrar_adyacentes(actual)
             self.closedList.append(actual)
+            if actual == final:
+                print("cree que lo logro")
                 
     def car_ahead(self):
-        for neighbor in self.model.space.get_neighbors(self.pos, 1):
+        for neighbor in self.model.space.get_neighbors(self.pos, 1, False):
             if type(neighbor) == Car:
-                if neighbor.pos[0] > self.pos[0] or neighbor.pos[1] > self.pos[1]:
+                if self.model.space.get_distance(self.pos, neighbor.pos) < 0.1:
+                #if neighbor.pos[0] > self.pos[0] or neighbor.pos[1] > self.pos[1]:
                     return neighbor
         return None
     
@@ -347,242 +350,242 @@ class Street(Model):
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 25
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([874.35 , 381.54 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 26
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([910.99 , 385.03 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 27
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([964.08 , 401.73 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 28
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([989.57, 429.41]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 29
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([1025.82 , 469.41 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 30
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([1045.91 , 504.07 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 31
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([1062.45 , 550.74 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 32
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([1063.92 , 590.87  ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 33
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([1030.20 , 642.23 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 34
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([1001.26 , 668.21 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 35
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([961.09 , 705.77 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 36
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([922.91 , 714.66 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 37
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([879.32 , 727.30 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 38
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([840.71 , 724.43 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 39
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([790.95 , 699.75 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 40
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([756.42 , 681.72 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 41
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([724.65 , 638.63 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 42
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([713.95 , 601.81 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 43
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([703.15 , 548.19 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 44
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([700.38 , 510.43 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 45
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([736.57 , 435.44 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 46
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([761.58 , 410.44 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 47
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([790.54 , 388.89 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 48
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([828.71 , 380.19 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 49
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([846.31 , 406.52 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 50
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([932.22 , 417.05 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 51
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([986.23 , 470.95 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 52
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([1024.42 , 535.97 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 53
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([1019.30 , 598.28 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 54
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([960.58 , 671.24 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 55
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([890.91 , 695.07 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 56
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([824.95 , 685.72 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 57
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([773.23 , 634.88 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 58
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([746.28 , 567.45 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 59
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([738.57 , 490.25 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 60
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([797.59 , 422.23 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 61
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([808.96 , 456.47 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 62
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([849.19 , 447.65 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 63
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([924.86 , 454.00 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 64
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([954.70 , 494.31 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 65
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([985.35 , 539.09 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 66
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([983.47 , 594.28 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 67
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([940.75 , 640.94 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 68
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([889.97 , 660.48 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 69
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([842.54 , 653.65 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 70
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([805.59 , 614.17 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 71
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([785.88 , 569.86 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
         #nodo 72
-        nodo = Nodo(self, np.array([12.5, 2]))
+        nodo = Nodo(self, np.array([772.64 , 507.43 ]))
         self.space.place_agent(nodo, nodo.pos)
         self.schedule.add(nodo)
         self.nodos.append(nodo)
@@ -614,10 +617,11 @@ class Street(Model):
         
         self.nodos = [nodo, nodo1, nodo2, nodo3, nodo4, nodo5, nodo6]
         """
-        
-        car = Car(self, np.array([12.5, 1]), np.array([0.1, 0.1]), self.nodos[0], self.nodos[12])
+        """
+        car = Car(self, np.array([12.5, 1]), np.array([0.1, 0.1]), self.nodos[0], self.nodos[15])
         self.space.place_agent(car, car.pos)
         self.schedule.add(car)
+        """
         
         """
         for i in range(len(self.matrix)):
@@ -629,14 +633,20 @@ class Street(Model):
         """
         
     def step(self):
+        if self.schedule.steps % 60 == 0:
+            entrada = self.random.randrange(0, 22, 2)
+            car = Car(self, self.nodos[entrada].pos, np.array([0.1, 0.1]), self.nodos[entrada], self.nodos[self.random.randrange(1, 23, 2)])
+            self.space.place_agent(car, car.pos)
+            self.schedule.add(car)
+            
         self.schedule.step()
 
 def car_draw(agent):
     if type(agent) == Car:
-        color = "Blue" if agent.unique_id == 1 else "Brown"
-        return {"Shape": "rect", "w": 0.034, "h": 0.02, "Filled": "true", "Color": color}
+        #color = "Blue" if agent.unique_id == 1 else "Brown"
+        return {"Shape": "rect", "w": 0.034, "h": 0.02, "Filled": "true", "Color": agent.color}
     elif type(agent) == Nodo:
-        return {"Shape": "rect", "w": 0.02, "h": 0.02, "Filled": "true", "Color": "Red"}
+        return {"Shape": "rect", "w": 0.01, "h": 0.01, "Filled": "true", "Color": "Black"}
 
 canvas = SimpleCanvas(car_draw, 500, 500)
 
