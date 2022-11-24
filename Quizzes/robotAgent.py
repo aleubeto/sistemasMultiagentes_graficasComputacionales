@@ -45,13 +45,19 @@ class Robot(Agent):
 
                 if self.carga == None:
                     siguiente = (self.pos[0] + self.direccion[0], self.pos[1] + self.direccion[1])
-                    if self.model.grid.is_cell_empty(siguiente):
+                    paso = True
+                    for element in self.model.grid.get_cell_list_contents(siguiente):
+                        if type(element) == Robot:
+                            element.cambiar_direccion()
+                            paso = False
+                        elif type(element) == WallBlock:
+                            paso = False
+                            
+
+                    if paso:
                         self.model.grid.move_agent(self, siguiente)
                     else:
                         self.cambiar_direccion()
-                        for element in self.model.grid.get_cell_list_contents(siguiente):
-                            if type(element) == Robot:
-                                element.cambiar_direccion()
 
         elif self.condition == self.ENCAMINO:
             if self.sig < len(self.path):
@@ -249,27 +255,36 @@ class Room(Model):
             y = self.random.randrange(0, self.h)
             if self.grid.is_cell_empty((x, y)):
                 robot = Robot(self, (x, y), self.w, self.h)
-                self.grid.place_agent(robot, robot.pos)
-                self.schedule.add(robot)
-                self.robot_list.append(robot)
+            else:
+                robot = Robot(self, self.grid.find_empty(), self.w, self.h)
+            
+            self.grid.place_agent(robot, robot.pos)
+            self.schedule.add(robot)
+            self.robot_list.append(robot)
         
         for i in range(boxes):
             x = self.random.randrange(0, self.w)
             y = self.random.randrange(0, self.h)
             if self.grid.is_cell_empty((x, y)):
-                caja = Caja(self, (x, y))
-                self.grid.place_agent(caja, caja.pos)
-                self.schedule.add(caja)
-                self.box_list.append(caja)
+                caja = Caja(self, (x, y))                
+            else:
+                caja = Caja(self, self.grid.find_empty())
+
+            self.grid.place_agent(caja, caja.pos)
+            self.schedule.add(caja)
+            self.box_list.append(caja)
                 
         for i in range(shelves):
             x = self.random.randrange(0, self.w)
             y = self.random.randrange(0, self.h)
             if self.grid.is_cell_empty((x, y)):
                 estante = Estante(self, (x, y))
-                self.grid.place_agent(estante, estante.pos)
-                self.schedule.add(estante)
-                self.shelf_list.append(estante)
+            else:
+                estante = Estante(self, self.grid.find_empty())
+                
+            self.grid.place_agent(estante, estante.pos)
+            self.schedule.add(estante)
+            self.shelf_list.append(estante)
             
          # Recolector de información: procentaje de celdas limpiadas
         self.boxesleft = self.count_type(self)
