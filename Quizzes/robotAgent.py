@@ -23,6 +23,7 @@ class Robot(Agent):
         self.w = width
         self.h = height
         self.sig = 1
+        self.c_dir = 0
         self.path = []
         self.activo = True
         self.carga = None
@@ -90,15 +91,21 @@ class Robot(Agent):
                 self.condition = self.ENCAMINO
     
     def cambiar_direccion(self):
-        random = self.random.randrange(0, 3, 1)
-        if random == 0:
+        
+        #random = self.random.randrange(0, 3, 1)
+        if self.c_dir == 0:
             self.direccion = (1, 0)
-        elif random == 1:
+        elif self.c_dir == 1:
             self.direccion = (0, 1)
-        elif random == 2:
+        elif self.c_dir == 2:
             self.direccion = (-1, 0)
-        elif random == 3:
+        elif self.c_dir == 3:
             self.direccion = (0, -1)
+            
+        self.c_dir += 1
+        
+        if self.c_dir == 4:
+            self.c_dir = 0
     
     def encontrar_caja(self):
         buscando = True
