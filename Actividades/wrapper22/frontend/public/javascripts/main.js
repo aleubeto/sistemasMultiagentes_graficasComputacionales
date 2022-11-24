@@ -46,20 +46,32 @@ var renderer = new THREE.WebGLRenderer();
 
 
 var gs = new THREE.SphereGeometry( 8, 32, 16 );
+var gslgb = new THREE.SphereGeometry( 8, 32, 16 );
 
 
 var LambertMaterial2 = new THREE.MeshLambertMaterial(
             {
                 color: 0xFFFF00
             });
+var LambertMaterial2lgb = new THREE.MeshLambertMaterial(
+            {
+                color: 0xFF0000
+            });
+  
 
 var object2 = new THREE.Mesh( gs, LambertMaterial2);
+var object2lgb = new THREE.Mesh( gslgb, LambertMaterial2lgb);
 
 group = new THREE.Object3D();           // create an empty container
-//group.add( object );                    // add a mesh with geometry to it
 group.add( object2 );                   // add a mesh with geometry to it
 
+grouplgb = new THREE.Object3D();           // create an empty container
+grouplgb.add( object2lgb );                   // add a mesh with geometry to it
+
+groups = { 1: group, 2: grouplgb };
+
 scene.add( group );                     // add the group to the scene
+scene.add(grouplgb);
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
@@ -89,43 +101,46 @@ scene.add(pointLight2);
 // set the background color
 renderer.setClearColor(0x000022, 1);
 
-// ========================================================
-// const frame_rate = 250; // Refresh screen every 200 ms
-// var previous_time = Date.now();
-// ========================================================
+const frame_rate = 250; // Refresh screen every 200 ms
+var previous_time = Date.now();
 
 var render = async function () {
 
-  // ========================================================
-  // var now, elapsed_time;
+  var now, elapsed_time;
 
-  // now = Date.now();
-  // elapsed_time = now - previous_time;
+  now = Date.now();
+  elapsed_time = now - previous_time;
 
-  // console.log("elapsed time", elapsed_time);
+  console.log("elapsed time", elapsed_time);
 
-  // if (elapsed_time >= frame_rate) {
-  // ========================================================
+  if (elapsed_time >= frame_rate) {
 
-    var xg = 34;
-    var yg = 65;
+    // var xg = 34;
+    // var yg = 65;
+    // var xglgb = 1;
+    // var yglgb = 1;
 
     if (location2 != ""){
       var res = await fetch(baseURL + location2);
       var data = await res.json();
-      xg = data.x;
-      yg = data.y;
+      console.log(data);
+      console.log(groups);
+      data.map((d) => {
+        var g = groups[d.id];
+        g.position.x = d.x * 3;
+        g.position.y = d.y * 3;
+        return;
+      });
+
     }
+      // group.position.x = xg*3;
+      // group.position.y = yg*3;
+      // grouplgb.position.x = xglgb*3;
+      // grouplgb.position.y = yglgb*3;
 
-
-      group.position.x = xg*3;
-      group.position.y = yg*3;
-
-    // ========================================================
-    //   previous_time = now;
-    // }
-    // ========================================================
-
+      //console.log("*   " ,xg, yg);
+      previous_time = now;
+    }
     requestAnimationFrame(render);
     renderer.render(scene, camera);
 };

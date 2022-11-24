@@ -9,6 +9,10 @@ games = {}
 app = flask.Flask(__name__)
 CORS(app)
 
+@app.route("/", methods=["GET"])
+def sayhello():
+    return jsonify("hello")
+
 @app.route("/games", methods=["POST"])
 def create():
     global games
@@ -27,7 +31,13 @@ def queryState(id):
     global model
     model = games[id]
     model.step()
-    ghost = model.schedule.agents[0]
-    return jsonify({"x": ghost.pos[0], "y": ghost.pos[1]})
+    result = []
+    for ghost in model.schedule.agents:
+        g = dict()
+        g["id"] = ghost.unique_id
+        g["x"] = ghost.pos[0]
+        g["y"] = ghost.pos[1]
+        result.append(g)
+    return jsonify(result)
 
 app.run()

@@ -9,10 +9,11 @@ class Ghost(Agent):
         super().__init__(model.next_id(), model)
         self.pos = pos
     def step(self):
-        print(self.pos)
+        print(self.unique_id)
         next_moves = self.model.grid.get_neighborhood(self.pos, moore=False)
         next_move = self.random.choice(next_moves)
         self.model.grid.move_agent(self, next_move)
+
 class Maze(Model):
     def __init__(self):
         super().__init__()
@@ -22,12 +23,16 @@ class Maze(Model):
         ghost = Ghost(self, (8, 6))
         self.grid.place_agent(ghost, ghost.pos)
         self.schedule.add(ghost)
-        
+
+        ghost1 = Ghost(self, (1, 1))
+        self.grid.place_agent(ghost1, ghost1.pos)
+        self.schedule.add(ghost1)
+
     def step(self):
         self.schedule.step()
 
-# def agent_portrayal(agent):
-#     return {"Shape": "ghost.png", "Layer": 0}
+def agent_portrayal(agent):
+    return {"Shape": "ghost.png", "Layer": 0}
 
 # grid = CanvasGrid(agent_portrayal, 17, 14, 450, 450)
 
