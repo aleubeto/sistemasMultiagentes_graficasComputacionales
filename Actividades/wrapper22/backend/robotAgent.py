@@ -82,7 +82,8 @@ class Robot(Agent):
                     self.model.box_list.remove(self.carga)
                     self.hallazgo = None
                     self.carga = None
-                    print("elimine una caja")
+                    if self == self.model.robot_list[0]:
+                        print("elimine una caja")
                 else:
                     self.condition = self.DEAMBULANDO
                     self.hallazgo = None
@@ -128,7 +129,8 @@ class Robot(Agent):
                     if self.condition == self.ENCAMINO:
                         self.sig = len(self.path)
                     self.condition = self.REGRESARESTANTE
-    
+                    if self == self.model.robot_list[0]:
+                        print("agarre una caja")
     def encontrar_estante(self):
         mejor = 0
         estante_mejor = None
@@ -184,7 +186,7 @@ class WallBlock(Agent):
 
 class Room(Model):
 
-    def __init__(self, height=30, width=30, agents=10, boxes=5, shelves=1, step_counter=1, time_limit=2000):
+    def __init__(self, height=30, width=30, agents=1, boxes=100, shelves=20, step_counter=1, time_limit=2000):
         
         super().__init__()
         
