@@ -1,3 +1,4 @@
+#importacion de librerias y modulos especificos
 import numpy as np
 
 from mesa import Agent, Model
@@ -5,45 +6,58 @@ from mesa.space import ContinuousSpace
 from mesa.time import RandomActivation
 from mesa.visualization.ModularVisualization import ModularServer
 
-
+#importacion de modulo continuo simple pre definido
 from SimpleContinuousModule import SimpleCanvas
 
+#definicion del agente auto
 class Car(Agent):
+    #constructor del agente auto
     def __init__(self, model: Model, pos, speed, inicial, final):
         super().__init__(model.next_id(), model)
+        #propiedades basicas de posicion y velocidad
         self.pos = pos
         self.speed = speed
-        #self.objetivos = objetivos
+        #variables de control para seguimiento de rutas
         self.contador = 0;
         self.contadorNodos = 1;
+        #variables de control para algoritmo aStar
         self.openList = []
         self.closedList = []
+        #seleccion de color aleatorio
         self.color = self.random.choice(["Brown", "Blue", "Red", "Yellow", "Green"])
-        
+        #creacion de una ruta con aStar
         self.aStar(inicial, final)
         """
         print(self.color)
         for nodo in self.closedList:
             print(nodo.unique_id, nodo.pos)
         """
-        
+    
+    #step del agente auto
     def step(self):
         
+        #deteccion de auto delantero
         car_ahead = self.car_ahead()
         
+        #control de aceleracion y desaceleracion
         new_speed = self.accelerate() if car_ahead == None else self.decelerate(car_ahead)
+        
+        #control de limites de velocidad
         if new_speed >= 1.0:
             new_speed = 1.0
         elif new_speed <= 0.0:
             new_speed = 0.0
          
+        #asignacion de velocidad
         self.speed = np.array([new_speed, new_speed])
         
+        #accion cuando el agente llega a su destino (es eliminado)
         if self.contadorNodos >= len(self.closedList):
             self.model.schedule.remove(self)
             self.model.space.remove_agent(self)
             return
         
+        #seguimiento de ruta creada
         if self.model.space.get_distance(self.pos, self.closedList[self.contadorNodos].pos) > 0.1:
             if self.pos[0] >= 0 and self.pos[0] < self.model.width and self.pos[1] >= 0 and self.pos[1] < self.model.height:
                 self.pos += (self.closedList[self.contadorNodos].pos - self.pos) * self.speed * self.contador
@@ -53,7 +67,8 @@ class Car(Agent):
         else:
             self.contadorNodos += 1
             self.contador = 0
-
+            
+    #funcion auxiliar de aStar para encontrar las adyacencias de un nodo
     def encontrar_adyacentes(self, actual):
         indice_actual = actual.unique_id - 1
         for i in range(len(self.model.matrix[indice_actual])):
@@ -63,7 +78,7 @@ class Car(Agent):
                     
                 self.openList.append(self.model.nodos[i])
 
-
+    #funcion auxiliar de aStar para encontrar el nodo adyacente con la menor distancia hacia el objetivo
     def encontrar_menor(self, final):
         menor = 180000000
         for nodo in self.openList:
@@ -73,6 +88,7 @@ class Car(Agent):
                 menor = comparar
         return nodoMenor
 
+    #funcion aStar para pathfinding en grafos
     def aStar(self, inicial, final):
         actual = inicial
         self.openList.append(inicial)
@@ -82,6 +98,7 @@ class Car(Agent):
             self.encontrar_adyacentes(actual)
             self.closedList.append(actual)
                 
+    #funcion de deteccion de auto delantero
     def car_ahead(self):
         for neighbor in self.model.space.get_neighbors(self.pos, 1, False):
             if type(neighbor) == Car:
@@ -90,12 +107,16 @@ class Car(Agent):
                     return neighbor
         return None
     
+    #funcion para acelerar
     def accelerate(self):
         return self.speed[0] + 0.05
     
+    #funcion para desacelerar
     def decelerate(self, car_ahead):
         return car_ahead.speed[0] - 0.1
-    
+
+#definicion del agente nodo.
+#Sirve como representacion grafica del grafo y punto a seguir para los autos
 class Nodo(Agent):
     def __init__(self, model: Model, pos):
         super().__init__(model.next_id(), model)
@@ -103,16 +124,23 @@ class Nodo(Agent):
         
     def step(self):
         pass
-        
+
+#definicion del modelo de calle
 class Street(Model):
+    #constructor del modelo calle
     def __init__(self):
         super().__init__()
+        #asigna el ancho y alto de la escena
         self.width = 1800
         self.height = 1200
+        #asigna el espacio de la simulacion como un continuous space
         self.space = ContinuousSpace(self.width, self.height, False)
+        #asigna el schedule del modelo aleatorizado
         self.schedule = RandomActivation(self)
+        #lista que contendra los nodos del grafo
         self.nodos = []
         
+        #grafo representado como matriz de adyacencias
         self.matrix = [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -188,19 +216,22 @@ class Street(Model):
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         ]
         
+        #definicion de coordenadas en x y y para todos los nodos de forma geeografica
         arr_x = [906.22, 943.29, 1283.53, 1311.69, 1761.60, 1779.89, 1780.44, 1778.62, 1736.14, 1707.37, 1099.87, 1060.94, 822.37, 784.07, 386.15, 352.48, 25.40, 16.11, 20.40, 21.25, 170.33, 198.62, 675.42, 712.58, 874.35, 910.99, 964.08, 989.57, 1025.82, 1045.91, 1062.45, 1063.92, 1030.20, 1001.26, 961.09, 922.91, 879.32, 840.71, 790.95, 756.42, 724.65, 713.95, 703.15, 700.38, 736.57, 761.58, 790.54, 828.71, 846.31, 932.22, 986.23, 1024.42, 1019.30, 960.58, 890.91, 824.95, 773.23, 746.28, 738.57, 797.59, 808.96, 849.19, 924.86, 954.70, 985.35, 983.47, 940.75, 889.97, 842.54, 805.59, 785.88, 772.64]
         arr_y = [15.85, 17.21, 14.65, 41.11, 204.91, 238.23, 582.76, 621.12, 1154.79, 1180.24, 1170.77, 1177.68, 1175.17, 1171.40, 1185.39, 1170.86, 882.06, 848.49, 521.63, 485.63, 40.06, 15.21, 21.78, 9.78, 381.54, 385.03, 401.73, 429.41, 469.41, 504.07, 550.74, 590.87, 642.23, 668.21, 705.77, 714.66, 727.30, 724.43, 699.75, 681.72, 638.63, 601.81, 548.19, 510.43, 435.44, 410.44, 388.89, 380.19, 406.52, 417.05, 470.95, 535.97, 598.28, 671.24, 695.07, 685.72, 634.88, 567.45, 490.25, 422.23, 456.47, 447.65, 454.00, 494.31, 539.09, 594.28, 640.94, 660.48, 653.65, 614.17, 569.86, 507.43] 
         
-        for i in range(72):
+        #creacion y colocacion de todos los nodos del grafo en la simulacion
+        for i in range(len(arr_x)):
             nodo = Nodo(self, np.array([arr_x[i], arr_y[i]]))
             self.space.place_agent(nodo, nodo.pos)
             self.schedule.add(nodo)
             self.nodos.append(nodo)
         
+    #definicion del step del modelo calle
     def step(self):
+        #cada 60 steps genera un nuevo auto en un nodo de inicio aleatorio con direccion
+        #a un nodo final aleatorio
         if self.schedule.steps % 60 == 0:
-            for nodo in self.nodos:
-                print(nodo.unique_id, nodo.pos)
             entrada = self.random.randrange(0, 22, 2)
             print(entrada)
             car = Car(self, self.nodos[entrada].pos, np.array([0.1, 0.1]), self.nodos[entrada], self.nodos[self.random.randrange(1, 23, 2)])
@@ -209,6 +240,7 @@ class Street(Model):
             
         self.schedule.step()
 
+#funcion para representar graficamente a todos los agentes de la simulacion
 def car_draw(agent):
     if type(agent) == Car:
         #color = "Blue" if agent.unique_id == 1 else "Brown"
@@ -216,6 +248,7 @@ def car_draw(agent):
     elif type(agent) == Nodo:
         return {"Shape": "rect", "w": 0.01, "h": 0.01, "Filled": "true", "Color": "Black"}
 
+#definicion del canvas visual de la simulacion
 canvas = SimpleCanvas(car_draw, 500, 500)
 
 model_params = {}
