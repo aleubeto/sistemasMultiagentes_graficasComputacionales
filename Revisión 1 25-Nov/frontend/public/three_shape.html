@@ -1,0 +1,189 @@
+<html>
+    <head>
+        <title> Defining a 3D Shape </title>
+        <style>
+            canvas { width: 100%; height: 100% }
+        </style>
+    </head>
+    <body>
+        <script src="three.min.js"> </script>
+
+        <script>
+
+        var location2 = "";
+
+        fetch("http://localhost:5000/games", {
+          method: "POST"
+        }).then(response => {
+          console.log(response.headers.get('Location'));
+          location2 = response.headers.get('Location');
+          //setLocation(response.headers.get('Location'));
+        });
+
+
+
+            window.addEventListener('keydown',doKeyDown,true);
+            // agregamos el "listener" para "escuchar" los eventos del teclado
+
+            var cam_zpos = 50.0;
+
+            function doKeyDown(evt){
+                //console.log("Tecla presionada: "+evt.keyCode);
+                switch (evt.keyCode) {
+                    case 38:  /* Up arrow pressed */
+
+                        break;
+                    case 40:  /* Down arrow pressed */
+
+                        break;
+                    case 37:  /* Left arrow pressed */
+
+                        break;
+                    case 39:  /* Right arrow pressed */
+
+                        break;
+                    case 87:  /* W was pressed */
+                        camera.position.y += 0.5;
+                    break;
+                    case 83:  /* S was pressed */
+                        camera.position.y -= 0.5;
+                    break;
+                    case 69:  /* E was pressed */
+
+                    break;
+                    case 68:  /* D was pressed */
+
+                    break;
+                }
+            }
+
+            // three basic components of a scene
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.01, 1000);
+            var renderer = new THREE.WebGLRenderer();
+
+
+            // create a new geometry
+            var geom = new THREE.Geometry();
+
+            // push the box 3D points
+            geom.vertices.push(new THREE.Vector3( -10,  10, -10));   // index 0
+            geom.vertices.push(new THREE.Vector3(  10,  10, -10));   // index 1
+            geom.vertices.push(new THREE.Vector3(  10,  10,  10));   // index 2
+            geom.vertices.push(new THREE.Vector3( -10,  10,  10));   // index 3
+
+            geom.vertices.push(new THREE.Vector3( -10,  8, -10));   // index 4
+            geom.vertices.push(new THREE.Vector3(  10,  8, -10));   // index 5
+            geom.vertices.push(new THREE.Vector3(  10,  8,  10));   // index 6
+            geom.vertices.push(new THREE.Vector3( -10,  8,  10));   // index 7
+
+            // tapa
+            geom.faces.push( new THREE.Face3( 1, 0, 2 ) );      // index 0
+            geom.faces.push( new THREE.Face3( 3, 2, 0 ) );      // index 1
+
+            // base
+            geom.faces.push( new THREE.Face3( 5, 6, 4 ) );      // index 2
+            geom.faces.push( new THREE.Face3( 4, 6, 7 ) );      // index 3
+
+            // frente
+            geom.faces.push( new THREE.Face3( 3, 6, 2 ) );      // index 4
+            geom.faces.push( new THREE.Face3( 3, 7, 6 ) );      // index 5
+
+            // derecha
+            geom.faces.push( new THREE.Face3( 2, 5, 1 ) );      // index 6
+            geom.faces.push( new THREE.Face3( 2, 6, 5 ) );      // index 7
+
+            // atras
+            geom.faces.push( new THREE.Face3( 1, 4, 0 ) );      // index 8
+            geom.faces.push( new THREE.Face3( 1, 5, 4 ) );      // index 9
+
+            // izq
+            geom.faces.push( new THREE.Face3( 0, 7, 3 ) );      // index 10
+            geom.faces.push( new THREE.Face3( 0, 4, 7 ) );      // index 11
+
+            geom.computeFaceNormals();
+
+
+            // create a Lambert material
+            var LambertMaterial = new THREE.MeshLambertMaterial(
+                        {
+                            color: 0xEEEEEE
+                        });
+
+            // create a wireframe material
+            var meshMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true});
+
+            var object = new THREE.Mesh( geom, LambertMaterial);
+            //var object2 = new THREE.Mesh( geom, meshMaterial);
+
+            group = new THREE.Object3D();           // create an empty container
+            group.add( object );                    // add a mesh with geometry to it
+            //group.add( object2 );                   // add a mesh with geometry to it
+
+            //object2.position.y -=10;
+
+            scene.add( group );                     // add the group to the scene
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            camera.position.z = cam_zpos;
+
+            // create some point lights
+            var pointLight = new THREE.PointLight( 0xFFFFFF );
+            var pointLight2 = new THREE.PointLight( 0xFFFFFF );
+
+            // set its position
+            pointLight.position.x = 10;
+            pointLight.position.y = 50;
+            pointLight.position.z = 130;
+
+            // add to the scene
+            scene.add(pointLight);
+
+            // set its position
+            pointLight2.position.x = 10;
+            pointLight2.position.y = -50;
+            pointLight2.position.z = -130;
+
+            // add to the scene
+            scene.add(pointLight2);
+
+            // set the background color
+            renderer.setClearColor(0x000022, 1);
+
+            var render = async function () {
+              var xg = 34;
+              var yg = 65;
+
+              if (location2 != ""){
+                var res = await fetch("http://localhost:5000"+location2);
+                var data = await res.json();
+
+                // .then(response => response.json())
+                // .then(data => {
+                  console.log(data);
+                  xg = data.x;
+                  yg = data.y;
+
+                  //setCoord([data.x * 20 + 10, data.y * 20 + 10]);
+                //});
+
+
+              }
+
+
+                requestAnimationFrame(render);
+                group.rotation.y += .005;
+                //group.position.x =
+                console.log("*   " ,xg, yg);
+                renderer.render(scene, camera);
+            };
+
+            render();
+
+
+
+        </script>
+    </body>
+</html>
