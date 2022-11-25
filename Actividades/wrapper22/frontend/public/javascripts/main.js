@@ -111,7 +111,7 @@ var render = async function () {
   now = Date.now();
   elapsed_time = now - previous_time;
 
-  console.log("elapsed time", elapsed_time);
+  //console.log("elapsed time", elapsed_time);
 
   if (elapsed_time >= frame_rate) {
 
