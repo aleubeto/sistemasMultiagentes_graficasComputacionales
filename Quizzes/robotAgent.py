@@ -15,13 +15,14 @@ class Robot(Agent):
     DEAMBULANDO = 0
     ENCAMINO = 1
     REGRESARESTANTE = 2
-    def __init__(self, model, pos, width, height):
+    def __init__(self, model, pos, width, height, intelligence):
         super().__init__(model.next_id(), model)
         self.condition = self.DEAMBULANDO
         self.pos = pos
         self.move_counter = 0
         self.w = width
         self.h = height
+        self.intelligence = intelligence
         self.sig = 1
         self.c_dir = 0
         self.path = []
@@ -33,32 +34,40 @@ class Robot(Agent):
     def step(self):
         if self.activo == False:
             return
-        
+            
         if self.condition == self.DEAMBULANDO:
-            if self.hallazgo != None:
-                self.path = self.pathfinding(self.hallazgo)
+            if self.intelligence:
+                self.objetivo = self.encontrar_caja()
                 self.sig = 1
-                self.condition = self.ENCAMINO
-                
+                if self.objetivo == None:
+                    self.activo = False
+                else:
+                    self.path = self.pathfinding(self.objetivo.pos)
+                    self.condition = self.ENCAMINO
             else:
-                self.encontrar_caja()
+                if self.hallazgo != None:
+                    self.path = self.pathfinding(self.hallazgo)
+                    self.sig = 1
+                    self.condition = self.ENCAMINO
 
-                if self.carga == None:
-                    siguiente = (self.pos[0] + self.direccion[0], self.pos[1] + self.direccion[1])
-                    paso = True
-                    for element in self.model.grid.get_cell_list_contents(siguiente):
-                        if type(element) == Robot:
-                            element.cambiar_direccion()
-                            paso = False
-                        elif type(element) == WallBlock:
-                            paso = False
-                            
+                else:
+                    self.detectar_caja()
 
-                    if paso:
-                        self.model.grid.move_agent(self, siguiente)
-                    else:
-                        self.cambiar_direccion()
+                    if self.carga == None:
+                        siguiente = (self.pos[0] + self.direccion[0], self.pos[1] + self.direccion[1])
+                        paso = True
+                        for element in self.model.grid.get_cell_list_contents(siguiente):
+                            if type(element) == Robot:
+                                element.cambiar_direccion()
+                                paso = False
+                            elif type(element) == WallBlock:
+                                paso = False
 
+
+                        if paso:
+                            self.model.grid.move_agent(self, siguiente)
+                        else:
+                            self.cambiar_direccion()
         elif self.condition == self.ENCAMINO:
             if self.sig < len(self.path):
                 paso = True
@@ -71,8 +80,8 @@ class Robot(Agent):
                     self.model.grid.move_agent(self, self.path[self.sig])
                     if self.carga != None:
                         self.carga.model.grid.move_agent(self.carga, self.path[self.sig])
-                    else:
-                        self.encontrar_caja()
+                    elif self.intelligence == False:
+                        self.detectar_caja()
                     self.sig = self.sig + 1
             else:
                 if self.carga != None:
@@ -86,6 +95,9 @@ class Robot(Agent):
                 else:
                     self.condition = self.DEAMBULANDO
                     self.hallazgo = None
+                    if self.intelligence:
+                        self.carga = self.objetivo
+                        self.condition = self.REGRESARESTANTE
             
         elif self.condition == self.REGRESARESTANTE:
             self.objetivo = self.encontrar_estante()
@@ -113,7 +125,7 @@ class Robot(Agent):
         if self.c_dir == 4:
             self.c_dir = 0
     
-    def encontrar_caja(self):
+    def detectar_caja(self):
         buscando = True
         for element in self.model.grid.neighbor_iter(self.pos, False):
             if type(element) == Caja and buscando:
@@ -128,6 +140,19 @@ class Robot(Agent):
                     if self.condition == self.ENCAMINO:
                         self.sig = len(self.path)
                     self.condition = self.REGRESARESTANTE
+    
+    def encontrar_caja(self):
+        menor = self.w * self.h
+        caja_menor = None
+        for caja in self.model.box_list:
+            distancia = ((caja.pos[0] - self.pos[0]) * (caja.pos[0] - self.pos[0])) + ((caja.pos[1] - self.pos[1]) * (caja.pos[1] - self.pos[1])) 
+            if distancia < menor and caja.condition == caja.DISPONIBLE:
+                menor = distancia
+                caja_menor = caja
+        if caja_menor != None:
+            caja_menor.condition = caja_menor.OCUPADA
+            
+        return caja_menor
     
     def encontrar_estante(self):
         mejor = 0
@@ -184,7 +209,7 @@ class WallBlock(Agent):
 
 class Room(Model):
 
-    def __init__(self, height=30, width=30, agents=10, boxes=5, shelves=1, step_counter=1, time_limit=50):
+    def __init__(self, height=30, width=30, agents=10, boxes=5, shelves=1, step_counter=1, time_limit=50, intelligence=False):
         
         super().__init__()
         
@@ -195,6 +220,8 @@ class Room(Model):
         
         self.step_counter = step_counter
         self.time_limit = time_limit
+        
+        self.intelligence = intelligence
         
         self.box_list = []
         self.shelf_list = []
@@ -254,9 +281,9 @@ class Room(Model):
             x = self.random.randrange(0, self.w)
             y = self.random.randrange(0, self.h)
             if self.grid.is_cell_empty((x, y)):
-                robot = Robot(self, (x, y), self.w, self.h)
+                robot = Robot(self, (x, y), self.w, self.h, self.intelligence)
             else:
-                robot = Robot(self, self.grid.find_empty(), self.w, self.h)
+                robot = Robot(self, self.grid.find_empty(), self.w, self.h, self.intelligence)
             
             self.grid.place_agent(robot, robot.pos)
             self.schedule.add(robot)
@@ -358,6 +385,8 @@ server = ModularServer(Room, [grid], "Equipo 10 - M1. Actividad",
                         "shelves": UserSettableParameter(
                             "number", "Número de estantes", 1, 1, 10, 1),
                         "time_limit": UserSettableParameter(
-                            "number", "Tiempo máximo de ejecución", 50)})
+                            "number", "Tiempo máximo de ejecución", 50),
+                        "intelligence": UserSettableParameter(
+                            "checkbox", "Omnisciencia de robots", False)})
 server.port = 8522
 server.launch()
