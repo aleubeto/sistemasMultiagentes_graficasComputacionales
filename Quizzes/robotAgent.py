@@ -66,6 +66,7 @@ class Robot(Agent):
 
                         if paso:
                             self.model.grid.move_agent(self, siguiente)
+                            self.model.move_counter += 1
                         else:
                             self.cambiar_direccion()
         elif self.condition == self.ENCAMINO:
@@ -74,10 +75,12 @@ class Robot(Agent):
                 for element in self.model.grid.get_cell_list_contents(self.path[self.sig]):
                     if type(element) == Robot:
                         element.model.grid.move_agent(element, self.path[self.sig - 1])
+                        self.model.move_counter += 1
                         paso = False
                         
                 if paso:
                     self.model.grid.move_agent(self, self.path[self.sig])
+                    self.model.move_counter += 1
                     if self.carga != None:
                         self.carga.model.grid.move_agent(self.carga, self.path[self.sig])
                     elif self.intelligence == False:
@@ -132,6 +135,7 @@ class Robot(Agent):
                 if element.condition == element.DISPONIBLE:
                     buscando = False
                     self.model.grid.move_agent(self, element.pos)
+                    self.model.move_counter += 1
                     element.condition = element.OCUPADA
                     self.carga = element
                     for robot in self.model.robot_list:
@@ -209,7 +213,7 @@ class WallBlock(Agent):
 
 class Room(Model):
 
-    def __init__(self, height=30, width=30, space_rows=3, space_cols=3, length_wall=3, agents=10, boxes=5, shelves=1, step_counter=1, time_limit=50, intelligence=False):
+    def __init__(self, height=30, width=30, space_rows=3, space_cols=3, length_wall=3, agents=10, boxes=5, shelves=1, step_counter=1, move_counter=0, time_limit=50, intelligence=False):
         
         super().__init__()
         
@@ -222,6 +226,7 @@ class Room(Model):
         self.length_wall = length_wall
         
         self.step_counter = step_counter
+        self.move_counter = move_counter
         self.time_limit = time_limit
         
         self.intelligence = intelligence
@@ -301,11 +306,11 @@ class Room(Model):
             self.shelf_list.append(estante)
             
          # Recolector de información: procentaje de celdas limpiadas
-        self.boxesleft = self.count_type(self)
+        #self.boxesleft = self.count_type(self)
         self.time_datacollector = DataCollector({"Tiempo transcurrido": lambda m: self.step_counter})
         #self.datacollector = DataCollector({"Porcentaje de celdas limpias": lambda m: ((width*height)-self.count_type(m)) * 100 / (width*height)})
-        self.boxes_datacollector = DataCollector({"Cantidad de cajas recogidas": lambda m: (self.boxesleft-self.count_type(m))})
-        self.move_datacollector = DataCollector({"Movimientos realizados": lambda m: self.count_moves(m)})
+       #self.boxes_datacollector = DataCollector({"Cantidad de cajas recogidas": lambda m: (self.boxesleft-self.count_type(m))})
+        self.move_datacollector = DataCollector({"Movimientos realizados": lambda m: self.move_counter})
     # Método para contar cantidad de celdas en cierto estado
     
     @staticmethod
@@ -316,19 +321,11 @@ class Room(Model):
                 count += 1
         return count
     
-    @staticmethod
-    def count_moves(model):
-        count = 0
-        for robot in model.schedule.agents:
-            if type(robot) == Robot:
-                count += robot.move_counter
-        return count
-    
     def step(self):
         self.step_counter += 1
         self.schedule.step()
         self.time_datacollector.collect(self)
-        self.boxes_datacollector.collect(self)
+        #self.boxes_datacollector.collect(self)
         self.move_datacollector.collect(self)
         if self.step_counter >= self.time_limit or self.count_type(self)==0:
             self.running = False
@@ -354,13 +351,13 @@ def agent_portrayal(agent):
 grid = CanvasGrid(agent_portrayal, 30, 30, 450, 450)
 
 # Creación de tabla que grafica datacollector
-#chart_tiempo = ChartModule([{"Label": "Tiempo transcurrido", "Color": "Black"}], data_collector_name='time_datacollector')
+chart_tiempo = ChartModule([{"Label": "Tiempo transcurrido", "Color": "Black"}], data_collector_name='time_datacollector')
 #
 #chart_cajas = ChartModule([{"Label": "Cantidad de cajas restante", "Color": "Black"}], data_collector_name='boxes_datacollector')
 #
-#chart_movimientos = ChartModule([{"Label": "Movimientos realizados", "Color": "Black"}], data_collector_name='move_datacollector')
+chart_movimientos = ChartModule([{"Label": "Movimientos realizados", "Color": "Black"}], data_collector_name='move_datacollector')
 
-server = ModularServer(Room, [grid], "Equipo 10 - M1. Actividad",
+server = ModularServer(Room, [grid, chart_tiempo, chart_movimientos], "Equipo 10 - Evidencia 1. Actividad Integradora",
                         {"width": UserSettableParameter(
                             "slider", "Anchura", 30, 1, 30, 1),
                         "height": UserSettableParameter(
