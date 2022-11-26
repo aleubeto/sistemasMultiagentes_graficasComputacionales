@@ -339,27 +339,27 @@ def agent_portrayal(agent):
     elif type(agent) == Robot:
         return {"Shape": "circle", "r": 1, "Filled": "true", "Color": "Blue", "Layer": 3}
     
-# grid = CanvasGrid(agent_portrayal, 30, 30, 450, 450)
+grid = CanvasGrid(agent_portrayal, 30, 30, 450, 450)
 
-# # Creación de tabla que grafica datacollector
-# chart_tiempo = ChartModule([{"Label": "Tiempo transcurrido", "Color": "Black"}], data_collector_name='time_datacollector')
+# Creación de tabla que grafica datacollector
+chart_tiempo = ChartModule([{"Label": "Tiempo transcurrido", "Color": "Black"}], data_collector_name='time_datacollector')
 
-# chart_cajas = ChartModule([{"Label": "Cantidad de cajas restante", "Color": "Black"}], data_collector_name='boxes_datacollector')
+chart_cajas = ChartModule([{"Label": "Cantidad de cajas restante", "Color": "Black"}], data_collector_name='boxes_datacollector')
 
-# chart_movimientos = ChartModule([{"Label": "Movimientos realizados", "Color": "Black"}], data_collector_name='move_datacollector')
+chart_movimientos = ChartModule([{"Label": "Movimientos realizados", "Color": "Black"}], data_collector_name='move_datacollector')
 
-# server = ModularServer(Room, [grid], "Equipo 10 - M1. Actividad",
-#                         {"width": UserSettableParameter(
-#                             "number", "Anchura", 30),
-#                         "height": UserSettableParameter(
-#                             "number", "Altura", 30),
-#                         "agents": UserSettableParameter(
-#                             "number", "Número de agentes", 10),
-#                         "boxes": UserSettableParameter(
-#                             "number", "Número de cajas", 5, 1, 10, 1),
-#                         "shelves": UserSettableParameter(
-#                             "number", "Número de estantes", 1, 1, 10, 1),
-#                         "time_limit": UserSettableParameter(
-#                             "number", "Tiempo máximo de ejecución", 50)})
-# server.port = 8522
-# server.launch()
+server = ModularServer(Room, [grid], "Equipo 10 - M1. Actividad",
+                        {"width": UserSettableParameter(
+                            "number", "Anchura", 30),
+                        "height": UserSettableParameter(
+                            "number", "Altura", 30),
+                        "agents": UserSettableParameter(
+                            "number", "Número de agentes", 10),
+                        "boxes": UserSettableParameter(
+                            "number", "Número de cajas", 5, 1, 10, 1),
+                        "shelves": UserSettableParameter(
+                            "number", "Número de estantes", 1, 1, 10, 1),
+                        "time_limit": UserSettableParameter(
+                            "number", "Tiempo máximo de ejecución", 50)})
+server.port = 8522
+server.launch()

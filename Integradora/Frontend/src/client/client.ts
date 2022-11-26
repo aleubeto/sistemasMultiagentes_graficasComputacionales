@@ -7,14 +7,19 @@ import Stats from 'three/examples/jsm/libs/stats.module.js'
 //We import the dat.gui library
 import { GUI } from 'dat.gui'
 
-//We fetch
 var baseURL = "http://localhost:5000"
+var gameLink: string | null = null; //The game link can be string or null
 
 fetch(baseURL + "/games", {
   method: "POST"
 }).then(response => {
-   var location2 = response.headers.get('Location');
+  var location2 = response.headers.get('Location');
+  if (location2 != null) {
+    gameLink = location2;
+  }
 });
+
+
 
 const scene = new THREE.Scene()
 //Add an axes helper to the scene
@@ -101,25 +106,25 @@ function addWall(x: number, y: number, z: number, width: number, height: number)
     return wall
 }
 
-// //Lateral walls
-// addWall(0.5, 0.5, 0, 30, 10)
-// addWall(0.5, 0.5, 30, 30, 10)
-// //Frontal walls
-// const wall1 = addWall(15.5, 0.5, 15, 30, 10)
-// wall1.rotation.y = Math.PI / 2
-// const wall2 = addWall(-14.5, 0.5, 15, 30, 10)
-// wall2.rotation.y = Math.PI / 2
+//Lateral walls
+addWall(0.5, 0.5, 0, 30, 10)
+addWall(0.5, 0.5, 30, 30, 10)
+//Frontal walls
+const wall1 = addWall(15.5, 0.5, 15, 30, 10)
+wall1.rotation.y = Math.PI / 2
+const wall2 = addWall(-14.5, 0.5, 15, 30, 10)
+wall2.rotation.y = Math.PI / 2
 
 
 cube.position.x = 0+0.5;
 cube.position.y = 0.5;
 cube.position.z = 0+0.5;
 
-// cube2.position.x = 0+0.5;
-// cube2.position.y = 0.5;
-// cube2.position.z = 0+0.5;
+cube2.position.x = 0+0.5;
+cube2.position.y = 0.5;
+cube2.position.z = 0+0.5;
 
-//scene.add(cube2)
+scene.add(cube2)
 
 // const cube = new THREE.Mesh(geometry, material)
 scene.add(cube)
@@ -171,6 +176,8 @@ var previous_time = Date.now();
 
 var render = async function () {
 
+  //console.log(gameLink);
+
   var now, elapsed_time;
 
   now = Date.now();
@@ -180,30 +187,38 @@ var render = async function () {
 
   if (elapsed_time >= frame_rate) {
 
-    // var xg = 34;
-    // var yg = 65;
-    // var xglgb = 1;
-    // var yglgb = 1;
+    var xg = 34;
+    var yg = 65;
 
-    if (location2 != ""){ // if the game has been created
-      var res = await fetch(baseURL + location2); // get the game state
+    if (gameLink != null){ // if the game has been created
+      var res = await fetch(baseURL + gameLink); // get the game state
       var data = await res.json(); // parse JSON to JS object that contains the positions of the 10 robots in every step
       //console.log(data);
       //We print the positions for the first robot
-      console.log(data[0].x);
-      console.log(data[0].y);
+      // console.log(data[0].x);
+      // console.log(data[0].y);
+      // //WE print the positions for the second robot
+      // console.log(data[1].x);
+      // console.log(data[1].y);
 
-    //   //We assign the positions to the robots
-    //   group.position.x = data[0].x;
-    //   group.position.y = data[0].y;
+      console.log("data", data);
+
+      // //We assign the positions to the robots
+      cube.position.x = data[0].x+0.5;
+      cube.position.z = data[0].y+0.5;
+
+      // //We assign the position to the second robot
+      // cube2.position.x = data[1].x+0.5;
+      // cube2.position.z = data[1].y+0.5;
+
       
-      //console.log(groups);
-      //data.map((d) => { // for each robot
+      // console.log(groups);
+      // data.map((d) => { // for each robot
       //  var g = groups[d.id]; 
       //  g.position.x = d.x * 3;
       //  g.position.y = d.y * 3;
       //  return;
-      //});
+      // });
 
     }
       // group.position.x = xg*3;
@@ -212,8 +227,8 @@ var render = async function () {
       // grouplgb.position.y = yglgb*3;
 
       //console.log("*   " ,xg, yg);
-      previous_time = now;
-    }
+       previous_time = now;
+     }
     requestAnimationFrame(render);
     renderer.render(scene, camera);
 };
