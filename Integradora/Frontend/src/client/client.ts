@@ -201,6 +201,7 @@ var render = async function () {
       // console.log(data[1].x);
       // console.log(data[1].y);
 
+      //Esto solamente imprime a un solo robot, faltan los otros 9
       console.log("data", data);
 
       // //We assign the positions to the robots
