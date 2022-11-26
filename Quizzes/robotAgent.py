@@ -84,7 +84,7 @@ class Robot(Agent):
                         self.detectar_caja()
                     self.sig = self.sig + 1
             else:
-                if self.carga != None:
+                if self.carga != None and len(self.path) > 0:
                     self.condition = self.DEAMBULANDO
                     self.model.grid.remove_agent(self.carga)
                     self.model.schedule.remove(self.carga)
@@ -209,7 +209,7 @@ class WallBlock(Agent):
 
 class Room(Model):
 
-    def __init__(self, height=30, width=30, agents=10, boxes=5, shelves=1, step_counter=1, time_limit=50, intelligence=False):
+    def __init__(self, height=30, width=30, space_rows=3, space_cols=3, length_wall=3, agents=10, boxes=5, shelves=1, step_counter=1, time_limit=50, intelligence=False):
         
         super().__init__()
         
@@ -217,6 +217,9 @@ class Room(Model):
         
         self.h = height
         self.w = width
+        self.space_rows = space_rows
+        self.space_cols = space_cols
+        self.length_wall = length_wall
         
         self.step_counter = step_counter
         self.time_limit = time_limit
@@ -229,53 +232,37 @@ class Room(Model):
         
         self.grid = MultiGrid(self.w, self.h, torus=False)
         
-        self.matrix = [
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-            [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        ]
+        self.matrix = []
         
-        for _,x,y in self.grid.coord_iter():
-            if self.matrix[y][x] == 0:
-                wall = WallBlock(self, (x, y))
-                self.grid.place_agent(wall, wall.pos)
-                self.schedule.add(wall)
-        
-        """
-        for i in range(self.w):
-            self.box_matrix.append([])
-            self.shelf_matrix.append([])
-            for j in range(self.h):
-                self.box_matrix[i].append(0)
-                self.shelf_matrix[i].append(0)
-        """
+        for i in range(self.h):
+            self.matrix.append([])
+            continuar = False
+            for j in range(self.w):
+                if (i == 0 or j == 0 or i == self.h - 1 or j == self.w - 1):
+                    self.matrix[i].append(0)
+                    wall = WallBlock(self, (j, i))
+                    self.grid.place_agent(wall, wall.pos)
+                    self.schedule.add(wall)
+                elif (i % (self.space_rows + 1) == 0 and j % (self.space_cols + self.length_wall) == 0 and continuar == False):
+                    continuar = True
+                    contador_continuar = 0
+                    self.matrix[i].append(0)
+                    wall = WallBlock(self, (j, i))
+                    self.grid.place_agent(wall, wall.pos)
+                    self.schedule.add(wall)
+                elif continuar and contador_continuar < self.length_wall - 1:
+                    self.matrix[i].append(0)
+                    wall = WallBlock(self, (j, i))
+                    self.grid.place_agent(wall, wall.pos)
+                    self.schedule.add(wall)
+                    contador_continuar += 1
+                    if contador_continuar >= self.length_wall - 1:
+                        continuar = False
+                    
+                else:
+                    self.matrix[i].append(1)
+            
+        print(self.matrix)
         
         for i in range(agents):
             x = self.random.randrange(0, self.w)
@@ -375,15 +362,21 @@ grid = CanvasGrid(agent_portrayal, 30, 30, 450, 450)
 
 server = ModularServer(Room, [grid], "Equipo 10 - M1. Actividad",
                         {"width": UserSettableParameter(
-                            "number", "Anchura", 30),
+                            "slider", "Anchura", 30, 1, 30, 1),
                         "height": UserSettableParameter(
-                            "number", "Altura", 30),
+                            "slider", "Altura", 30, 1, 30, 1),
+                        "space_rows": UserSettableParameter(
+                            "number", "Espacio entre filas", 3),
+                        "space_cols": UserSettableParameter(
+                            "number", "Espacio entre columnas", 3),
+                        "length_wall": UserSettableParameter(
+                            "number", "Largo de muros", 3),
                         "agents": UserSettableParameter(
                             "number", "Número de agentes", 10),
                         "boxes": UserSettableParameter(
-                            "number", "Número de cajas", 5, 1, 10, 1),
+                            "number", "Número de cajas", 5),
                         "shelves": UserSettableParameter(
-                            "number", "Número de estantes", 1, 1, 10, 1),
+                            "number", "Número de estantes", 1),
                         "time_limit": UserSettableParameter(
                             "number", "Tiempo máximo de ejecución", 50),
                         "intelligence": UserSettableParameter(
