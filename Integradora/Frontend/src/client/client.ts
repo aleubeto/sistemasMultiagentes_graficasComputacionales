@@ -7,6 +7,15 @@ import Stats from 'three/examples/jsm/libs/stats.module.js'
 //We import the dat.gui library
 import { GUI } from 'dat.gui'
 
+//We fetch
+var baseURL = "http://localhost:5000"
+
+fetch(baseURL + "/games", {
+  method: "POST"
+}).then(response => {
+   var location2 = response.headers.get('Location');
+});
+
 const scene = new THREE.Scene()
 //Add an axes helper to the scene
 const axesHelper = new THREE.AxesHelper(5)
@@ -157,16 +166,57 @@ cameraFolder.add(camera, 'zoom', 0, 5, 0.01) //Add the zoom to the dat.gui
 cameraFolder.add(camera, 'focus', 0, 5, 0.01) //Add the focus to the dat.gui
 cameraFolder.add(camera, 'aspect', 0, 5, 0.01) //Add the aspect to the dat.gui
 
-function animate() {
-    requestAnimationFrame(animate)
-    render()
-    stats.update()
-}
+const frame_rate = 250; // Refresh screen every 200 ms
+var previous_time = Date.now();
 
-function render() {
-    renderer.render(scene, camera)
-}
+var render = async function () {
+
+  var now, elapsed_time;
+
+  now = Date.now();
+  elapsed_time = now - previous_time;
+
+  //console.log("elapsed time", elapsed_time);
+
+  if (elapsed_time >= frame_rate) {
+
+    // var xg = 34;
+    // var yg = 65;
+    // var xglgb = 1;
+    // var yglgb = 1;
+
+    if (location2 != ""){ // if the game has been created
+      var res = await fetch(baseURL + location2); // get the game state
+      var data = await res.json(); // parse JSON to JS object that contains the positions of the 10 robots in every step
+      //console.log(data);
+      //We print the positions for the first robot
+      console.log(data[0].x);
+      console.log(data[0].y);
+
+    //   //We assign the positions to the robots
+    //   group.position.x = data[0].x;
+    //   group.position.y = data[0].y;
+      
+      //console.log(groups);
+      //data.map((d) => { // for each robot
+      //  var g = groups[d.id]; 
+      //  g.position.x = d.x * 3;
+      //  g.position.y = d.y * 3;
+      //  return;
+      //});
+
+    }
+      // group.position.x = xg*3;
+      // group.position.y = yg*3;
+      // grouplgb.position.x = xglgb*3;
+      // grouplgb.position.y = yglgb*3;
+
+      //console.log("*   " ,xg, yg);
+      previous_time = now;
+    }
+    requestAnimationFrame(render);
+    renderer.render(scene, camera);
+};
 
 
-
-animate()
+render();
