@@ -186,7 +186,11 @@ class WallBlock(Agent):
 
 class Room(Model):
 
+<<<<<<< HEAD
     def __init__(self, height=30, width=30, agents=40, boxes=100, shelves=20, step_counter=1, time_limit=500):
+=======
+    def __init__(self, height=30, width=30, agents=40, boxes=100, shelves=20, step_counter=1, time_limit=1000):
+>>>>>>> bbec006f89e4a867bebc285ea28adf88a467438b
         
         super().__init__()
         
