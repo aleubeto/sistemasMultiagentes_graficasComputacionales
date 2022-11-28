@@ -2,7 +2,7 @@ import flask
 from flask_cors import CORS
 from flask.json import jsonify
 import uuid
-from robotAgent import Room, Robot
+from robotAgent import Room, Robot, WallBlock, Caja, Estante
 
 games = {}
 
@@ -31,14 +31,30 @@ def queryState(id):
     global model
     model = games[id]
     model.step()
-    result = [] #Array of dictionaries with robot info
+    result = [] #Array of arrays with dictionaries with agent info
+    robots = [] #Array of robot info
+    walls = [] #Array of wall info
+    boxes = [] #Array of box info
+    shelves = [] #Array of shelf info
     for agent in model.schedule.agents:
-        if type(agent) == Robot:
-            g = dict() #Dictionary with robot info
-            g["id"] = agent.unique_id
-            g["x"] = agent.pos[0]
-            g["y"] = agent.pos[1]
-            result.append(g)
+        g = dict() #Dictionary with agent info
+        g["id"] = agent.unique_id
+        g["x"] = agent.pos[0]
+        g["y"] = agent.pos[1]
+        
+        if type(agent) == Robot:    #Add to robot array
+            robots.append(g)
+        elif type(agent) == WallBlock: #Add to wall array
+            walls.append(g)
+        elif type(agent) == Caja: #Add to box array
+            boxes.append(g)
+        else:
+            shelves.append(g)
+            
+    result.append(robots)
+    result.append(walls)
+    result.append(boxes)
+    result.append(shelves)
     return jsonify(result)
 
 app.run()
