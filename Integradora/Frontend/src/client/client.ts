@@ -171,7 +171,7 @@ var render = async function () {
 
       if (firstFrame == true){
       //From data we get how many robots are in the game
-      robotsNumber = data.length;
+      robotsNumber = data[0].length;
       //We instantiate the robots
       for (var i = 0; i < robotsNumber; i++) {
         //We create a robot
@@ -187,8 +187,8 @@ var render = async function () {
 
       // //We assign the positions to the robots
       for (var i = 0; i < robotsNumber; i++) {
-        robots[i].position.x = data[i].x+0.5;
-        robots[i].position.z = data[i].y+0.5;
+        robots[i].position.x = data[0][i].x+0.5;
+        robots[i].position.z = data[0][i].y+0.5;
         robots[i].position.y = 0.5;
       }
 
