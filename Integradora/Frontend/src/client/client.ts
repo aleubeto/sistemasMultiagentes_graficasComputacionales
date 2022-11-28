@@ -9,6 +9,10 @@ import { GUI } from 'dat.gui'
 //We import the GLTFLoader from three.js
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
+//Boolean for first frame
+var firstFrame = true
+var robotsNumber = 0;
+
 
 
 var baseURL = "http://localhost:5000"
@@ -76,6 +80,7 @@ const robotGeometry = new THREE.BoxGeometry(1, 1, 1)
 const robotMaterial = new THREE.MeshBasicMaterial({ color: 0x3c4d69 })
 //We create an array to store the robots
 var robots: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>[] | { position: { x: number, y: number ,z: number } }[] = []
+var size = 0;
 
 //We create a function to add a wall with texture to the scene
 function addWall(x: number, y: number, z: number, width: number, height: number) {
@@ -143,22 +148,6 @@ cameraFolder.add(camera, 'zoom', 0, 5, 0.01) //Add the zoom to the dat.gui
 cameraFolder.add(camera, 'focus', 0, 5, 0.01) //Add the focus to the dat.gui
 cameraFolder.add(camera, 'aspect', 0, 5, 0.01) //Add the aspect to the dat.gui
 
-var init = async function () {
-    if (gameLink != null){
-      var res = await fetch(baseURL + gameLink); // get the game state
-      var data = await res.json();
-      //Data is a json with an array of objects
-      //We want to get the size of the array
-      var size = Object.keys(data).length; //Number of robots
-      //We instantiate the robots
-      for (var i = 0; i < size; i++) {
-        var robot = new THREE.Mesh(robotGeometry, robotMaterial)
-        robots.push(robot)
-        scene.add(robot)
-      }
-    }
-}
-
 const frame_rate = 250; // Refresh screen every 200 ms
 var previous_time = Date.now();
 
@@ -179,12 +168,25 @@ var render = async function () {
       var res = await fetch(baseURL + gameLink); // get the game state
       var data = await res.json(); // parse JSON to JS object that contains the positions of the 10 robots in every step
 
-      // console.log("data", data);
 
-      console.log("robots", robots);
+      if (firstFrame == true){
+      //From data we get how many robots are in the game
+      robotsNumber = data.length;
+      //We instantiate the robots
+      for (var i = 0; i < robotsNumber; i++) {
+        //We create a robot
+        const robot = new THREE.Mesh(robotGeometry, robotMaterial)
+        //We add the robot to the scene
+        scene.add(robot)
+        //We add the robot to the array
+        robots.push(robot)
+      }
+      }
+
+      firstFrame = false;
 
       // //We assign the positions to the robots
-      for (var i = 0; i < robots.length; i++) {
+      for (var i = 0; i < robotsNumber; i++) {
         robots[i].position.x = data[i].x+0.5;
         robots[i].position.z = data[i].y+0.5;
         robots[i].position.y = 0.5;
@@ -212,5 +214,4 @@ var render = async function () {
     renderer.render(scene, camera);
 };
 
-init()
 render();
