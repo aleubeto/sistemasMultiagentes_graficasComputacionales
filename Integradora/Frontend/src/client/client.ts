@@ -6,6 +6,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import Stats from 'three/examples/jsm/libs/stats.module.js'
 //We import the dat.gui library
 import { GUI } from 'dat.gui'
+//We import the GLTFLoader from three.js
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+
+
 
 var baseURL = "http://localhost:5000"
 var gameLink: string | null = null; //The game link can be string or null
@@ -18,7 +22,6 @@ fetch(baseURL + "/games", {
     gameLink = location2;
   }
 });
-
 
 
 const scene = new THREE.Scene()
@@ -69,13 +72,10 @@ floor.position.x = 15
 floor.position.z = 15
 scene.add(floor)
 //We create a cube to represent the robot
-const cubeGeometry = new THREE.BoxGeometry(1, 1, 1)
-const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0x3c4d69 })
-const cube = new THREE.Mesh(cubeGeometry, cubeMaterial)
-const cube2 = new THREE.Mesh(cubeGeometry, cubeMaterial)
-const cube3 = new THREE.Mesh(cubeGeometry, cubeMaterial)
-const cube4 = new THREE.Mesh(cubeGeometry, cubeMaterial)
-//scene.add(cube)
+const robotGeometry = new THREE.BoxGeometry(1, 1, 1)
+const robotMaterial = new THREE.MeshBasicMaterial({ color: 0x3c4d69 })
+//We create an array to store the robots
+var robots: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>[] | { position: { x: number, y: number ,z: number } }[] = []
 
 //We create a function to add a wall with texture to the scene
 function addWall(x: number, y: number, z: number, width: number, height: number) {
@@ -115,21 +115,7 @@ wall1.rotation.y = Math.PI / 2
 const wall2 = addWall(-14.5, 0.5, 15, 30, 10)
 wall2.rotation.y = Math.PI / 2
 
-
-cube.position.x = 0+0.5;
-cube.position.y = 0.5;
-cube.position.z = 0+0.5;
-
-cube2.position.x = 0+0.5;
-cube2.position.y = 0.5;
-cube2.position.z = 0+0.5;
-
-scene.add(cube2)
-
-// const cube = new THREE.Mesh(geometry, material)
-scene.add(cube)
-
-console.dir(scene)
+//console.dir(scene)
 
 window.addEventListener('resize', onWindowResize, false)
 function onWindowResize() {
@@ -143,20 +129,6 @@ const stats = Stats() //Stats
 document.body.appendChild(stats.dom) //Add the stats to the body of the html
 
 const gui = new GUI() //Dat.gui
-const cubeFolder = gui.addFolder('Cube') //Add a cubeFolder to the dat.gui
-cubeFolder.add(cube.position, 'x', -5, 5, 0.01) //Add the x position to the dat.gui
-// cubeFolder.add(cube.position, 'y', -5, 5, 0.01) //Add the y position to the dat.gui
-cubeFolder.add(cube.position, 'z', -5, 5, 0.01) //Add the z position to the dat.gui
-// cubeFolder.add(cube.rotation, 'x', 0, 2 * Math.PI, 0.01) //Add the x rotation to the dat.gui
-// cubeFolder.add(cube.rotation, 'y', 0, 2 * Math.PI, 0.01) //Add the y rotation to the dat.gui
-// cubeFolder.add(cube.rotation, 'z', 0, 2 * Math.PI, 0.01) //Add the z rotation to the dat.gui
-// cubeFolder.add(cube.scale, 'x', 0, 2, 0.01) //Add the x scale to the dat.gui
-// cubeFolder.add(cube.scale, 'y', 0, 2, 0.01) //Add the y scale to the dat.gui
-// cubeFolder.add(cube.scale, 'z', 0, 2, 0.01) //Add the z scale to the dat.gui
-// cubeFolder.add(cube, 'visible') //Add the visible property to the dat.gui
-// cubeFolder.add(cube, 'castShadow') //Add the castShadow property to the dat.gui
-// cubeFolder.add(cube, 'receiveShadow') //Add the receiveShadow property to the dat.gui
-
 const cameraFolder = gui.addFolder('Camera') //Add a cameraFolder to the dat.gui
 cameraFolder.add(camera.position, 'x', -5, 5, 0.01) //Add the x position to the dat.gui
 cameraFolder.add(camera.position, 'y', -5, 5, 0.01) //Add the y position to the dat.gui
@@ -170,6 +142,22 @@ cameraFolder.add(camera, 'far', 0, 5, 0.01) //Add the far to the dat.gui
 cameraFolder.add(camera, 'zoom', 0, 5, 0.01) //Add the zoom to the dat.gui
 cameraFolder.add(camera, 'focus', 0, 5, 0.01) //Add the focus to the dat.gui
 cameraFolder.add(camera, 'aspect', 0, 5, 0.01) //Add the aspect to the dat.gui
+
+var init = async function () {
+    if (gameLink != null){
+      var res = await fetch(baseURL + gameLink); // get the game state
+      var data = await res.json();
+      //Data is a json with an array of objects
+      //We want to get the size of the array
+      var size = Object.keys(data).length; //Number of robots
+      //We instantiate the robots
+      for (var i = 0; i < size; i++) {
+        var robot = new THREE.Mesh(robotGeometry, robotMaterial)
+        robots.push(robot)
+        scene.add(robot)
+      }
+    }
+}
 
 const frame_rate = 250; // Refresh screen every 200 ms
 var previous_time = Date.now();
@@ -187,30 +175,20 @@ var render = async function () {
 
   if (elapsed_time >= frame_rate) {
 
-    var xg = 34;
-    var yg = 65;
-
     if (gameLink != null){ // if the game has been created
       var res = await fetch(baseURL + gameLink); // get the game state
       var data = await res.json(); // parse JSON to JS object that contains the positions of the 10 robots in every step
-      //console.log(data);
-      //We print the positions for the first robot
-      // console.log(data[0].x);
-      // console.log(data[0].y);
-      // //WE print the positions for the second robot
-      // console.log(data[1].x);
-      // console.log(data[1].y);
 
-      //Esto solamente imprime a un solo robot, faltan los otros 9
-      console.log("data", data);
+      // console.log("data", data);
+
+      console.log("robots", robots);
 
       // //We assign the positions to the robots
-      cube.position.x = data[0].x+0.5;
-      cube.position.z = data[0].y+0.5;
-
-      // //We assign the position to the second robot
-      // cube2.position.x = data[1].x+0.5;
-      // cube2.position.z = data[1].y+0.5;
+      for (var i = 0; i < robots.length; i++) {
+        robots[i].position.x = data[i].x+0.5;
+        robots[i].position.z = data[i].y+0.5;
+        robots[i].position.y = 0.5;
+      }
 
       
       // console.log(groups);
@@ -234,5 +212,5 @@ var render = async function () {
     renderer.render(scene, camera);
 };
 
-
+init()
 render();
