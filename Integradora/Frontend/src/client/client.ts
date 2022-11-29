@@ -25,6 +25,8 @@ fetch(baseURL + "/games", {
 const robotPath = 'models/Roomba.glb'
 const boxPath = 'models/Box.glb'
 const palletPath = 'models/WoodenPallet.glb'
+const zuckPath = 'models/ZuckHead.glb'
+const doorPath = 'models/Door.glb'
 
 //We create an array to store the robots generated with the GLTFLoader
 const robots: THREE.Group[] = []
@@ -42,10 +44,7 @@ var palletsNumber: number = 10;
 //Boolean for first frame
 var firstFrame = true
 var robotsNumber = 0;
-//We create a cube to represent the robot
-const robotGeometry = new THREE.BoxGeometry(1, 1, 1)
-const robotMaterial = new THREE.MeshBasicMaterial({ color: 0x3c4d69 })
-
+var palletsNumber = 0;
 
 const stats = Stats() //Stats
 document.body.appendChild(stats.dom) //Add the stats to the body of the html
@@ -55,6 +54,9 @@ const scene = new THREE.Scene()
 const axesHelper = new THREE.AxesHelper(1000)
 scene.add(axesHelper)
 
+//We add models to the scene
+addModel(15,7,15,2,zuckPath) //We add the zuckHead to the scene
+addModel(15,0.1,30,2,doorPath) //We add the door to the scene
 const camera = new THREE.PerspectiveCamera(
   100,
   window.innerWidth / window.innerHeight,
@@ -112,27 +114,36 @@ var render = async function () {
         //We instantiate the robots
         for (var i = 0; i < robotsNumber; i++) {
           //We use the importGLFT function to add the robot to the scene
-          await importGLTFModel(i+0.5,0,i+0.5,0.030,robotPath,robots)
+          importGLTFModel(i+0.5,0,i+0.5,0.030,robotPath,robots)
+        }
+        //From date we get how many pallets are in the game
+        palletsNumber = data[3].length;
+        //We instantiate the pallets
+        for (var i = 0; i < palletsNumber; i++) {
+          //We use the importGLFT function to add the pallet to the scene
+          importGLTFModel(0.5,0,0.5,0.125,palletPath,pallets)
         }
       }
 
+      //console.log(robots)
+      console.log(pallets)
+
       //If the robots array position is not undefined we update the position of the robots
-      if (robots[0] != undefined) {
+      if (robots[0] != undefined && pallets[0] != undefined) {
         for (var i = 0; i < robotsNumber; i++) {
           robots[i].position.x = data[0][i].x + 0.5;
           robots[i].position.z = data[0][i].y + 0.5;
           robots[i].position.y = 0.05;
         }
+        for (var i = 0; i < palletsNumber; i++) {
+          pallets[i].position.x = data[3][i].x + 0.5;
+          pallets[i].position.z = data[3][i].y + 0.5;
+          pallets[i].position.y = 0;
+        }
       }
       // console.log(robots)
       //await console.log(robots[0])
       firstFrame = false;
-      // // // We assign the positions to the robots
-      // for (var i = 0; i < robotsNumber; i++) {
-      //   robots[i].position.x = data[0][i].x + 0.5;
-      //   robots[i].position.z = data[0][i].y + 0.5;
-      //   robots[i].position.y = 0.5;
-      // }
     }
     previous_time = now;
   }
@@ -171,6 +182,49 @@ function importGLTFModel(x: number, y: number, z: number, scale: number, modelPa
     //We add the model to the scene
     scene.add(model)
   })
+}
+
+function addModel(x: number, y: number, z: number, scale: number, path: string) {
+  //We create a new GLTFLoader
+  const loader = new GLTFLoader()
+  //We load the model
+  loader.load(
+    //We pass the path to the model
+    path,
+    //We pass the function that will be executed after the model is loaded
+    function (gltf) {
+      //We get the model from the gltf object
+      const model = gltf.scene
+      //We set the model position
+      model.position.set(x, y, z)
+      //We set the model scale
+      model.scale.set(scale, scale, scale)
+      gltf.scene.traverse(function (child) {
+        if ((child as THREE.Mesh).isMesh) {
+            const m = child as THREE.Mesh
+            m.receiveShadow = true
+            m.castShadow = true
+        }
+        if ((child as THREE.Light).isLight) {
+            const l = child as THREE.Light
+            l.castShadow = true
+            l.shadow.bias = -0.003
+            l.shadow.mapSize.width = 2048
+            l.shadow.mapSize.height = 2048
+        }
+    })
+      //We add the model to the scene
+      scene.add(model)
+    },
+    //We pass the function that will be executed while the model is loading
+    //function (xhr) {
+      //console.log((xhr.loaded / xhr.total * 100) + '% loaded')
+    //},
+    //We pass the function that will be executed if there is an error loading the model
+    //function (error) {
+      //console.log('An error happened')
+    //}
+  )
 }
 
 //We create a function to add a light to the scene
@@ -248,6 +302,20 @@ function setWalls() {
   wall1.rotation.y = Math.PI / 2
   const wall2 = addWall(-14.5, 0.5, 15, 30, 10)
   wall2.rotation.y = Math.PI / 2
+}
+
+//Function to add a skybox to the scene taking as parameters the path to the skybox images
+function addSkyBox(path: string) {
+  const loader = new THREE.CubeTextureLoader()
+  const texture = loader.load([
+    path + 'px.jpg', //Right
+    path + 'nx.jpg', //Left
+    path + 'py.jpg', //Top
+    path + 'ny.jpg', //Bottom
+    path + 'pz.jpg', //Front
+    path + 'nz.jpg', //Back
+  ])
+  scene.background = texture
 }
 
 // GUI
