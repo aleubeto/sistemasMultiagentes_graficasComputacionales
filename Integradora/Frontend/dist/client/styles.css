@@ -3,6 +3,6 @@ body{
     overflow: hidden;
     margin: 50px;
 }
-.model{
+.model canvas{
     border-radius: 15px;
 }
