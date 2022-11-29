@@ -22,7 +22,7 @@ fetch(baseURL + "/games", {
 });
 
 //We create a variable path to store the path to the assets folder
-const path = 'models/monkey.glb'
+const path = 'models/Roomba.glb'
 
 //Boolean for first frame
 var firstFrame = true
@@ -55,7 +55,7 @@ renderer.physicallyCorrectLights = true
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement) //Add the renderer to the body of the html
 
-addModel(5, 5, 5, 1, path)
+addModel(0.5,0,0.5,0.038,path)
 
 
 const controls = new OrbitControls(camera, renderer.domElement) //OrbitControls
