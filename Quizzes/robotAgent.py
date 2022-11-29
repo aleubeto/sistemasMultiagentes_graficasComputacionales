@@ -69,6 +69,7 @@ class Robot(Agent):
                             self.model.move_counter += 1
                         else:
                             self.cambiar_direccion()
+                            
         elif self.condition == self.ENCAMINO:
             if self.sig < len(self.path):
                 paso = True
@@ -94,14 +95,13 @@ class Robot(Agent):
                     self.model.box_list.remove(self.carga)
                     self.hallazgo = None
                     self.carga = None
-                    print("elimine una caja")
                 else:
                     self.condition = self.DEAMBULANDO
                     self.hallazgo = None
                     if self.intelligence:
                         self.carga = self.objetivo
                         self.condition = self.REGRESARESTANTE
-            
+
         elif self.condition == self.REGRESARESTANTE:
             self.objetivo = self.encontrar_estante()
             self.sig = 1
@@ -213,7 +213,7 @@ class WallBlock(Agent):
 
 class Room(Model):
 
-    def __init__(self, height=30, width=30, space_rows=3, space_cols=3, length_wall=3, agents=10, boxes=5, shelves=1, step_counter=1, move_counter=0, time_limit=50, intelligence=False):
+    def __init__(self, height=30, width=30, space_rows=3, space_cols=3, length_wall=3, robots=10, boxes=5, shelves=1, step_counter=1, move_counter=0, time_limit=50, intelligence=False):
         
         super().__init__()
         
@@ -266,10 +266,8 @@ class Room(Model):
                     
                 else:
                     self.matrix[i].append(1)
-            
-        print(self.matrix)
-        
-        for i in range(agents):
+                    
+        for i in range(robots):
             x = self.random.randrange(0, self.w)
             y = self.random.randrange(0, self.h)
             if self.grid.is_cell_empty((x, y)):
@@ -368,7 +366,7 @@ server = ModularServer(Room, [grid, chart_tiempo, chart_movimientos], "Equipo 10
                             "number", "Espacio entre columnas", 3),
                         "length_wall": UserSettableParameter(
                             "number", "Largo de muros", 3),
-                        "agents": UserSettableParameter(
+                        "robots": UserSettableParameter(
                             "number", "Número de agentes", 10),
                         "boxes": UserSettableParameter(
                             "number", "Número de cajas", 5),
