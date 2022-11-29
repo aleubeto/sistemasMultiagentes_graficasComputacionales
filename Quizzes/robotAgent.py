@@ -48,7 +48,9 @@ class Robot(Agent):
                 else:
                     print("voy hacia", self.objetivo.pos)
                     self.path = self.pathfinding(self.objetivo.pos)
-                    self.condition = self.ENCAMINO
+                    if self.path != []:
+                        print(self.path)
+                        self.condition = self.ENCAMINO
             else:
                 if self.hallazgo != None:
                     self.path = self.pathfinding(self.hallazgo)
@@ -75,8 +77,8 @@ class Robot(Agent):
                             self.cambiar_direccion()
                             
         elif self.condition == self.ENCAMINO:
-            print(self.path)
-            print(self.sig)
+            #print(self.path)
+            #print(self.sig)
             if self.sig < len(self.path):
                 paso = True
                 for element in self.model.grid.get_cell_list_contents(self.path[self.sig]):
@@ -122,7 +124,9 @@ class Robot(Agent):
                 self.color = "Gray"
             else:
                 self.path = self.pathfinding(self.objetivo.pos)
-                self.condition = self.ENCAMINO
+                if self.path != []:
+                    print(self.path)
+                    self.condition = self.ENCAMINO
                 
         print("soy el robot", self.unique_id, "en la", self.pos, "estoy", self.condition, "fuera")
         
@@ -171,6 +175,7 @@ class Robot(Agent):
                 menor = distancia
                 caja_menor = caja
         if caja_menor != None:
+            self.model.matrix[caja_menor.pos[1]][caja_menor.pos[0]] = 1
             caja_menor.condition = caja_menor.OCUPADA
             caja_menor.color = "Green"
             
@@ -186,6 +191,7 @@ class Robot(Agent):
                 estante_mejor = estante
         if estante_mejor != None:
             estante_mejor.cuenta_cajas += 1
+            self.model.matrix[estante_mejor.pos[1]][estante_mejor.pos[0]] = 1
             
         return estante_mejor
     
@@ -196,6 +202,9 @@ class Robot(Agent):
             robot.carga = self.carga
             robot.sig = self.sig + 1
             robot.path = self.path
+            temporal = robot.objetivo
+            robot.objetivo = self.objetivo
+            self.objetivo = temporal
             robot.condition = self.ENCAMINO
             if self.carga != None:
                 self.model.grid.move_agent(robot.carga, robot.pos)
@@ -209,6 +218,9 @@ class Robot(Agent):
             else:
                 if type(robot.objetivo) == Caja:
                     robot.objetivo.condition = robot.objetivo.DISPONIBLE
+                    robot.objetivo.color = "Brown"
+                    for robot in self.model.robot_list:
+                        robot.activo = True
                 robot.objetivo = self.objetivo
                 
     def pathfinding(self, destino):
@@ -217,7 +229,7 @@ class Robot(Agent):
         end = grid.node(destino[0], destino[1])
         finder = AStarFinder(diagonal_movement=DiagonalMovement.never)
         path, runs = finder.find_path(start, end, grid)
-        
+        print(grid.grid_str(path=self.path, start=start, end=end))
         return path
 
 class Caja(Agent):
@@ -329,6 +341,7 @@ class Room(Model):
                 caja = Caja(self, (x, y))                
             else:
                 caja = Caja(self, self.grid.find_empty())
+            self.matrix[caja.pos[1]][caja.pos[0]] = 0
 
             self.grid.place_agent(caja, caja.pos)
             self.schedule.add(caja)
@@ -341,11 +354,13 @@ class Room(Model):
                 estante = Estante(self, (x, y))
             else:
                 estante = Estante(self, self.grid.find_empty())
-                
+            self.matrix[estante.pos[1]][estante.pos[0]] = 0
+            
             self.grid.place_agent(estante, estante.pos)
             self.schedule.add(estante)
             self.shelf_list.append(estante)
             
+        print(self.matrix)
          # Recolector de información: procentaje de celdas limpiadas
         #self.boxesleft = self.count_type(self)
         self.time_datacollector = DataCollector({"Tiempo transcurrido": lambda m: self.step_counter})
