@@ -7,7 +7,7 @@ import Stats from 'three/examples/jsm/libs/stats.module.js'
 //We import the dat.gui library
 import { GUI } from 'dat.gui'
 //We import the GLTFLoader from three.js
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 var baseURL = "http://localhost:5000"
 var gameLink: string | null = null; //The game link can be string or null
@@ -26,14 +26,26 @@ const robotPath = 'models/Roomba.glb'
 const boxPath = 'models/Box.glb'
 const palletPath = 'models/WoodenPallet.glb'
 
+//We create an array to store the robots generated with the GLTFLoader
+const robots: THREE.Group[] = []
+//We create an array to store the pallets generated with the GLTFLoader
+const pallets: THREE.Group[] = []
+//We create an array to store the boxes generated with the GLTFLoader
+const boxes: THREE.Group[] = []
+//We create an array to store the brick/Walls generated with the GLTFLoader
+const bricks: THREE.Group[] = []
+//Variable to store number of robots
+var robotsNumber: number = 10;
+//Variable to store the number of pallets
+var palletsNumber: number = 10;
+
 //Boolean for first frame
 var firstFrame = true
 var robotsNumber = 0;
 //We create a cube to represent the robot
 const robotGeometry = new THREE.BoxGeometry(1, 1, 1)
 const robotMaterial = new THREE.MeshBasicMaterial({ color: 0x3c4d69 })
-//We create an array to store the robots
-var robots: THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>[] | { position: { x: number, y: number, z: number } }[] = []
+
 
 const stats = Stats() //Stats
 document.body.appendChild(stats.dom) //Add the stats to the body of the html
@@ -57,12 +69,10 @@ renderer.physicallyCorrectLights = true
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement) //Add the renderer to the body of the html
 
-//We add a robot
-addModel(0.5,0,0.5,0.038,robotPath)
-//We add a box
-addModel(2.5,0.1,2.5,3.2,boxPath)
-//We add a pallet
-addModel(2.5,0,2.5,0.125,palletPath)
+// //We add a box
+// addModel(2.5,0.1,2.5,3.2,boxPath)
+// //We add a pallet
+// addModel(2.5,0,2.5,0.125,palletPath)
 //We add a directional light to the scene
 addLight(15, 10, 15) //This is the light bulb
 
@@ -78,7 +88,7 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight)
   render()
 }
-const frame_rate = 250; // Refresh screen every 200 ms
+const frame_rate = 300; // Refresh screen every 200 ms
 var previous_time = Date.now();
 
 var render = async function () {
@@ -101,21 +111,28 @@ var render = async function () {
         robotsNumber = data[0].length;
         //We instantiate the robots
         for (var i = 0; i < robotsNumber; i++) {
-          //We create a robot
-          const robot = new THREE.Mesh(robotGeometry, robotMaterial)
-          //We add the robot to the scene
-          scene.add(robot)
-          //We add the robot to the array
-          robots.push(robot)
+          //We use the importGLFT function to add the robot to the scene
+          await importGLTFModel(i+0.5,0,i+0.5,0.030,robotPath,robots)
         }
       }
-      firstFrame = false;
-      // We assign the positions to the robots
-      for (var i = 0; i < robotsNumber; i++) {
-        robots[i].position.x = data[0][i].x + 0.5;
-        robots[i].position.z = data[0][i].y + 0.5;
-        robots[i].position.y = 0.5;
+
+      //If the robots array position is not undefined we update the position of the robots
+      if (robots[0] != undefined) {
+        for (var i = 0; i < robotsNumber; i++) {
+          robots[i].position.x = data[0][i].x + 0.5;
+          robots[i].position.z = data[0][i].y + 0.5;
+          robots[i].position.y = 0.05;
+        }
       }
+      // console.log(robots)
+      //await console.log(robots[0])
+      firstFrame = false;
+      // // // We assign the positions to the robots
+      // for (var i = 0; i < robotsNumber; i++) {
+      //   robots[i].position.x = data[0][i].x + 0.5;
+      //   robots[i].position.z = data[0][i].y + 0.5;
+      //   robots[i].position.y = 0.5;
+      // }
     }
     previous_time = now;
   }
@@ -125,48 +142,35 @@ var render = async function () {
 
 // Functions that are useful
 
-//We add a 3D model GLTF to the scene from the assets folder
-function addModel(x: number, y: number, z: number, scale: number, robotPath: string) {
-  //We create a new GLTFLoader
+//Function to import GLTF model and save it in an array
+function importGLTFModel(x: number, y: number, z: number, scale: number, modelPath: string, array: THREE.Group[]) { 
   const loader = new GLTFLoader()
-  //We load the model
-  loader.load(
-    //We pass the robotPath to the model
-    robotPath,
-    //We pass the function that will be executed after the model is loaded
-    function (gltf) {
-      //We get the model from the gltf object
-      const model = gltf.scene
-      //We set the model position
-      model.position.set(x, y, z)
-      //We set the model scale
-      model.scale.set(scale, scale, scale)
-      gltf.scene.traverse(function (child) {
-        if ((child as THREE.Mesh).isMesh) {
-            const m = child as THREE.Mesh
-            m.receiveShadow = true
-            m.castShadow = true
-        }
-        if ((child as THREE.Light).isLight) {
-            const l = child as THREE.Light
-            l.castShadow = true
-            l.shadow.bias = -0.003
-            l.shadow.mapSize.width = 2048
-            l.shadow.mapSize.height = 2048
-        }
-    })
-      //We add the model to the scene
-      scene.add(model)
-    },
-    //We pass the function that will be executed while the model is loading
-    //function (xhr) {
-      //console.log((xhr.loaded / xhr.total * 100) + '% loaded')
-    //},
-    //We pass the function that will be executed if there is an error loading the model
-    //function (error) {
-      //console.log('An error happened')
-    //}
-  )
+  loader.load(modelPath, (gltf) => { //We load the model
+    //We get the model from the gltf object
+    const model = gltf.scene
+    //We scale the model
+    model.scale.set(scale, scale, scale)
+    //We set the model position
+    model.position.set(x, y, z)
+    //We add the model to the array
+    array.push(model)
+    gltf.scene.traverse(function (child) { //We traverse the model
+      if ((child as THREE.Mesh).isMesh) { //If the child is a mesh we set the shadow properties
+          const m = child as THREE.Mesh //We cast the child to a mesh
+          m.receiveShadow = true //We set the receiveShadow property to true
+          m.castShadow = true //We set the castShadow property to true
+      }
+      if ((child as THREE.Light).isLight) { //If the child is a light we set the shadow properties
+          const l = child as THREE.Light //We cast the child to a light
+          l.castShadow = true //We set the castShadow property to true
+          l.shadow.bias = -0.003 //We set the bias property to -0.003
+          l.shadow.mapSize.width = 2048 //We set the width of the shadow map to 2048
+          l.shadow.mapSize.height = 2048 //We set the height of the shadow map to 2048
+      }
+  })
+    //We add the model to the scene
+    scene.add(model)
+  })
 }
 
 //We create a function to add a light to the scene
