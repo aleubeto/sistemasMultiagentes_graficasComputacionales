@@ -18,6 +18,7 @@ class Robot(Agent):
     def __init__(self, model, pos, width, height, intelligence):
         super().__init__(model.next_id(), model)
         self.condition = self.DEAMBULANDO
+        self.color = "Blue"
         self.pos = pos
         self.move_counter = 0
         self.w = width
@@ -32,8 +33,10 @@ class Robot(Agent):
         self.hallazgo = None
 
     def step(self):
-        #print("soy el robot en la", self.pos, "estoy", self.condition)
+        print("soy el robot", self.unique_id, "en la", self.pos, "estoy", self.condition)
         if self.activo == False:
+            self.color = "Gray"
+            print("estoy muerto")
             return
             
         if self.condition == self.DEAMBULANDO:
@@ -43,6 +46,7 @@ class Robot(Agent):
                 if self.objetivo == None:
                     self.activo = False
                 else:
+                    print("voy hacia", self.objetivo.pos)
                     self.path = self.pathfinding(self.objetivo.pos)
                     self.condition = self.ENCAMINO
             else:
@@ -71,17 +75,17 @@ class Robot(Agent):
                             self.cambiar_direccion()
                             
         elif self.condition == self.ENCAMINO:
-            #print(self.path)
-            #print(self.sig)
+            print(self.path)
+            print(self.sig)
             if self.sig < len(self.path):
                 paso = True
                 for element in self.model.grid.get_cell_list_contents(self.path[self.sig]):
                     if type(element) == Robot:
                         #element.model.grid.move_agent(element, self.path[self.sig - 1])
                         #self.model.move_counter += 1
-                        if self.carga != None:
-                            #print("hice un cambio de caja")
-                            self.cambiar_caja(element)
+                        if self.carga != None or element.activo == False:
+                            print("hice un cambio de caja con ", element.unique_id)
+                            self.cambiar(element)
                         paso = False
                         if self.intelligence == False and self.carga == None:
                             self.condition = self.DEAMBULANDO
@@ -101,7 +105,7 @@ class Robot(Agent):
                     self.model.boxstack_counter += 1
                     self.hallazgo = None
                     self.carga = None
-                    #print("guarde una caja")
+                    print("guarde una caja")
                 else:
                     self.condition = self.DEAMBULANDO
                     self.hallazgo = None
@@ -115,11 +119,12 @@ class Robot(Agent):
             self.sig = 1
             if self.objetivo == None:
                 self.activo = False
+                self.color = "Gray"
             else:
                 self.path = self.pathfinding(self.objetivo.pos)
                 self.condition = self.ENCAMINO
                 
-        #print("soy el robot en la", self.pos, "estoy", self.condition, "fuera")
+        print("soy el robot", self.unique_id, "en la", self.pos, "estoy", self.condition, "fuera")
         
     def cambiar_direccion(self):
         
@@ -147,6 +152,7 @@ class Robot(Agent):
                     self.model.grid.move_agent(self, element.pos)
                     self.model.move_counter += 1
                     element.condition = element.OCUPADA
+                    element.color = "Green"
                     self.carga = element
                     element.cargada = True
                     for robot in self.model.robot_list:
@@ -166,6 +172,7 @@ class Robot(Agent):
                 caja_menor = caja
         if caja_menor != None:
             caja_menor.condition = caja_menor.OCUPADA
+            caja_menor.color = "Green"
             
         return caja_menor
     
@@ -182,14 +189,16 @@ class Robot(Agent):
             
         return estante_mejor
     
-    def cambiar_caja(self, robot):
+    def cambiar(self, robot):
         if robot.activo == False or robot.carga == None:
+            robot.color = "Blue"
             robot.activo = True
             robot.carga = self.carga
             robot.sig = self.sig + 1
             robot.path = self.path
             robot.condition = self.ENCAMINO
-            self.model.grid.move_agent(robot.carga, robot.pos)
+            if self.carga != None:
+                self.model.grid.move_agent(robot.carga, robot.pos)
             self.hallazgo = None
             self.carga = None
             self.condition = self.DEAMBULANDO
@@ -197,6 +206,10 @@ class Robot(Agent):
             self.path = []
             if self.intelligence == False:
                 self.cambiar_direccion()
+            else:
+                if type(robot.objetivo) == Caja:
+                    robot.objetivo.condition = robot.objetivo.DISPONIBLE
+                robot.objetivo = self.objetivo
                 
     def pathfinding(self, destino):
         grid = pathGrid(width=self.w, height=self.h, matrix=self.model.matrix)
@@ -215,6 +228,7 @@ class Caja(Agent):
         self.condition = self.DISPONIBLE
         self.pos = pos
         self.cargada = False
+        self.color = "Brown"
 
     def step(self):
         pass
@@ -354,14 +368,14 @@ class Room(Model):
         self.time_datacollector.collect(self)
         #self.boxes_datacollector.collect(self)
         self.move_datacollector.collect(self)
-        #print("cuenta cajas", self.count_type(self))
-        #print("cuenta apiladas", self.boxstack_counter)
+        print("cuenta cajas", self.count_type(self))
+        print("cuenta apiladas", self.boxstack_counter)
         if self.step_counter >= self.time_limit or self.count_type(self)==self.boxstack_counter:
             self.running = False
             
 def agent_portrayal(agent):
     if type(agent) == Caja:
-        return {"Shape": "rect", "w": 1, "h": 1, "Filled": "true", "Color": "Brown", "Layer": 1}
+        return {"Shape": "rect", "w": 1, "h": 1, "Filled": "true", "Color": agent.color, "Layer": 1}
     
     elif type(agent) == Estante:
         if agent.cuenta_cajas >= 0 and agent.cuenta_cajas < 2:
@@ -375,7 +389,7 @@ def agent_portrayal(agent):
         return {"Shape": "rect", "w": 1, "h": 1, "Filled": "true", "Color": "Gray", "Layer": 2}
     
     elif type(agent) == Robot:
-        return {"Shape": "circle", "r": 1, "Filled": "true", "Color": "Blue", "Layer": 3}
+        return {"Shape": "circle", "r": 1, "Filled": "true", "Color": agent.color, "Layer": 3}
     
 grid = CanvasGrid(agent_portrayal, 30, 30, 450, 450)
 
