@@ -129,7 +129,8 @@ var render = async function () {
         //We instantiate the bricks
         for (var i = 0; i < bricksNumber; i++) {
           //We use the importGLFT function to add the bricks to the scene
-          await importGLTFModel(0.5,0.5,0.5,0.48,brickPath,bricks)
+          await importGLTFModel(data[1][i].x+0.5,0.5,data[1][i].y+0.5,0.48,brickPath,bricks)
+          await addModel(data[1][i].x+0.5,1.5,data[1][i].y+0.5,0.48,brickPath)
         }
       }
 
@@ -157,6 +158,7 @@ var render = async function () {
     }
     previous_time = now;
   }
+  stats.update() //We update the stats
   requestAnimationFrame(render);
   renderer.render(scene, camera);
 };
