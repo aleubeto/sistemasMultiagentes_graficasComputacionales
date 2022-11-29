@@ -49,6 +49,7 @@ def queryState(id):
         elif type(agent) == Caja: #Add to box array
             boxes.append(g)
         else:
+            g["count"] = agent.cuenta_cajas
             shelves.append(g)
             
     result.append(robots)
