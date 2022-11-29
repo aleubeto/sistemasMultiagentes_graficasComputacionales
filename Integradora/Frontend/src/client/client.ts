@@ -49,7 +49,7 @@ var palletsNumber = 0;
 //HTML new object
 const htmlFrame = document.getElementById('frame') as HTMLCanvasElement;
 const stats = Stats() //Stats
-htmlFrame.appendChild(stats.dom) //Add the stats to the body of the html
+//htmlFrame.appendChild(stats.dom) //Add the stats to the body of the html
 
 const scene = new THREE.Scene()
 //Add an axes helper to the scene
