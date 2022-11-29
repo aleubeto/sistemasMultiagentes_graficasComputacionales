@@ -7,7 +7,7 @@ import Stats from 'three/examples/jsm/libs/stats.module.js'
 //We import the dat.gui library
 import { GUI } from 'dat.gui'
 //We import the GLTFLoader from three.js
-import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 var baseURL = "http://localhost:5000"
 var gameLink: string | null = null; //The game link can be string or null
@@ -27,6 +27,7 @@ const boxPath = 'models/Box.glb'
 const palletPath = 'models/WoodenPallet.glb'
 const zuckPath = 'models/ZuckHead.glb'
 const doorPath = 'models/Door.glb'
+const brickPath = 'models/Brick.glb'
 
 //We create an array to store the robots generated with the GLTFLoader
 const robots: THREE.Group[] = []
@@ -37,14 +38,14 @@ const boxes: THREE.Group[] = []
 //We create an array to store the brick/Walls generated with the GLTFLoader
 const bricks: THREE.Group[] = []
 //Variable to store number of robots
-var robotsNumber: number = 10;
+var robotsNumber: number = 0;
 //Variable to store the number of pallets
-var palletsNumber: number = 10;
+var palletsNumber: number = 0;
+//Variable to store the number of bricks
+var bricksNumber: number = 0;
 
 //Boolean for first frame
 var firstFrame = true
-var robotsNumber = 0;
-var palletsNumber = 0;
 
 const stats = Stats() //Stats
 document.body.appendChild(stats.dom) //Add the stats to the body of the html
@@ -110,40 +111,49 @@ var render = async function () {
 
       if (firstFrame == true) {
         //From data we get how many robots are in the game
-        robotsNumber = data[0].length;
+        robotsNumber = await data[0].length;
         //We instantiate the robots
         for (var i = 0; i < robotsNumber; i++) {
           //We use the importGLFT function to add the robot to the scene
-          importGLTFModel(i+0.5,0,i+0.5,0.030,robotPath,robots)
+          await importGLTFModel(i+0.5,0,i+0.5,0.030,robotPath,robots)
         }
-        //From date we get how many pallets are in the game
-        palletsNumber = data[3].length;
+        //From data we get how many pallets are in the game
+        palletsNumber = await data[3].length;
         //We instantiate the pallets
         for (var i = 0; i < palletsNumber; i++) {
           //We use the importGLFT function to add the pallet to the scene
-          importGLTFModel(0.5,0,0.5,0.125,palletPath,pallets)
+          await importGLTFModel(0.5,0,0.5,0.125,palletPath,pallets)
+        }
+        //From data we get how many bricks are in the game
+        bricksNumber = await data[1].length;
+        //We instantiate the bricks
+        for (var i = 0; i < bricksNumber; i++) {
+          //We use the importGLFT function to add the bricks to the scene
+          await importGLTFModel(0.5,0.5,0.5,0.48,brickPath,bricks)
         }
       }
 
+      firstFrame = false;
+
       //console.log(robots)
-      console.log(pallets)
+      //console.log(pallets)
+      console.log(bricks)
 
       //If the robots array position is not undefined we update the position of the robots
       if (robots[0] != undefined && pallets[0] != undefined) {
         for (var i = 0; i < robotsNumber; i++) {
-          robots[i].position.x = data[0][i].x + 0.5;
-          robots[i].position.z = data[0][i].y + 0.5;
+          robots[i].position.x = await data[0][i].x + 0.5;
+          robots[i].position.z = await data[0][i].y + 0.5;
           robots[i].position.y = 0.05;
         }
         for (var i = 0; i < palletsNumber; i++) {
-          pallets[i].position.x = data[3][i].x + 0.5;
-          pallets[i].position.z = data[3][i].y + 0.5;
+          pallets[i].position.x = await data[3][i].x + 0.5;
+          pallets[i].position.z = await data[3][i].y + 0.5;
           pallets[i].position.y = 0;
         }
       }
       // console.log(robots)
       //await console.log(robots[0])
-      firstFrame = false;
     }
     previous_time = now;
   }
@@ -154,9 +164,9 @@ var render = async function () {
 // Functions that are useful
 
 //Function to import GLTF model and save it in an array
-function importGLTFModel(x: number, y: number, z: number, scale: number, modelPath: string, array: THREE.Group[]) { 
+async function importGLTFModel(x: number, y: number, z: number, scale: number, modelPath: string, array: THREE.Group[]) { 
   const loader = new GLTFLoader()
-  loader.load(modelPath, (gltf) => { //We load the model
+  loader.load(modelPath, async (gltf) => { //We load the model
     //We get the model from the gltf object
     const model = gltf.scene
     //We scale the model
@@ -184,7 +194,7 @@ function importGLTFModel(x: number, y: number, z: number, scale: number, modelPa
   })
 }
 
-function addModel(x: number, y: number, z: number, scale: number, path: string) {
+async function addModel(x: number, y: number, z: number, scale: number, path: string) {
   //We create a new GLTFLoader
   const loader = new GLTFLoader()
   //We load the model
@@ -192,7 +202,7 @@ function addModel(x: number, y: number, z: number, scale: number, path: string) 
     //We pass the path to the model
     path,
     //We pass the function that will be executed after the model is loaded
-    function (gltf) {
+    async function (gltf) {
       //We get the model from the gltf object
       const model = gltf.scene
       //We set the model position
