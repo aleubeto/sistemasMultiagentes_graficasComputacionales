@@ -13,68 +13,68 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 var firstFrame = true
 var robotsNumber = 0;
 
-// //We create a variable path to store the path to the assets folder
-// const path = 'models/monkey.gltf'
+//We create a variable path to store the path to the assets folder
+const path = 'models/monkey.glb'
 
-// //We add a 3D model GLTF to the scene from the assets folder
-// function addModel(x: number, y: number, z: number, scale: number, path: string) {
-//     //We create a new GLTFLoader
-//     const loader = new GLTFLoader()
-//     //We load the model
-//     loader.load(
-//         //We pass the path to the model
-//         path,
-//         //We pass the function that will be executed after the model is loaded
-//         function (gltf) {
-//             //We get the model from the gltf object
-//             const model = gltf.scene.children[0]
-//             //We set the model position
-//             model.position.set(x, y, z)
-//             //We set the model scale
-//             model.scale.set(scale, scale, scale)
-//             //We add the model to the scene
-//             scene.add(model)
-//         },
-//         //We pass the function that will be executed while the model is loading
-//         function (xhr) {
-//             console.log((xhr.loaded / xhr.total * 100) + '% loaded')
-//         },
-//         //We pass the function that will be executed if there is an error loading the model
-//         function (error) {
-//             console.log('An error happened')
-//         }
-//     )
-// }
+//We add a 3D model GLTF to the scene from the assets folder
+function addModel(x: number, y: number, z: number, scale: number, path: string) {
+    //We create a new GLTFLoader
+    const loader = new GLTFLoader()
+    //We load the model
+    loader.load(
+        //We pass the path to the model
+        path,
+        //We pass the function that will be executed after the model is loaded
+        function (gltf) {
+            //We get the model from the gltf object
+            const model = gltf.scene
+            //We set the model position
+            model.position.set(x, y, z)
+            //We set the model scale
+            model.scale.set(scale, scale, scale)
+            //We add the model to the scene
+            scene.add(model)
+        },
+        //We pass the function that will be executed while the model is loading
+        function (xhr) {
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded')
+        },
+        //We pass the function that will be executed if there is an error loading the model
+        function (error) {
+            console.log('An error happened')
+        }
+    )
+}
 
-// addModel(0.5, 0.5, 0.5, 20, path)
+addModel(5, 5, 5, 1, path)
 
-const loader = new GLTFLoader()
-loader.load(
-    'models/monkey.glb',
-    function (gltf) {
-        // gltf.scene.traverse(function (child) {
-        //     if ((child as THREE.Mesh).isMesh) {
-        //         const m = (child as THREE.Mesh)
-        //         m.receiveShadow = true
-        //         m.castShadow = true
-        //     }
-        //     if (((child as THREE.Light)).isLight) {
-        //         const l = (child as THREE.Light)
-        //         l.castShadow = true
-        //         l.shadow.bias = -.003
-        //         l.shadow.mapSize.width = 2048
-        //         l.shadow.mapSize.height = 2048
-        //     }
-        // })
-        scene.add(gltf.scene)
-    },
-    (xhr) => {
-        console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
-    },
-    (error) => {
-        console.log(error)
-    }
-)
+// const loader = new GLTFLoader()
+// loader.load(
+//     'models/monkey.glb',
+//     function (gltf) {
+//         // gltf.scene.traverse(function (child) {
+//         //     if ((child as THREE.Mesh).isMesh) {
+//         //         const m = (child as THREE.Mesh)
+//         //         m.receiveShadow = true
+//         //         m.castShadow = true
+//         //     }
+//         //     if (((child as THREE.Light)).isLight) {
+//         //         const l = (child as THREE.Light)
+//         //         l.castShadow = true
+//         //         l.shadow.bias = -.003
+//         //         l.shadow.mapSize.width = 2048
+//         //         l.shadow.mapSize.height = 2048
+//         //     }
+//         // })
+//         scene.add(gltf.scene)
+//     },
+//     (xhr) => {
+//         console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+//     },
+//     (error) => {
+//         console.log(error)
+//     }
+// )
 
 //We create a function to add a light to the scene
 function addLight(x: number, y: number, z: number) {
