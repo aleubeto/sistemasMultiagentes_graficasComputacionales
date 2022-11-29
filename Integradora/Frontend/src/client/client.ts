@@ -46,8 +46,10 @@ var firstFrame = true
 var robotsNumber = 0;
 var palletsNumber = 0;
 
+//HTML new object
+var htmlFrame = document.getElementById('frame');
 const stats = Stats() //Stats
-document.body.appendChild(stats.dom) //Add the stats to the body of the html
+htmlFrame!.appendChild(stats.dom) //Add the stats to the body of the html
 
 const scene = new THREE.Scene()
 //Add an axes helper to the scene
@@ -69,7 +71,7 @@ camera.rotation.y = 20
 const renderer = new THREE.WebGLRenderer()
 renderer.physicallyCorrectLights = true
 renderer.setSize(window.innerWidth, window.innerHeight)
-document.body.appendChild(renderer.domElement) //Add the renderer to the body of the html
+htmlFrame!.appendChild(renderer.domElement) //Add the renderer to the body of the html
 
 // //We add a box
 // addModel(2.5,0.1,2.5,3.2,boxPath)
