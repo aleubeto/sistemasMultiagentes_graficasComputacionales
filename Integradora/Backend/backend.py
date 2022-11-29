@@ -47,6 +47,7 @@ def queryState(id):
         elif type(agent) == WallBlock: #Add to wall array
             walls.append(g)
         elif type(agent) == Caja: #Add to box array
+            g["status"] = agent.cargada
             boxes.append(g)
         else:
             g["count"] = agent.cuenta_cajas
