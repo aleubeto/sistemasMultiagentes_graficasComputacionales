@@ -21,8 +21,10 @@ fetch(baseURL + "/games", {
   }
 });
 
-//We create a variable path to store the path to the assets folder
-const path = 'models/Roomba.glb'
+//We create a variable robotPath to store the robotPath to the assets folder
+const robotPath = 'models/Roomba.glb'
+const boxPath = 'models/Box.glb'
+const palletPath = 'models/WoodenPallet.glb'
 
 //Boolean for first frame
 var firstFrame = true
@@ -55,8 +57,14 @@ renderer.physicallyCorrectLights = true
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement) //Add the renderer to the body of the html
 
-addModel(0.5,0,0.5,0.038,path)
-
+//We add a robot
+addModel(0.5,0,0.5,0.038,robotPath)
+//We add a box
+addModel(2.5,0.1,2.5,3.2,boxPath)
+//We add a pallet
+addModel(2.5,0,2.5,0.125,palletPath)
+//We add a directional light to the scene
+addLight(15, 10, 15) //This is the light bulb
 
 const controls = new OrbitControls(camera, renderer.domElement) //OrbitControls
 //controls.addEventListener('change', render) // use if there is no animation loop. The first parameter is the event type, the second is the callback function.
@@ -118,13 +126,13 @@ var render = async function () {
 // Functions that are useful
 
 //We add a 3D model GLTF to the scene from the assets folder
-function addModel(x: number, y: number, z: number, scale: number, path: string) {
+function addModel(x: number, y: number, z: number, scale: number, robotPath: string) {
   //We create a new GLTFLoader
   const loader = new GLTFLoader()
   //We load the model
   loader.load(
-    //We pass the path to the model
-    path,
+    //We pass the robotPath to the model
+    robotPath,
     //We pass the function that will be executed after the model is loaded
     function (gltf) {
       //We get the model from the gltf object
@@ -133,24 +141,38 @@ function addModel(x: number, y: number, z: number, scale: number, path: string) 
       model.position.set(x, y, z)
       //We set the model scale
       model.scale.set(scale, scale, scale)
+      gltf.scene.traverse(function (child) {
+        if ((child as THREE.Mesh).isMesh) {
+            const m = child as THREE.Mesh
+            m.receiveShadow = true
+            m.castShadow = true
+        }
+        if ((child as THREE.Light).isLight) {
+            const l = child as THREE.Light
+            l.castShadow = true
+            l.shadow.bias = -0.003
+            l.shadow.mapSize.width = 2048
+            l.shadow.mapSize.height = 2048
+        }
+    })
       //We add the model to the scene
       scene.add(model)
     },
     //We pass the function that will be executed while the model is loading
-    function (xhr) {
-      console.log((xhr.loaded / xhr.total * 100) + '% loaded')
-    },
+    //function (xhr) {
+      //console.log((xhr.loaded / xhr.total * 100) + '% loaded')
+    //},
     //We pass the function that will be executed if there is an error loading the model
-    function (error) {
-      console.log('An error happened')
-    }
+    //function (error) {
+      //console.log('An error happened')
+    //}
   )
 }
 
 //We create a function to add a light to the scene
 function addLight(x: number, y: number, z: number) {
   //We create a new directional light
-  const light = new THREE.DirectionalLight(0xffffff, 1)
+  const light = new THREE.DirectionalLight(0xffffff, 10)
   //We set the light position
   light.position.set(x, y, z)
   //We add the light to the scene
