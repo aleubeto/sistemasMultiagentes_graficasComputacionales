@@ -252,7 +252,7 @@ var render = async function () {
     //Camara cenital
     camera.position.x = 15;
     camera.position.z = 15;
-    camera.position.y = 17;
+    camera.position.y = 13;
     //camera.rotateX(-Math.PI/2);
   }
   else if(cam3 == true){
@@ -370,8 +370,8 @@ function addWall(x: number, y: number, z: number, width: number, height: number)
   const wallTexture = new THREE.TextureLoader().load(
     'https://threejsfundamentals.org/threejs/resources/images/checker.png'
   )
-  wallTexture.wrapS = THREE.RepeatWrapping
-  wallTexture.wrapT = THREE.RepeatWrapping
+  //wallTexture.wrapS = THREE.RepeatWrapping
+  //wallTexture.wrapT = THREE.RepeatWrapping
   wallTexture.magFilter = THREE.NearestFilter
   wallTexture.repeat.set(15, 15)
   wallMaterial.map = wallTexture
@@ -403,8 +403,8 @@ function setWalls() {
   const floorTexture = new THREE.TextureLoader().load(
     'https://threejsfundamentals.org/threejs/resources/images/checker.png'
   )
-  floorTexture.wrapS = THREE.RepeatWrapping
-  floorTexture.wrapT = THREE.RepeatWrapping
+  //floorTexture.wrapS = THREE.RepeatWrapping
+  //floorTexture.wrapT = THREE.RepeatWrapping
   floorTexture.magFilter = THREE.NearestFilter
   floorTexture.repeat.set(15, 15)
   floorMaterial.map = floorTexture
