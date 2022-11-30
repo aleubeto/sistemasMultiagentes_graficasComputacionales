@@ -72,21 +72,20 @@ class Robot(Agent):
                     if self.carga == None:
                         siguiente = (self.pos[0] + self.direccion[0], self.pos[1] + self.direccion[1])
                         paso = True
-                        for element in self.model.grid.get_cell_list_contents(siguiente):
-                            if type(element) == Robot:
-                                element.cambiar_direccion()
-                                paso = False
-                            elif type(element) == WallBlock:
-                                paso = False
-                                
-                        if paso:
+                        if self.model.grid.is_cell_empty(siguiente):
                             self.model.grid.move_agent(self, siguiente)
                             self.model.move_counter += 1
+                        #for element in self.model.grid.get_cell_list_contents(siguiente):
+                        #    if type(element) == Robot:
+                        #        element.cambiar_direccion()
+                        #        paso = False
+                        #    elif type(element) == WallBlock:
+                        #        paso = False
                         else:
                             self.cambiar_direccion()
                             
         elif self.condition == self.ENCAMINO:
-            if self.sig < len(self.path):
+            if self.sig < len(self.path) - 1:
                 paso = True
                 for element in self.model.grid.get_cell_list_contents(self.path[self.sig]):
                     if type(element) == Robot:
@@ -108,6 +107,8 @@ class Robot(Agent):
                     self.model.grid.move_agent(self.carga, self.path[len(self.path) - 1])
                     self.condition = self.DEAMBULANDO
                     self.model.boxstack_counter += 1
+                    self.objetivo.cuenta_stack += 1
+                    self.carga.numero = self.objetivo.cuenta_stack
                     self.hallazgo = None
                     self.carga = None
                     #print("guarde una caja")
@@ -116,6 +117,7 @@ class Robot(Agent):
                     self.hallazgo = None
                     if self.intelligence:
                         self.carga = self.objetivo
+                        self.model.grid.move_agent(self.carga, self.pos)
                         self.objetivo.cargada = True
                         self.condition = self.REGRESARESTANTE
 
@@ -129,6 +131,7 @@ class Robot(Agent):
             else:
                 self.model.matrix[self.objetivo.pos[1]][self.objetivo.pos[0]] = 1
                 self.path = self.pathfinding(self.objetivo.pos)
+                self.model.matrix[self.objetivo.pos[1]][self.objetivo.pos[0]] = 0
                 if self.path == []:
                     self.model.matrix[self.objetivo.pos[1]][self.objetivo.pos[0]] = 0
                     self.objetivo = self.encontrar_estante_emergencia()
@@ -138,6 +141,7 @@ class Robot(Agent):
                     else:
                         self.model.matrix[self.objetivo.pos[1]][self.objetivo.pos[0]] = 1
                         self.path = self.pathfinding(self.objetivo.pos)
+                        self.model.matrix[self.objetivo.pos[1]][self.objetivo.pos[0]] = 0
                 if self.path != []:
                     self.objetivo.cuenta_cajas += 1
                     #print(self.path)
@@ -275,6 +279,7 @@ class Caja(Agent):
         self.condition = self.DISPONIBLE
         self.pos = pos
         self.cargada = False
+        self.numero = 0
         self.color = "Brown"
 
     def step(self):
@@ -286,6 +291,7 @@ class Estante(Agent):
         super().__init__(model.next_id(), model)
         self.pos = pos
         self.cuenta_cajas = 0
+        self.cuenta_stack = 0
 
     def step(self):
         pass
@@ -302,7 +308,7 @@ class WallBlock(Agent):
 
 class Room(Model):
 
-    def __init__(self, height=30, width=30, space_rows=3, space_cols=3, length_wall=3, robots=10, boxes=5, shelves=1, step_counter=1, move_counter=0, boxstack_counter=0, time_limit=50, intelligence=False):
+    def __init__(self, height=30, width=30, space_rows=3, space_cols=2, length_wall=6, robots=10, boxes=25, shelves=5, step_counter=1, move_counter=0, boxstack_counter=0, time_limit=50, intelligence=False):
         
         super().__init__()
         
@@ -440,7 +446,7 @@ def agent_portrayal(agent):
     
     elif type(agent) == Robot:
         return {"Shape": "circle", "r": 1, "Filled": "true", "Color": agent.color, "Layer": 3}
-    
+
 grid = CanvasGrid(agent_portrayal, 30, 30, 450, 450)
 
 # Creación de tabla que grafica datacollector
