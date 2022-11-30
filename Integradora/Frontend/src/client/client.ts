@@ -193,7 +193,9 @@ var render = async function () {
         //We instantiate the robots
         for (var i = 0; i < robotsNumber; i++) {
           //We use the importGLFT function to add the robot to the scene
-          await importGLTFModel(i + 0.5, 0, i + 0.5, 0.030, robotPath, robots)
+          await importGLTFModel(i,0,i, 0.030, robotPath, robots)
+          //We add a point light to each robot in the first frame
+          await addPointLightArray(i,0.25,i,lights)
         }
         //From data we get how many pallets are in the game
         palletsNumber = await data[3].length;
@@ -231,6 +233,7 @@ var render = async function () {
           robots[i].position.x = await data[0][i].x + 0.5;
           robots[i].position.z = await data[0][i].y + 0.5;
           robots[i].position.y = 0.05;
+          await changePointLightPosition(lights,i,await data[0][i].x,0.5,await data[0][i].y)
         }
         for (var i = 0; i < palletsNumber; i++) {
           pallets[i].position.x = await data[3][i].x + 0.5;
@@ -377,7 +380,7 @@ function addLight(x: number, y: number, z: number) {
 // }
 
 //We create a function to add a point light over each robot and push it to an array
-function addPointLightArray(x: number, y: number, z: number, array: THREE.PointLight[]) {
+async function addPointLightArray(x: number, y: number, z: number, array: THREE.PointLight[]) {
   var pointLight = new THREE.PointLight(0xff0000, 1, 100)
   pointLight.position.set(x, y, z)
   scene.add(pointLight)
@@ -385,12 +388,12 @@ function addPointLightArray(x: number, y: number, z: number, array: THREE.PointL
 }
 
 //Function to acces to an specific pointLight in array and change the position of it
-function changePointLightPosition(array: THREE.PointLight[], index: number, x: number, y: number, z: number) {
+async function changePointLightPosition(array: THREE.PointLight[], index: number, x: number, y: number, z: number) {
   array[index].position.set(x, y, z)
 }
 
 //Function to acces to an specific pointLight in array and change the color of it
-function changePointLightColor(array: THREE.PointLight[], index: number, color: number) {
+async function changePointLightColor(array: THREE.PointLight[], index: number, color: number) {
   array[index].color.setHex(color)
 }
 
@@ -479,18 +482,18 @@ function addSkyBox(path: string) {
 // GUI
 const gui = new GUI() //Dat.gui
 const cameraFolder = gui.addFolder('Camera') //Add a cameraFolder to the dat.gui
-cameraFolder.add(camera.position, 'x', -5, 5, 0.01) //Add the x position to the dat.gui
-cameraFolder.add(camera.position, 'y', -5, 5, 0.01) //Add the y position to the dat.gui
-cameraFolder.add(camera.position, 'z', -5, 100, 0.01) //Add the z position to the dat.gui
+cameraFolder.add(camera.position, 'x', -100, 100, 0.01) //Add the x position to the dat.gui
+cameraFolder.add(camera.position, 'y', -100, 100, 0.01) //Add the y position to the dat.gui
+cameraFolder.add(camera.position, 'z', -100, 100, 0.01) //Add the z position to the dat.gui
 cameraFolder.add(camera.rotation, 'x', 0, 2 * Math.PI, 0.01) //Add the x rotation to the dat.gui
 cameraFolder.add(camera.rotation, 'y', 0, 2 * Math.PI, 0.01) //Add the y rotation to the dat.gui
 cameraFolder.add(camera.rotation, 'z', 0, 2 * Math.PI, 0.01) //Add the z rotation to the dat.gui
-cameraFolder.add(camera, 'fov', 0, 180, 0.01) //Add the fov to the dat.gui
-cameraFolder.add(camera, 'near', 0, 5, 0.01) //Add the near to the dat.gui
-cameraFolder.add(camera, 'far', 0, 5, 0.01) //Add the far to the dat.gui
-cameraFolder.add(camera, 'zoom', 0, 5, 0.01) //Add the zoom to the dat.gui
-cameraFolder.add(camera, 'focus', 0, 5, 0.01) //Add the focus to the dat.gui
-cameraFolder.add(camera, 'aspect', 0, 5, 0.01) //Add the aspect to the dat.gui
+// cameraFolder.add(camera, 'fov', 0, 180, 0.01) //Add the fov to the dat.gui
+// cameraFolder.add(camera, 'near', 0, 5, 0.01) //Add the near to the dat.gui
+// cameraFolder.add(camera, 'far', 0, 5, 0.01) //Add the far to the dat.gui
+// cameraFolder.add(camera, 'zoom', 0, 5, 0.01) //Add the zoom to the dat.gui
+// cameraFolder.add(camera, 'focus', 0, 5, 0.01) //Add the focus to the dat.gui
+// cameraFolder.add(camera, 'aspect', 0, 5, 0.01) //Add the aspect to the dat.gui
 
 setWalls();
 render();
