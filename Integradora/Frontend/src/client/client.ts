@@ -28,6 +28,16 @@ const palletPath = 'models/WoodenPallet.glb'
 const zuckPath = 'models/ZuckHead.glb'
 const doorPath = 'models/Door.glb'
 const brickPath = 'models/Brick.glb'
+const floorPath = 'img/Floor.png'
+const songPath = 'sounds/Song.mp3'
+const wallPath = 'img/Wall.png'
+
+
+//We play a song
+function playSong() {
+  var audio = new Audio(songPath);
+  audio.play();
+}
 
 //We create an array to store the robots generated with the GLTFLoader
 const robots: THREE.Group[] = []
@@ -60,13 +70,13 @@ var cam3 = false
 const canvas = document.getElementById('frame') as HTMLCanvasElement;
 const container = document.getElementById('frame-container') as HTMLDivElement;
 const stats = Stats() //Stats
-//htmlFrame.appendChild(stats.dom) //Add the stats to the body of the html
+container.appendChild(stats.dom) //Add the stats to the body of the html
 
 const scene = new THREE.Scene()
 scene.background = new THREE.Color(0x0e1231)
 //Add an axes helper to the scene
 const axesHelper = new THREE.AxesHelper(1000)
-scene.add(axesHelper)
+//scene.add(axesHelper)
 
 //We add models to the scene
 // addModel(15,7,15,2,zuckPath) //We add the zuckHead to the scene
@@ -77,9 +87,9 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 )
-camera.position.x = 15;
-camera.position.z = 15;
-camera.position.y = 17;
+camera.position.x = 2;
+camera.position.z = 28;
+camera.position.y = 8;
 
 const renderer = new THREE.WebGLRenderer({ canvas: canvas })
 renderer.physicallyCorrectLights = true
@@ -142,6 +152,10 @@ function doKeyDown(evt: { keyCode: any }) {
     case 40:
       actY++;
     break;
+    //Easter egg
+    case 82:
+      playSong();
+    break;
   }
 }
 
@@ -152,7 +166,7 @@ function onWindowResize() {
   renderer.setSize(container.offsetWidth, container.offsetHeight)
   render()
 }
-const frame_rate = 300; // Refresh screen every 200 ms
+const frame_rate = 100; // Refresh screen every 200 ms
 var previous_time = Date.now();
 
 var render = async function () {
@@ -171,6 +185,7 @@ var render = async function () {
       var data = await res.json(); // parse JSON to JS object that contains the positions of the 10 robots in every step
 
       if (firstFrame == true) {
+        camera.lookAt(30, -5, 10)
         //From data we get how many robots are in the game
         robotsNumber = await data[0].length;
         //We instantiate the robots
@@ -206,10 +221,10 @@ var render = async function () {
 
       //console.log(robots)
       //console.log(pallets)
-      console.log(bricks)
+      //console.log(bricks)
 
       //If the robots array position is not undefined we update the position of the robots
-      if (robots[0] != undefined && pallets[0] != undefined && boxes[0] != undefined) {
+      if (robots[0] != undefined && pallets[0] != undefined && boxes[0] != undefined && data[4][0].run == true) {
         for (var i = 0; i < robotsNumber; i++) {
           robots[i].position.x = await data[0][i].x + 0.5;
           robots[i].position.z = await data[0][i].y + 0.5;
@@ -253,6 +268,7 @@ var render = async function () {
     camera.position.x = 15;
     camera.position.z = 15;
     camera.position.y = 13;
+    //camera.lookAt(0, -150, 0)
     //camera.rotateX(-Math.PI/2);
   }
   else if(cam3 == true){
@@ -368,12 +384,12 @@ function addWall(x: number, y: number, z: number, width: number, height: number)
   })
   //We set the texture of the wall from a file
   const wallTexture = new THREE.TextureLoader().load(
-    'https://threejsfundamentals.org/threejs/resources/images/checker.png'
+    wallPath
   )
   //wallTexture.wrapS = THREE.RepeatWrapping
   //wallTexture.wrapT = THREE.RepeatWrapping
   wallTexture.magFilter = THREE.NearestFilter
-  wallTexture.repeat.set(15, 15)
+  wallTexture.repeat.set(1, 1)
   wallMaterial.map = wallTexture
   const wall = new THREE.Mesh(wallGeometry, wallMaterial)
   wall.position.x = x
@@ -401,12 +417,12 @@ function setWalls() {
   })
   //We add a texture to the floor
   const floorTexture = new THREE.TextureLoader().load(
-    'https://threejsfundamentals.org/threejs/resources/images/checker.png'
+    floorPath
   )
-  //floorTexture.wrapS = THREE.RepeatWrapping
-  //floorTexture.wrapT = THREE.RepeatWrapping
+  floorTexture.wrapS = THREE.RepeatWrapping
+  floorTexture.wrapT = THREE.RepeatWrapping
   floorTexture.magFilter = THREE.NearestFilter
-  floorTexture.repeat.set(15, 15)
+  floorTexture.repeat.set(4, 4)
   floorMaterial.map = floorTexture
   const floor = new THREE.Mesh(floorGeometry, floorMaterial)
   floor.rotation.x = Math.PI / 2
