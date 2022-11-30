@@ -30,13 +30,21 @@ p{
     width: 90vw;
     justify-content: space-between;
 }
-.model{
-    background-color: #f0f0f1;
+
+.model-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border-radius: 15px;
     width: 70%;
     height: 100%;
     color: #191919;
 }
+
+.model {
+    border-radius: 15px;
+}
+
 .head{
     display: flex;
     width: 25%;

@@ -48,6 +48,7 @@ var palletsNumber = 0;
 
 //HTML new object
 const canvas = document.getElementById('frame') as HTMLCanvasElement;
+const container = document.getElementById('frame-container') as HTMLDivElement;
 const stats = Stats() //Stats
 //htmlFrame.appendChild(stats.dom) //Add the stats to the body of the html
 
@@ -61,7 +62,7 @@ addModel(15,7,15,2,zuckPath) //We add the zuckHead to the scene
 addModel(15,0.1,30,2,doorPath) //We add the door to the scene
 const camera = new THREE.PerspectiveCamera(
   100,
-  window.innerWidth / window.innerHeight,
+  parent.innerWidth / parent.innerHeight,
   0.1,
   1000
 )
@@ -70,7 +71,7 @@ camera.rotation.y = 20
 
 const renderer = new THREE.WebGLRenderer({canvas:canvas})
 renderer.physicallyCorrectLights = true
-renderer.setSize(parent.innerWidth, parent.innerHeight)
+renderer.setSize(container.offsetWidth, container.offsetHeight)
 //htmlFrame.appendChild(renderer.domElement) //Add the renderer to the body of the html
 
 // //We add a box
@@ -87,9 +88,9 @@ const controls = new OrbitControls(camera, renderer.domElement) //OrbitControls
 
 window.addEventListener('resize', onWindowResize, false)
 function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight
+  camera.aspect = container.offsetWidth / container.offsetHeight
   camera.updateProjectionMatrix()
-  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.setSize(container.offsetWidth, container.offsetHeight)
   render()
 }
 const frame_rate = 300; // Refresh screen every 200 ms
