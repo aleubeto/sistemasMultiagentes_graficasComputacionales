@@ -39,6 +39,7 @@ const boxes: THREE.Group[] = []
 const bricks: THREE.Group[] = []
 //Variable to store number of robots
 var robotsNumber: number = 0;
+var actRobot = 0;
 //Variable to store the number of pallets
 var palletsNumber: number = 0;
 //Variable to store the number of bricks
@@ -48,6 +49,11 @@ var boxesNumber: number = 0;
 
 //Boolean for first frame
 var firstFrame = true
+
+//Boolean control of cameras
+var cam1 = true
+var cam2 = false
+var cam3 = false
 
 //HTML new object
 const canvas = document.getElementById('frame') as HTMLCanvasElement;
@@ -70,8 +76,9 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 )
-camera.position.z = 20
-camera.rotation.y = 20
+camera.position.x = 15;
+camera.position.z = 15;
+camera.position.y = 17;
 
 const renderer = new THREE.WebGLRenderer({ canvas: canvas })
 renderer.physicallyCorrectLights = true
@@ -85,6 +92,47 @@ const controls = new OrbitControls(camera, renderer.domElement) //OrbitControls
 //controls.addEventListener('change', render) // use if there is no animation loop. The first parameter is the event type, the second is the callback function.
 
 //console.dir(scene)
+
+// Control de cámaras
+window.addEventListener('keydown',doKeyDown,true);
+function doKeyDown(evt: { keyCode: any }) {
+  switch (evt.keyCode) {
+    case 49: //cámara 1
+      //Se activa cámara 1
+      cam1 = true
+      cam2 = false
+      cam3 = false
+    break;
+    case 50: //cámara 2
+      //Se activa cámara 2
+      cam1 = false
+      cam2 = true
+      cam3 = false
+    break;
+    case 51: //cámara 3
+      //Se activa cámara 3
+      cam1 = false
+      cam2 = false
+      cam3 = true
+    break;
+    case 37:
+      if(actRobot == 0){
+        actRobot = robotsNumber - 1;
+      }
+      else{
+        actRobot--;
+      }
+    break;
+    case 39:
+      if(actRobot == robotsNumber - 1){
+        actRobot = 0;
+      }
+      else{
+        actRobot++;
+      }
+    break;
+  }
+}
 
 window.addEventListener('resize', onWindowResize, false)
 function onWindowResize() {
@@ -163,15 +211,15 @@ var render = async function () {
         }
         for (var i = 0; i < boxesNumber; i++) {
           //If the box is being carried by a robot we update the position of the box
-          // if (data[2][i].status == true) {
-          //   boxes[i].position.x = await data[2][i].x + 0.5;
-          //   boxes[i].position.z = await data[2][i].y + 0.5;
-          //   boxes[i].position.y = 0.25;
-          // }
+          if (data[2][i].status == true) {
+            boxes[i].position.x = await data[2][i].x + 0.5;
+            boxes[i].position.z = await data[2][i].y + 0.5;
+            boxes[i].position.y = 0.25;
+          }
           if (data[2][i].stack != 0){ //It means that the box is stacked
             boxes[i].position.x = await data[2][i].x + 0.5;
             boxes[i].position.z = await data[2][i].y + 0.5;
-            boxes[i].position.y = 0.15+((data[2][i].stack - 1)*0.5);
+            boxes[i].position.y = 0.15+((data[2][i].stack - 1)*0.75);
           }
         }
         // boxes[i].position.x = await data[2][i].x + 0.5;
@@ -186,6 +234,24 @@ var render = async function () {
   stats.update() //We update the stats
   requestAnimationFrame(render);
   renderer.render(scene, camera);
+  if(cam1 == true){
+    //nada, jeje
+  }
+  else if(cam2 == true){
+    //Camara cenital
+    camera.position.x = 15;
+    camera.position.z = 15;
+    camera.position.y = 17;
+    //camera.rotateX(-Math.PI/2);
+  }
+  else if(cam3 == true){
+    //We set the camera to follow the robot
+    camera.position.x = robots[actRobot].position.x;
+    camera.position.z = robots[actRobot].position.z;
+    camera.position.y = 6;
+    camera.rotateX(-Math.PI/2);
+    camera.lookAt(robots[actRobot].position.x, robots[actRobot].position.y, robots[actRobot].position.z)
+  }
 };
 
 // Functions that are useful
