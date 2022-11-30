@@ -2,7 +2,7 @@ import flask
 from flask_cors import CORS
 from flask.json import jsonify
 import uuid
-from pacman import Maze
+from robotAgent import Room, Robot
 
 games = {}
 
@@ -17,7 +17,7 @@ def sayhello():
 def create():
     global games
     id = str(uuid.uuid4())
-    games[id] = Maze()
+    games[id] = Room()
 
     response = jsonify("ok")
     response.status_code = 201
@@ -31,13 +31,14 @@ def queryState(id):
     global model
     model = games[id]
     model.step()
-    result = []
-    for ghost in model.schedule.agents:
-        g = dict()
-        g["id"] = ghost.unique_id
-        g["x"] = ghost.pos[0]
-        g["y"] = ghost.pos[1]
-        result.append(g)
+    result = [] #Array of dictionaries with robot info
+    for agent in model.schedule.agents:
+        if type(agent) == Robot:
+            g = dict() #Dictionary with robot info
+            g["id"] = agent.unique_id
+            g["x"] = agent.pos[0]
+            g["y"] = agent.pos[1]
+            result.append(g)
     return jsonify(result)
 
 app.run()

@@ -1,0 +1,8 @@
+####
+post https://pac-back-balanced-kangaroo-bi.mybluemix.net:
+
+####
+get http://localhost:5000/
+
+####
+get http://127.0.0.1:5000/games/0023e262-477a-40ea-9730-0c3a8695fc54

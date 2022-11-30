@@ -41,7 +41,7 @@ function doKeyDown(evt){
 
 // three basic components of a scene
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.01, 1000);
+var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 1, 1000);
 var renderer = new THREE.WebGLRenderer();
 
 
@@ -111,7 +111,7 @@ var render = async function () {
   now = Date.now();
   elapsed_time = now - previous_time;
 
-  console.log("elapsed time", elapsed_time);
+  //console.log("elapsed time", elapsed_time);
 
   if (elapsed_time >= frame_rate) {
 
@@ -120,17 +120,25 @@ var render = async function () {
     // var xglgb = 1;
     // var yglgb = 1;
 
-    if (location2 != ""){
-      var res = await fetch(baseURL + location2);
-      var data = await res.json();
-      console.log(data);
-      console.log(groups);
-      data.map((d) => {
-        var g = groups[d.id];
-        g.position.x = d.x * 3;
-        g.position.y = d.y * 3;
-        return;
-      });
+    if (location2 != ""){ // if the game has been created
+      var res = await fetch(baseURL + location2); // get the game state
+      var data = await res.json(); // parse JSON to JS object that contains the positions of the 10 robots in every step
+      //console.log(data);
+      //We print the positions for the first robot
+      console.log(data[0].x);
+      console.log(data[0].y);
+
+      //We assign the positions to the robots
+      group.position.x = data[0].x;
+      group.position.y = data[0].y;
+      
+      //console.log(groups);
+      //data.map((d) => { // for each robot
+      //  var g = groups[d.id]; 
+      //  g.position.x = d.x * 3;
+      //  g.position.y = d.y * 3;
+      //  return;
+      //});
 
     }
       // group.position.x = xg*3;
