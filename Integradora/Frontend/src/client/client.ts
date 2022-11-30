@@ -47,6 +47,8 @@ const pallets: THREE.Group[] = []
 const boxes: THREE.Group[] = []
 //We create an array to store the brick/Walls generated with the GLTFLoader
 const bricks: THREE.Group[] = []
+//We create an array to store the pointing lights of each robot
+const lights: THREE.PointLight[] = []
 //Variable to store number of robots
 var robotsNumber: number = 0;
 var actRobot = 0;
@@ -367,12 +369,31 @@ function addLight(x: number, y: number, z: number) {
   scene.add(light)
 }
 
-//We create a function to add a point light over each robot
-function addPointLight(x: number, y: number, z: number) {
+// //We create a function to add a point light over each robot
+// function addPointLight(x: number, y: number, z: number) {
+//   var pointLight = new THREE.PointLight(0xff0000, 1, 100)
+//   pointLight.position.set(x, y, z)
+//   scene.add(pointLight)
+// }
+
+//We create a function to add a point light over each robot and push it to an array
+function addPointLightArray(x: number, y: number, z: number, array: THREE.PointLight[]) {
   var pointLight = new THREE.PointLight(0xff0000, 1, 100)
   pointLight.position.set(x, y, z)
   scene.add(pointLight)
+  array.push(pointLight)
 }
+
+//Function to acces to an specific pointLight in array and change the position of it
+function changePointLightPosition(array: THREE.PointLight[], index: number, x: number, y: number, z: number) {
+  array[index].position.set(x, y, z)
+}
+
+//Function to acces to an specific pointLight in array and change the color of it
+function changePointLightColor(array: THREE.PointLight[], index: number, color: number) {
+  array[index].color.setHex(color)
+}
+
 
 //We create a function to add a wall with texture to the scene
 function addWall(x: number, y: number, z: number, width: number, height: number) {
