@@ -13,7 +13,7 @@ body{
     overflow: hidden;
 }
 h2{
-    font-size: 9vh;
+    font-size: 8vh;
     margin-bottom: 4vh;
 }
 h3{
@@ -50,7 +50,7 @@ p{
 
 .head{
     display: flex;
-    width: 25%;
+    width: 30%;
     height: 100%;
     border-radius: 15px;
     justify-content: center;
