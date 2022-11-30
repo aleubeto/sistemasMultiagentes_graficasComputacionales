@@ -32,7 +32,6 @@ class Robot(Agent):
         self.direccion = (0, 0)
         self.hallazgo = None
         self.objetivo = None
-        self.numero_caja = 0
 
     def step(self):
         ##print("soy el robot", self.unique_id, "en la", self.pos, "estoy", self.condition)
@@ -108,7 +107,8 @@ class Robot(Agent):
                     self.model.grid.move_agent(self.carga, self.path[len(self.path) - 1])
                     self.condition = self.DEAMBULANDO
                     self.model.boxstack_counter += 1
-                    self.carga.numero = self.numero_caja
+                    self.objetivo.cuenta_stack += 1
+                    self.carga.numero = self.objetivo.cuenta_stack
                     self.hallazgo = None
                     self.carga = None
                     #print("guarde una caja")
@@ -144,7 +144,6 @@ class Robot(Agent):
                         self.model.matrix[self.objetivo.pos[1]][self.objetivo.pos[0]] = 0
                 if self.path != []:
                     self.objetivo.cuenta_cajas += 1
-                    self.numero_caja = self.objetivo.cuenta_cajas
                     #print(self.path)
                     self.condition = self.ENCAMINO
                 else:
@@ -292,6 +291,7 @@ class Estante(Agent):
         super().__init__(model.next_id(), model)
         self.pos = pos
         self.cuenta_cajas = 0
+        self.cuenta_stack = 0
 
     def step(self):
         pass
