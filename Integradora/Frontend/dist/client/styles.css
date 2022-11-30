@@ -11,6 +11,18 @@ body{
     height: 100vh;
     color: #191919
 }
+h2{
+    font-size: 5vh;
+}
+h3{
+    font-size: 3.5vh;
+}
+h4{
+    font-size: 2.7vh;
+}
+p{
+    font-size: 2.3vh;
+}
 .container{
     display: flex;
     position: fixed;
@@ -18,13 +30,21 @@ body{
     width: 90vw;
     justify-content: space-between;
 }
-.model{
-    background-color: #f0f0f0;
+
+.model-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border-radius: 15px;
     width: 70%;
     height: 100%;
     color: #191919;
 }
+
+.model {
+    border-radius: 15px;
+}
+
 .head{
     display: flex;
     width: 25%;
