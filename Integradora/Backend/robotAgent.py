@@ -482,6 +482,7 @@ def agent_portrayal(agent):
     elif type(agent) == Robot:
         return {"Shape": "circle", "r": 1, "Filled": "true", "Color": agent.color, "Layer": 3}
 
+"""
 #Creacion del grid visual de la simulacion
 grid = CanvasGrid(agent_portrayal, 30, 30, 450, 450)
 
@@ -513,3 +514,4 @@ server = ModularServer(Room, [grid, chart_tiempo, chart_movimientos], "Equipo 10
                             "checkbox", "Omnisciencia de robots", False)})
 server.port = 8522
 server.launch()
+"""
