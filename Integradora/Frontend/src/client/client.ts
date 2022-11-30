@@ -43,6 +43,8 @@ var robotsNumber: number = 0;
 var palletsNumber: number = 0;
 //Variable to store the number of bricks
 var bricksNumber: number = 0;
+//Variable to store the number of boxes
+var boxesNumber: number = 0;
 
 //Boolean for first frame
 var firstFrame = true
@@ -54,13 +56,14 @@ const stats = Stats() //Stats
 //htmlFrame.appendChild(stats.dom) //Add the stats to the body of the html
 
 const scene = new THREE.Scene()
+scene.background = new THREE.Color(0x0e1231)
 //Add an axes helper to the scene
 const axesHelper = new THREE.AxesHelper(1000)
 scene.add(axesHelper)
 
 //We add models to the scene
-addModel(15,7,15,2,zuckPath) //We add the zuckHead to the scene
-addModel(15,0.1,30,2,doorPath) //We add the door to the scene
+// addModel(15,7,15,2,zuckPath) //We add the zuckHead to the scene
+addModel(15, 0.1, 30, 2, doorPath) //We add the door to the scene
 const camera = new THREE.PerspectiveCamera(
   100,
   parent.innerWidth / parent.innerHeight,
@@ -70,15 +73,11 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.z = 20
 camera.rotation.y = 20
 
-const renderer = new THREE.WebGLRenderer({canvas:canvas})
+const renderer = new THREE.WebGLRenderer({ canvas: canvas })
 renderer.physicallyCorrectLights = true
 renderer.setSize(container.offsetWidth, container.offsetHeight)
 //htmlFrame.appendChild(renderer.domElement) //Add the renderer to the body of the html
 
-// //We add a box
-// addModel(2.5,0.1,2.5,3.2,boxPath)
-// //We add a pallet
-// addModel(2.5,0,2.5,0.125,palletPath)
 //We add a directional light to the scene
 addLight(15, 10, 15) //This is the light bulb
 
@@ -118,22 +117,29 @@ var render = async function () {
         //We instantiate the robots
         for (var i = 0; i < robotsNumber; i++) {
           //We use the importGLFT function to add the robot to the scene
-          await importGLTFModel(i+0.5,0,i+0.5,0.030,robotPath,robots)
+          await importGLTFModel(i + 0.5, 0, i + 0.5, 0.030, robotPath, robots)
         }
         //From data we get how many pallets are in the game
         palletsNumber = await data[3].length;
         //We instantiate the pallets
         for (var i = 0; i < palletsNumber; i++) {
           //We use the importGLFT function to add the pallet to the scene
-          await importGLTFModel(0.5,0,0.5,0.125,palletPath,pallets)
+          await importGLTFModel(0.5, 0, 0.5, 0.125, palletPath, pallets)
         }
         //From data we get how many bricks are in the game
         bricksNumber = await data[1].length;
         //We instantiate the bricks
         for (var i = 0; i < bricksNumber; i++) {
           //We use the importGLFT function to add the bricks to the scene
-          await importGLTFModel(data[1][i].x+0.5,0.5,data[1][i].y+0.5,0.48,brickPath,bricks)
-          await addModel(data[1][i].x+0.5,1.5,data[1][i].y+0.5,0.48,brickPath)
+          await importGLTFModel(data[1][i].x + 0.5, 0.5, data[1][i].y + 0.5, 0.48, brickPath, bricks)
+          await addModel(data[1][i].x + 0.5, 1.5, data[1][i].y + 0.5, 0.48, brickPath)
+        }
+        //From data we get how many boxes are in the game
+        boxesNumber = await data[2].length;
+        //We instantiate the boxes
+        for (var i = 0; i < boxesNumber; i++) {
+          //We use the importGLFT function to add the boxes to the scene
+          await importGLTFModel(data[2][i].x + 0.5, 0, data[2][i].y + 0.5, 3.2, boxPath, boxes)
         }
       }
 
@@ -144,7 +150,7 @@ var render = async function () {
       console.log(bricks)
 
       //If the robots array position is not undefined we update the position of the robots
-      if (robots[0] != undefined && pallets[0] != undefined) {
+      if (robots[0] != undefined && pallets[0] != undefined && boxes[0] != undefined) {
         for (var i = 0; i < robotsNumber; i++) {
           robots[i].position.x = await data[0][i].x + 0.5;
           robots[i].position.z = await data[0][i].y + 0.5;
@@ -155,6 +161,22 @@ var render = async function () {
           pallets[i].position.z = await data[3][i].y + 0.5;
           pallets[i].position.y = 0;
         }
+        for (var i = 0; i < boxesNumber; i++) {
+          //If the box is being carried by a robot we update the position of the box
+          // if (data[2][i].status == true) {
+          //   boxes[i].position.x = await data[2][i].x + 0.5;
+          //   boxes[i].position.z = await data[2][i].y + 0.5;
+          //   boxes[i].position.y = 0.25;
+          // }
+          if (data[2][i].stack != 0){ //It means that the box is stacked
+            boxes[i].position.x = await data[2][i].x + 0.5;
+            boxes[i].position.z = await data[2][i].y + 0.5;
+            boxes[i].position.y = 0.15+((data[2][i].stack - 1)*0.5);
+          }
+        }
+        // boxes[i].position.x = await data[2][i].x + 0.5;
+        // boxes[i].position.z = await data[2][i].y + 0.5;
+        // boxes[i].position.y = 0;
       }
       // console.log(robots)
       //await console.log(robots[0])
@@ -169,7 +191,7 @@ var render = async function () {
 // Functions that are useful
 
 //Function to import GLTF model and save it in an array
-async function importGLTFModel(x: number, y: number, z: number, scale: number, modelPath: string, array: THREE.Group[]) { 
+async function importGLTFModel(x: number, y: number, z: number, scale: number, modelPath: string, array: THREE.Group[]) {
   const loader = new GLTFLoader()
   loader.load(modelPath, async (gltf) => { //We load the model
     //We get the model from the gltf object
@@ -182,18 +204,18 @@ async function importGLTFModel(x: number, y: number, z: number, scale: number, m
     array.push(model)
     gltf.scene.traverse(function (child) { //We traverse the model
       if ((child as THREE.Mesh).isMesh) { //If the child is a mesh we set the shadow properties
-          const m = child as THREE.Mesh //We cast the child to a mesh
-          m.receiveShadow = true //We set the receiveShadow property to true
-          m.castShadow = true //We set the castShadow property to true
+        const m = child as THREE.Mesh //We cast the child to a mesh
+        m.receiveShadow = true //We set the receiveShadow property to true
+        m.castShadow = true //We set the castShadow property to true
       }
       if ((child as THREE.Light).isLight) { //If the child is a light we set the shadow properties
-          const l = child as THREE.Light //We cast the child to a light
-          l.castShadow = true //We set the castShadow property to true
-          l.shadow.bias = -0.003 //We set the bias property to -0.003
-          l.shadow.mapSize.width = 2048 //We set the width of the shadow map to 2048
-          l.shadow.mapSize.height = 2048 //We set the height of the shadow map to 2048
+        const l = child as THREE.Light //We cast the child to a light
+        l.castShadow = true //We set the castShadow property to true
+        l.shadow.bias = -0.003 //We set the bias property to -0.003
+        l.shadow.mapSize.width = 2048 //We set the width of the shadow map to 2048
+        l.shadow.mapSize.height = 2048 //We set the height of the shadow map to 2048
       }
-  })
+    })
     //We add the model to the scene
     scene.add(model)
   })
@@ -216,28 +238,28 @@ async function addModel(x: number, y: number, z: number, scale: number, path: st
       model.scale.set(scale, scale, scale)
       gltf.scene.traverse(function (child) {
         if ((child as THREE.Mesh).isMesh) {
-            const m = child as THREE.Mesh
-            m.receiveShadow = true
-            m.castShadow = true
+          const m = child as THREE.Mesh
+          m.receiveShadow = true
+          m.castShadow = true
         }
         if ((child as THREE.Light).isLight) {
-            const l = child as THREE.Light
-            l.castShadow = true
-            l.shadow.bias = -0.003
-            l.shadow.mapSize.width = 2048
-            l.shadow.mapSize.height = 2048
+          const l = child as THREE.Light
+          l.castShadow = true
+          l.shadow.bias = -0.003
+          l.shadow.mapSize.width = 2048
+          l.shadow.mapSize.height = 2048
         }
-    })
+      })
       //We add the model to the scene
       scene.add(model)
     },
     //We pass the function that will be executed while the model is loading
     //function (xhr) {
-      //console.log((xhr.loaded / xhr.total * 100) + '% loaded')
+    //console.log((xhr.loaded / xhr.total * 100) + '% loaded')
     //},
     //We pass the function that will be executed if there is an error loading the model
     //function (error) {
-      //console.log('An error happened')
+    //console.log('An error happened')
     //}
   )
 }
