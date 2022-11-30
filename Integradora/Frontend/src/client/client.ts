@@ -170,6 +170,7 @@ function onWindowResize() {
 }
 const frame_rate = 100; // Refresh screen every 200 ms
 var previous_time = Date.now();
+var last_check = true;
 
 var render = async function () {
 
@@ -256,6 +257,22 @@ var render = async function () {
         // boxes[i].position.x = await data[2][i].x + 0.5;
         // boxes[i].position.z = await data[2][i].y + 0.5;
         // boxes[i].position.y = 0;
+      }
+      else if (data[4][0].run == false && last_check == true) {
+        for (var i = 0; i < boxesNumber; i++) {
+          //If the box is being carried by a robot we update the position of the box
+          if (data[2][i].status == true) {
+            boxes[i].position.x = await data[2][i].x + 0.5;
+            boxes[i].position.z = await data[2][i].y + 0.5;
+            boxes[i].position.y = 0.25;
+          }
+          if (data[2][i].stack != 0){ //It means that the box is stacked
+            boxes[i].position.x = await data[2][i].x + 0.5;
+            boxes[i].position.z = await data[2][i].y + 0.5;
+            boxes[i].position.y = 0.15+((data[2][i].stack - 1)*0.75);
+          }
+        }
+        last_check = false;
       }
       // console.log(robots)
       //await console.log(robots[0])

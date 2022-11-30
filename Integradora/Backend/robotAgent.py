@@ -117,11 +117,11 @@ class Robot(Agent):
                 if self.carga != None and len(self.path) > 0:
                     self.model.grid.move_agent(self.carga, self.path[len(self.path) - 1])
                     self.condition = self.DEAMBULANDO
-                    self.model.boxstack_counter += 1
                     self.objetivo.cuenta_stack += 1
                     self.carga.numero = self.objetivo.cuenta_stack
                     self.hallazgo = None
                     self.carga = None
+                    self.model.boxstack_counter += 1
                 else:
                     #Si termino su camino y no tenia una caja, si no era omnisciente significa
                     #que llego hacia donde se habia reportado un hallazgo
@@ -344,7 +344,7 @@ class WallBlock(Agent):
 #Definicion del modelo Room
 class Room(Model):
     #Constructor del modelo Room
-    def __init__(self, height=30, width=30, space_rows=3, space_cols=2, length_wall=6, robots=5, boxes=20, shelves=4, step_counter=1, move_counter=0, boxstack_counter=0, time_limit=100, intelligence=True):
+    def __init__(self, height=30, width=30, space_rows=3, space_cols=2, length_wall=6, robots=5, boxes=20, shelves=4, step_counter=1, move_counter=0, boxstack_counter=0, time_limit=1000, intelligence=True):
         
         super().__init__()
         #Atributos del modelo Room
