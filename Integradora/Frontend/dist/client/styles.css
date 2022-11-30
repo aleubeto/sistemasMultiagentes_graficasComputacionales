@@ -4,18 +4,21 @@
     font-family: 'Encode Sans', sans-serif;
 }
 body{
-    background-color: #166cf7;
+    background-color: #002F99;
     display: flex;
     align-items: center;
     justify-content: space-around;
     height: 100vh;
-    color: #191919
+    color: #f0f0f0;
+    overflow: hidden;
 }
 h2{
-    font-size: 5vh;
+    font-size: 9vh;
+    margin-bottom: 4vh;
 }
 h3{
-    font-size: 3.5vh;
+    font-size: 4vh;
+    margin-bottom: 3vh;
 }
 h4{
     font-size: 2.7vh;
@@ -26,7 +29,7 @@ p{
 .container{
     display: flex;
     position: fixed;
-    height: 90vh;
+    height: 70vh;
     width: 90vw;
     justify-content: space-between;
 }
@@ -36,9 +39,9 @@ p{
     justify-content: center;
     align-items: center;
     border-radius: 15px;
-    width: 70%;
+    width: 60%;
     height: 100%;
-    color: #191919;
+    /*background-color: #0e1231;*/
 }
 
 .model {
@@ -49,14 +52,17 @@ p{
     display: flex;
     width: 25%;
     height: 100%;
-    background-color: #f0f0f0;
     border-radius: 15px;
     justify-content: center;
     align-items: center;
 }
 .margin{
-    width: 80%;
-    height: 90%;
+    /*border:solid;*/
+    width: 100%;
+    height: 100%;
+}
+.name{
+    margin-bottom: 2vh;
 }
 .waves {
     z-index: -10;
