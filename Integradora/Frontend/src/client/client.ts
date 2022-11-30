@@ -47,8 +47,11 @@ var bricksNumber: number = 0;
 //Boolean for first frame
 var firstFrame = true
 
+//HTML new object
+const canvas = document.getElementById('frame') as HTMLCanvasElement;
+const container = document.getElementById('frame-container') as HTMLDivElement;
 const stats = Stats() //Stats
-document.body.appendChild(stats.dom) //Add the stats to the body of the html
+//htmlFrame.appendChild(stats.dom) //Add the stats to the body of the html
 
 const scene = new THREE.Scene()
 //Add an axes helper to the scene
@@ -60,17 +63,17 @@ addModel(15,7,15,2,zuckPath) //We add the zuckHead to the scene
 addModel(15,0.1,30,2,doorPath) //We add the door to the scene
 const camera = new THREE.PerspectiveCamera(
   100,
-  window.innerWidth / window.innerHeight,
+  parent.innerWidth / parent.innerHeight,
   0.1,
   1000
 )
 camera.position.z = 20
 camera.rotation.y = 20
 
-const renderer = new THREE.WebGLRenderer()
+const renderer = new THREE.WebGLRenderer({canvas:canvas})
 renderer.physicallyCorrectLights = true
-renderer.setSize(window.innerWidth, window.innerHeight)
-document.body.appendChild(renderer.domElement) //Add the renderer to the body of the html
+renderer.setSize(container.offsetWidth, container.offsetHeight)
+//htmlFrame.appendChild(renderer.domElement) //Add the renderer to the body of the html
 
 // //We add a box
 // addModel(2.5,0.1,2.5,3.2,boxPath)
@@ -86,9 +89,9 @@ const controls = new OrbitControls(camera, renderer.domElement) //OrbitControls
 
 window.addEventListener('resize', onWindowResize, false)
 function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight
+  camera.aspect = container.offsetWidth / container.offsetHeight
   camera.updateProjectionMatrix()
-  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.setSize(container.offsetWidth, container.offsetHeight)
   render()
 }
 const frame_rate = 300; // Refresh screen every 200 ms
