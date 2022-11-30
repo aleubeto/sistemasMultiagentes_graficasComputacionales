@@ -40,6 +40,7 @@ const bricks: THREE.Group[] = []
 //Variable to store number of robots
 var robotsNumber: number = 0;
 var actRobot = 0;
+var actY = 6;
 //Variable to store the number of pallets
 var palletsNumber: number = 0;
 //Variable to store the number of bricks
@@ -115,6 +116,7 @@ function doKeyDown(evt: { keyCode: any }) {
       cam2 = false
       cam3 = true
     break;
+    //Cámara 3: robot anterior
     case 37:
       if(actRobot == 0){
         actRobot = robotsNumber - 1;
@@ -123,6 +125,7 @@ function doKeyDown(evt: { keyCode: any }) {
         actRobot--;
       }
     break;
+    //Cámara 3: robot anterior
     case 39:
       if(actRobot == robotsNumber - 1){
         actRobot = 0;
@@ -130,6 +133,14 @@ function doKeyDown(evt: { keyCode: any }) {
       else{
         actRobot++;
       }
+    break;
+    //Cámara 3: bajamos y
+    case 38:
+      actY--;
+    break;
+    //Cámara 3: subimos y
+    case 40:
+      actY++;
     break;
   }
 }
@@ -248,7 +259,7 @@ var render = async function () {
     //We set the camera to follow the robot
     camera.position.x = robots[actRobot].position.x;
     camera.position.z = robots[actRobot].position.z;
-    camera.position.y = 6;
+    camera.position.y = actY;
     camera.rotateX(-Math.PI/2);
     camera.lookAt(robots[actRobot].position.x, robots[actRobot].position.y, robots[actRobot].position.z)
   }
@@ -338,6 +349,13 @@ function addLight(x: number, y: number, z: number) {
   light.position.set(x, y, z)
   //We add the light to the scene
   scene.add(light)
+}
+
+//We create a function to add a point light over each robot
+function addPointLight(x: number, y: number, z: number) {
+  var pointLight = new THREE.PointLight(0xff0000, 1, 100)
+  pointLight.position.set(x, y, z)
+  scene.add(pointLight)
 }
 
 //We create a function to add a wall with texture to the scene
