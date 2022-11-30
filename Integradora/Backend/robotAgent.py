@@ -73,21 +73,20 @@ class Robot(Agent):
                     if self.carga == None:
                         siguiente = (self.pos[0] + self.direccion[0], self.pos[1] + self.direccion[1])
                         paso = True
-                        for element in self.model.grid.get_cell_list_contents(siguiente):
-                            if type(element) == Robot:
-                                element.cambiar_direccion()
-                                paso = False
-                            elif type(element) == WallBlock:
-                                paso = False
-                                
-                        if paso:
+                        if self.model.grid.is_cell_empty(siguiente):
                             self.model.grid.move_agent(self, siguiente)
                             self.model.move_counter += 1
+                        #for element in self.model.grid.get_cell_list_contents(siguiente):
+                        #    if type(element) == Robot:
+                        #        element.cambiar_direccion()
+                        #        paso = False
+                        #    elif type(element) == WallBlock:
+                        #        paso = False
                         else:
                             self.cambiar_direccion()
                             
         elif self.condition == self.ENCAMINO:
-            if self.sig < len(self.path):
+            if self.sig < len(self.path) - 1:
                 paso = True
                 for element in self.model.grid.get_cell_list_contents(self.path[self.sig]):
                     if type(element) == Robot:
@@ -118,6 +117,7 @@ class Robot(Agent):
                     self.hallazgo = None
                     if self.intelligence:
                         self.carga = self.objetivo
+                        self.model.grid.move_agent(self.carga, self.pos)
                         self.objetivo.cargada = True
                         self.condition = self.REGRESARESTANTE
 
@@ -131,6 +131,7 @@ class Robot(Agent):
             else:
                 self.model.matrix[self.objetivo.pos[1]][self.objetivo.pos[0]] = 1
                 self.path = self.pathfinding(self.objetivo.pos)
+                self.model.matrix[self.objetivo.pos[1]][self.objetivo.pos[0]] = 0
                 if self.path == []:
                     self.model.matrix[self.objetivo.pos[1]][self.objetivo.pos[0]] = 0
                     self.objetivo = self.encontrar_estante_emergencia()
@@ -140,6 +141,7 @@ class Robot(Agent):
                     else:
                         self.model.matrix[self.objetivo.pos[1]][self.objetivo.pos[0]] = 1
                         self.path = self.pathfinding(self.objetivo.pos)
+                        self.model.matrix[self.objetivo.pos[1]][self.objetivo.pos[0]] = 0
                 if self.path != []:
                     self.objetivo.cuenta_cajas += 1
                     self.numero_caja = self.objetivo.cuenta_cajas
