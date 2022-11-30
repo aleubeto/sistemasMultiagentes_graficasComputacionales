@@ -1,8 +1,79 @@
-body{
-    background-color: blue;
-    overflow: hidden;
-    margin: 50px;
+@import url('https://fonts.googleapis.com/css2?family=Encode+Sans:wght@400;800&display=swap');
+*{
+    margin: auto;
+    font-family: 'Encode Sans', sans-serif;
 }
-.model canvas{
+body{
+    background-color: #166cf7;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 100vh;
+    color: #191919
+}
+.container{
+    display: flex;
+    position: fixed;
+    height: 90vh;
+    width: 90vw;
+    justify-content: space-between;
+}
+.model{
+    background-color: #f0f0f0;
     border-radius: 15px;
+    width: 70%;
+    height: 100%;
+    color: #191919;
+}
+.head{
+    display: flex;
+    width: 25%;
+    height: 100%;
+    background-color: #f0f0f0;
+    border-radius: 15px;
+    justify-content: center;
+    align-items: center;
+}
+.margin{
+    width: 80%;
+    height: 90%;
+}
+.waves {
+    z-index: -10;
+    position: absolute;
+    bottom: -135px;
+    height: 527px;
+    width: 100%;
+    overflow: hidden;
+}
+.wave {
+    position: absolute;
+    left: -180px;
+    bottom: 0;
+    width: 2402px;
+    height: 427px;
+    background: url(https://static.platzi.com/media/files/waves_c8551f5d-ecf6-4a81-ae1d-f3a0ad55ba10.png) center bottom no-repeat;
+    animation: 5s wave ease-in-out infinite alternate;
+}
+.wave.a {
+    background-position: 0 -854px;
+}
+.wave.b {
+    background-position: 0 -427px;
+    animation-delay: .6s;
+}
+.wave.c {
+    background-position: 0 0;
+    animation-delay: 1.2s;
+}
+@keyframes wave {
+    0% {
+        transform: translate(0 , 0);
+    }
+    50% {
+        transform: translate(-80px, 30px);
+    }
+    100% {
+        transform: translate(160px, -60px);
+    }
 }
