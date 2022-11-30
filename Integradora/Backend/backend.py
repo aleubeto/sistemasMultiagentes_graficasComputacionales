@@ -36,6 +36,10 @@ def queryState(id):
     walls = [] #Array of wall info
     boxes = [] #Array of box info
     shelves = [] #Array of shelf info
+    model_array = []
+    g = dict()
+    g["run"] = model.running
+    model_array.append(g)
     for agent in model.schedule.agents:
         g = dict() #Dictionary with agent info
         g["id"] = agent.unique_id
@@ -58,6 +62,7 @@ def queryState(id):
     result.append(walls)
     result.append(boxes)
     result.append(shelves)
+    result.append(model_array)
     return jsonify(result)
 
 app.run()
