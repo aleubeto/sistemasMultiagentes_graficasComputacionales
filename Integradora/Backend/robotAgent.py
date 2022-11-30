@@ -32,6 +32,7 @@ class Robot(Agent):
         self.direccion = (0, 0)
         self.hallazgo = None
         self.objetivo = None
+        self.numero_caja = 0
 
     def step(self):
         ##print("soy el robot", self.unique_id, "en la", self.pos, "estoy", self.condition)
@@ -108,6 +109,7 @@ class Robot(Agent):
                     self.model.grid.move_agent(self.carga, self.path[len(self.path) - 1])
                     self.condition = self.DEAMBULANDO
                     self.model.boxstack_counter += 1
+                    self.carga.numero = self.numero_caja
                     self.hallazgo = None
                     self.carga = None
                     #print("guarde una caja")
@@ -140,6 +142,7 @@ class Robot(Agent):
                         self.path = self.pathfinding(self.objetivo.pos)
                 if self.path != []:
                     self.objetivo.cuenta_cajas += 1
+                    self.numero_caja = self.objetivo.cuenta_cajas
                     #print(self.path)
                     self.condition = self.ENCAMINO
                 else:
@@ -275,6 +278,7 @@ class Caja(Agent):
         self.condition = self.DISPONIBLE
         self.pos = pos
         self.cargada = False
+        self.numero = 0
         self.color = "Brown"
 
     def step(self):
@@ -441,7 +445,6 @@ def agent_portrayal(agent):
     elif type(agent) == Robot:
         return {"Shape": "circle", "r": 1, "Filled": "true", "Color": agent.color, "Layer": 3}
 
-"""
 grid = CanvasGrid(agent_portrayal, 30, 30, 450, 450)
 
 # Creación de tabla que grafica datacollector
@@ -474,4 +477,3 @@ server = ModularServer(Room, [grid, chart_tiempo, chart_movimientos], "Equipo 10
                             "checkbox", "Omnisciencia de robots", False)})
 server.port = 8522
 server.launch()
-"""
