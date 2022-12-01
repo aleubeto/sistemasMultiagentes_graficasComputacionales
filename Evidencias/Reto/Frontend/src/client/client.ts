@@ -21,44 +21,17 @@ fetch(baseURL + "/games", {
   }
 });
 
-//We create a variable robotPath to store the robotPath to the assets folder
-const robotPath = 'models/Roomba.glb'
-const boxPath = 'models/Box.glb'
-const palletPath = 'models/WoodenPallet.glb'
-const zuckPath = 'models/ZuckHead.glb'
-const doorPath = 'models/Door.glb'
-const brickPath = 'models/Brick.glb'
-const floorPath = 'img/Floor.png'
-const songPath = 'sounds/Song.mp3'
-const wallPath = 'img/Wall.png'
+//Here we create all the paths to the assets
 
 
-//We play a song
-function playSong() {
-  var audio = new Audio(songPath);
-  audio.play();
-}
-
-//We create an array to store the robots generated with the GLTFLoader
-const robots: THREE.Group[] = []
-//We create an array to store the pallets generated with the GLTFLoader
-const pallets: THREE.Group[] = []
-//We create an array to store the boxes generated with the GLTFLoader
-const boxes: THREE.Group[] = []
-//We create an array to store the brick/Walls generated with the GLTFLoader
-const bricks: THREE.Group[] = []
-//We create an array to store the pointing lights of each robot
-const lights: THREE.PointLight[] = []
-//Variable to store number of robots
-var robotsNumber: number = 0;
-var actRobot = 0;
-var actY = 6;
-//Variable to store the number of pallets
-var palletsNumber: number = 0;
-//Variable to store the number of bricks
-var bricksNumber: number = 0;
-//Variable to store the number of boxes
-var boxesNumber: number = 0;
+//We create an array to store the cars generated with the GLTFLoader
+const cars: THREE.Group[] = []; //The array can be empty
+//We create a variable that will save a car model
+const car: THREE.Group | null = null; //The car starts being a null
+//We create a variable to keep track of how many cars are in the actual frame
+var carsNumber: number = 0;
+//We create a variable to know which car the camera is focusing
+var actCar: number = 0;
 
 //Boolean for first frame
 var firstFrame = true
@@ -78,17 +51,20 @@ const scene = new THREE.Scene()
 scene.background = new THREE.Color(0x0e1231)
 //Add an axes helper to the scene
 const axesHelper = new THREE.AxesHelper(1000)
-//scene.add(axesHelper)
+scene.add(axesHelper)
 
 //We add models to the scene
-// addModel(15,7,15,2,zuckPath) //We add the zuckHead to the scene
-addModel(15, 0.1, 30, 2, doorPath) //We add the door to the scene
+//Here we can add the static models of the scene, like buildings and stuff.
+
+
 const camera = new THREE.PerspectiveCamera(
   100,
   parent.innerWidth / parent.innerHeight,
   0.1,
   1000
 )
+
+//These are the camera first positions
 camera.position.x = 2;
 camera.position.z = 28;
 camera.position.y = 8;
@@ -99,7 +75,7 @@ renderer.setSize(container.offsetWidth, container.offsetHeight)
 //htmlFrame.appendChild(renderer.domElement) //Add the renderer to the body of the html
 
 //We add a directional light to the scene
-addLight(15, 10, 15) //This is the light bulb
+addLight(15, 10, 15) //This is the sun
 
 const controls = new OrbitControls(camera, renderer.domElement) //OrbitControls
 //controls.addEventListener('change', render) // use if there is no animation loop. The first parameter is the event type, the second is the callback function.
@@ -130,20 +106,20 @@ function doKeyDown(evt: { keyCode: any }) {
     break;
     //Cámara 3: robot anterior
     case 37:
-      if(actRobot == 0){
-        actRobot = robotsNumber - 1;
+      if(actCar == 0){
+        actCar = carsNumber - 1;
       }
       else{
-        actRobot--;
+        actCar--;
       }
     break;
     //Cámara 3: robot anterior
     case 39:
-      if(actRobot == robotsNumber - 1){
-        actRobot = 0;
+      if(actCar == carsNumber - 1){
+        actCar = 0;
       }
       else{
-        actRobot++;
+        actCar++;
       }
     break;
     //Cámara 3: bajamos y
@@ -156,7 +132,7 @@ function doKeyDown(evt: { keyCode: any }) {
     break;
     //Easter egg
     case 82:
-      playSong();
+      //playSong(); //Here we can play a song
     break;
   }
 }
@@ -168,7 +144,7 @@ function onWindowResize() {
   renderer.setSize(container.offsetWidth, container.offsetHeight)
   render()
 }
-const frame_rate = 100; // Refresh screen every 200 ms
+const frame_rate = 250; // Refresh screen every 200 ms
 var previous_time = Date.now();
 var last_check = true;
 
@@ -188,90 +164,18 @@ var render = async function () {
       var data = await res.json(); // parse JSON to JS object that contains the positions of the 10 robots in every step
 
       if (firstFrame == true) {
-        camera.lookAt(30, -5, 10)
-        //From data we get how many robots are in the game
-        robotsNumber = await data[0].length;
-        //We instantiate the robots
-        for (var i = 0; i < robotsNumber; i++) {
-          //We use the importGLFT function to add the robot to the scene
-          await importGLTFModel(i,0,i, 0.030, robotPath, robots)
-          //We add a point light to each robot in the first frame
-          await addPointLightArray(i,0.25,i,lights)
-        }
-        //From data we get how many pallets are in the game
-        palletsNumber = await data[3].length;
-        //We instantiate the pallets
-        for (var i = 0; i < palletsNumber; i++) {
-          //We use the importGLFT function to add the pallet to the scene
-          await importGLTFModel(0.5, 0, 0.5, 0.125, palletPath, pallets)
-        }
-        //From data we get how many bricks are in the game
-        bricksNumber = await data[1].length;
-        //We instantiate the bricks
-        for (var i = 0; i < bricksNumber; i++) {
-          //We use the importGLFT function to add the bricks to the scene
-          await importGLTFModel(data[1][i].x + 0.5, 0.5, data[1][i].y + 0.5, 0.48, brickPath, bricks)
-          await addModel(data[1][i].x + 0.5, 1.5, data[1][i].y + 0.5, 0.48, brickPath)
-        }
-        //From data we get how many boxes are in the game
-        boxesNumber = await data[2].length;
-        //We instantiate the boxes
-        for (var i = 0; i < boxesNumber; i++) {
-          //We use the importGLFT function to add the boxes to the scene
-          await importGLTFModel(data[2][i].x + 0.5, 0, data[2][i].y + 0.5, 3.2, boxPath, boxes)
-        }
+        camera.lookAt(30, -5, 10) //This is the first position the camera will look at
+        
       }
 
       firstFrame = false;
 
-      //console.log(robots)
-      //console.log(pallets)
-      //console.log(bricks)
-
       //If the robots array position is not undefined we update the position of the robots
       if (robots[0] != undefined && pallets[0] != undefined && boxes[0] != undefined && data[4][0].run == true) {
-        for (var i = 0; i < robotsNumber; i++) {
-          robots[i].position.x = await data[0][i].x + 0.5;
-          robots[i].position.z = await data[0][i].y + 0.5;
-          robots[i].position.y = 0.05;
-          await changePointLightPosition(lights,i,await data[0][i].x,0.5,await data[0][i].y)
-        }
-        for (var i = 0; i < palletsNumber; i++) {
-          pallets[i].position.x = await data[3][i].x + 0.5;
-          pallets[i].position.z = await data[3][i].y + 0.5;
-          pallets[i].position.y = 0;
-        }
-        for (var i = 0; i < boxesNumber; i++) {
-          //If the box is being carried by a robot we update the position of the box
-          if (data[2][i].status == true) {
-            boxes[i].position.x = await data[2][i].x + 0.5;
-            boxes[i].position.z = await data[2][i].y + 0.5;
-            boxes[i].position.y = 0.25;
-          }
-          if (data[2][i].stack != 0){ //It means that the box is stacked
-            boxes[i].position.x = await data[2][i].x + 0.5;
-            boxes[i].position.z = await data[2][i].y + 0.5;
-            boxes[i].position.y = 0.15+((data[2][i].stack - 1)*0.75);
-          }
-        }
-        // boxes[i].position.x = await data[2][i].x + 0.5;
-        // boxes[i].position.z = await data[2][i].y + 0.5;
-        // boxes[i].position.y = 0;
+        //Here we update the cars position every frame
       }
       else if (data[4][0].run == false && last_check == true) {
-        for (var i = 0; i < boxesNumber; i++) {
-          //If the box is being carried by a robot we update the position of the box
-          if (data[2][i].status == true) {
-            boxes[i].position.x = await data[2][i].x + 0.5;
-            boxes[i].position.z = await data[2][i].y + 0.5;
-            boxes[i].position.y = 0.25;
-          }
-          if (data[2][i].stack != 0){ //It means that the box is stacked
-            boxes[i].position.x = await data[2][i].x + 0.5;
-            boxes[i].position.z = await data[2][i].y + 0.5;
-            boxes[i].position.y = 0.15+((data[2][i].stack - 1)*0.75);
-          }
-        }
+        //Here we can execute the last frame of the simulation
         last_check = false;
       }
       // console.log(robots)
@@ -282,31 +186,31 @@ var render = async function () {
   stats.update() //We update the stats
   requestAnimationFrame(render);
   renderer.render(scene, camera);
-  if(cam1 == true){
-    //nada, jeje
-  }
-  else if(cam2 == true){
-    //Camara cenital
-    camera.position.x = 15;
-    camera.position.z = 15;
-    camera.position.y = 13;
-    //camera.lookAt(0, -150, 0)
-    //camera.rotateX(-Math.PI/2);
-  }
-  else if(cam3 == true){
-    //We set the camera to follow the robot
-    camera.position.x = robots[actRobot].position.x;
-    camera.position.z = robots[actRobot].position.z;
-    camera.position.y = actY;
-    camera.rotateX(-Math.PI/2);
-    camera.lookAt(robots[actRobot].position.x, robots[actRobot].position.y, robots[actRobot].position.z)
-  }
+  // if(cam1 == true){
+  //   //nada, jeje
+  // }
+  // else if(cam2 == true){
+  //   //Camara cenital
+  //   camera.position.x = 15;
+  //   camera.position.z = 15;
+  //   camera.position.y = 13;
+  //   //camera.lookAt(0, -150, 0)
+  //   //camera.rotateX(-Math.PI/2);
+  // }
+  // else if(cam3 == true){
+  //   //We set the camera to follow the robot
+  //   camera.position.x = robots[actRobot].position.x;
+  //   camera.position.z = robots[actRobot].position.z;
+  //   camera.position.y = actY;
+  //   camera.rotateX(-Math.PI/2);
+  //   camera.lookAt(robots[actRobot].position.x, robots[actRobot].position.y, robots[actRobot].position.z)
+  // }
 };
 
 // Functions that are useful
 
 //Function to import GLTF model and save it in an array
-async function importGLTFModel(x: number, y: number, z: number, scale: number, modelPath: string, array: THREE.Group[]) {
+async function modelToArray(x: number, y: number, z: number, scale: number, modelPath: string, array: THREE.Group[]) {
   const loader = new GLTFLoader()
   loader.load(modelPath, async (gltf) => { //We load the model
     //We get the model from the gltf object
@@ -317,6 +221,37 @@ async function importGLTFModel(x: number, y: number, z: number, scale: number, m
     model.position.set(x, y, z)
     //We add the model to the array
     array.push(model)
+    gltf.scene.traverse(function (child) { //We traverse the model
+      if ((child as THREE.Mesh).isMesh) { //If the child is a mesh we set the shadow properties
+        const m = child as THREE.Mesh //We cast the child to a mesh
+        m.receiveShadow = true //We set the receiveShadow property to true
+        m.castShadow = true //We set the castShadow property to true
+      }
+      if ((child as THREE.Light).isLight) { //If the child is a light we set the shadow properties
+        const l = child as THREE.Light //We cast the child to a light
+        l.castShadow = true //We set the castShadow property to true
+        l.shadow.bias = -0.003 //We set the bias property to -0.003
+        l.shadow.mapSize.width = 2048 //We set the width of the shadow map to 2048
+        l.shadow.mapSize.height = 2048 //We set the height of the shadow map to 2048
+      }
+    })
+    //We add the model to the scene
+    scene.add(model)
+  })
+}
+
+//Function to import GLTF model and assign it to a variable
+async function modelToVariable(x: number, y: number, z: number, scale: number, modelPath: string, variable: THREE.Group) {
+  const loader = new GLTFLoader()
+  loader.load(modelPath, async (gltf) => { //We load the model
+    //We get the model from the gltf object
+    const model = gltf.scene
+    //We scale the model
+    model.scale.set(scale, scale, scale)
+    //We set the model position
+    model.position.set(x, y, z)
+    //We add the model to the variable
+    variable = model
     gltf.scene.traverse(function (child) { //We traverse the model
       if ((child as THREE.Mesh).isMesh) { //If the child is a mesh we set the shadow properties
         const m = child as THREE.Mesh //We cast the child to a mesh
@@ -368,14 +303,6 @@ async function addModel(x: number, y: number, z: number, scale: number, path: st
       //We add the model to the scene
       scene.add(model)
     },
-    //We pass the function that will be executed while the model is loading
-    //function (xhr) {
-    //console.log((xhr.loaded / xhr.total * 100) + '% loaded')
-    //},
-    //We pass the function that will be executed if there is an error loading the model
-    //function (error) {
-    //console.log('An error happened')
-    //}
   )
 }
 
@@ -389,63 +316,8 @@ function addLight(x: number, y: number, z: number) {
   scene.add(light)
 }
 
-// //We create a function to add a point light over each robot
-// function addPointLight(x: number, y: number, z: number) {
-//   var pointLight = new THREE.PointLight(0xff0000, 1, 100)
-//   pointLight.position.set(x, y, z)
-//   scene.add(pointLight)
-// }
-
-//We create a function to add a point light over each robot and push it to an array
-async function addPointLightArray(x: number, y: number, z: number, array: THREE.PointLight[]) {
-  var pointLight = new THREE.PointLight(0xff0000, 1, 100)
-  pointLight.position.set(x, y, z)
-  scene.add(pointLight)
-  array.push(pointLight)
-}
-
-//Function to acces to an specific pointLight in array and change the position of it
-async function changePointLightPosition(array: THREE.PointLight[], index: number, x: number, y: number, z: number) {
-  array[index].position.set(x, y, z)
-}
-
-//Function to acces to an specific pointLight in array and change the color of it
-async function changePointLightColor(array: THREE.PointLight[], index: number, color: number) {
-  array[index].color.setHex(color)
-}
-
-
-//We create a function to add a wall with texture to the scene
-function addWall(x: number, y: number, z: number, width: number, height: number) {
-  const wallGeometry = new THREE.PlaneGeometry(width, height)
-  const loader = new THREE.TextureLoader();
-  const wallMaterial = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    side: THREE.DoubleSide,
-  })
-  //We set the texture of the wall from a file
-  const wallTexture = new THREE.TextureLoader().load(
-    wallPath
-  )
-  //wallTexture.wrapS = THREE.RepeatWrapping
-  //wallTexture.wrapT = THREE.RepeatWrapping
-  wallTexture.magFilter = THREE.NearestFilter
-  wallTexture.repeat.set(1, 1)
-  wallMaterial.map = wallTexture
-  const wall = new THREE.Mesh(wallGeometry, wallMaterial)
-  wall.position.x = x
-  wall.position.y = y
-  wall.position.z = z
-  //We translate the wall to the right by half its width - 0.5
-  wall.translateX(width / 2 - 0.5)
-  //We translate the wall up by half its height - 0.5
-  wall.translateY(height / 2 - 0.5)
-  scene.add(wall)
-  return wall
-}
-
-//Function to set the walls
-function setWalls() {
+//Function to set the floor
+function setFloor() {
   // //We create a grid plane
   // const gridHelper = new THREE.GridHelper(60, 60)
   // scene.add(gridHelper)
@@ -472,28 +344,12 @@ function setWalls() {
   // //We move the floor 30 units to the front
   floor.position.z = 15
   scene.add(floor)
-  //Lateral walls
-  addWall(0.5, 0.5, 0, 30, 10)
-  addWall(0.5, 0.5, 30, 30, 10)
-  //Frontal walls
-  const wall1 = addWall(15.5, 0.5, 15, 30, 10)
-  wall1.rotation.y = Math.PI / 2
-  const wall2 = addWall(-14.5, 0.5, 15, 30, 10)
-  wall2.rotation.y = Math.PI / 2
 }
 
-//Function to add a skybox to the scene taking as parameters the path to the skybox images
-function addSkyBox(path: string) {
-  const loader = new THREE.CubeTextureLoader()
-  const texture = loader.load([
-    path + 'px.jpg', //Right
-    path + 'nx.jpg', //Left
-    path + 'py.jpg', //Top
-    path + 'ny.jpg', //Bottom
-    path + 'pz.jpg', //Front
-    path + 'nz.jpg', //Back
-  ])
-  scene.background = texture
+//We play a song
+function playSong() {
+  var audio = new Audio(songPath);
+  audio.play();
 }
 
 // GUI
@@ -505,12 +361,6 @@ cameraFolder.add(camera.position, 'z', -100, 100, 0.01) //Add the z position to 
 cameraFolder.add(camera.rotation, 'x', 0, 2 * Math.PI, 0.01) //Add the x rotation to the dat.gui
 cameraFolder.add(camera.rotation, 'y', 0, 2 * Math.PI, 0.01) //Add the y rotation to the dat.gui
 cameraFolder.add(camera.rotation, 'z', 0, 2 * Math.PI, 0.01) //Add the z rotation to the dat.gui
-// cameraFolder.add(camera, 'fov', 0, 180, 0.01) //Add the fov to the dat.gui
-// cameraFolder.add(camera, 'near', 0, 5, 0.01) //Add the near to the dat.gui
-// cameraFolder.add(camera, 'far', 0, 5, 0.01) //Add the far to the dat.gui
-// cameraFolder.add(camera, 'zoom', 0, 5, 0.01) //Add the zoom to the dat.gui
-// cameraFolder.add(camera, 'focus', 0, 5, 0.01) //Add the focus to the dat.gui
-// cameraFolder.add(camera, 'aspect', 0, 5, 0.01) //Add the aspect to the dat.gui
 
-setWalls();
+//setFloor();
 render();
