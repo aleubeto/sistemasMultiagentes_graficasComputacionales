@@ -3,7 +3,7 @@ import * as THREE from 'three'
 //We import OrbitControls from three.js
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 //We import the stats.js library
-import Stats from 'three/examples/jsm/libs/stats.module.js'
+import Stats from 'three/examples/jsm/libs/stats.module'
 //We import the dat.gui library
 import { GUI } from 'dat.gui'
 //We import the GLTFLoader from three.js
