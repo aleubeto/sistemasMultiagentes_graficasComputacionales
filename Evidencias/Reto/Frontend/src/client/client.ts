@@ -87,7 +87,7 @@ const controls = new OrbitControls(camera, renderer.domElement) //OrbitControls
 //console.dir(scene)
 
 // Control de cámaras
-window.addEventListener('keydown',doKeyDown,true);
+window.addEventListener('keydown', doKeyDown, true);
 function doKeyDown(evt: { keyCode: any }) {
   switch (evt.keyCode) {
     case 49: //cámara 1
@@ -95,49 +95,49 @@ function doKeyDown(evt: { keyCode: any }) {
       cam1 = true
       cam2 = false
       cam3 = false
-    break;
+      break;
     case 50: //cámara 2
       //Se activa cámara 2
       cam1 = false
       cam2 = true
       cam3 = false
-    break;
+      break;
     case 51: //cámara 3
       //Se activa cámara 3
       cam1 = false
       cam2 = false
       cam3 = true
-    break;
+      break;
     //Cámara 3: carro anterior
     case 37:
-      if(actCar == 0){
+      if (actCar == 0) {
         actCar = carsNumber - 1;
       }
-      else{
+      else {
         actCar--;
       }
-    break;
+      break;
     //Cámara 3: carrp anterior
     case 39:
-      if(actCar == carsNumber - 1){
+      if (actCar == carsNumber - 1) {
         actCar = 0;
       }
-      else{
+      else {
         actCar++;
       }
-    break;
+      break;
     //Cámara 3: bajamos y
     case 38:
       actY--;
-    break;
+      break;
     //Cámara 3: subimos y
     case 40:
       actY++;
-    break;
+      break;
     //Easter egg
     case 82:
       //playSong(); //Here we can play a song
-    break;
+      break;
   }
 }
 
@@ -167,21 +167,22 @@ var render = async function () {
       var res = await fetch(baseURL + gameLink); // get the game state
       var data = await res.json(); // parse JSON to JS object that contains the positions of the cars
 
-      if (firstFrame == true) {
-        camera.lookAt(30, -5, 10) //This is the first position the camera will look at
-        
-      }
-
-      firstFrame = false;
+      //console.log(data[0][0].id);
 
       //If the cars array position is not undefined we update the position of the car
-      if (cars[0] != undefined && data[2][0].run == true) {
+      if (data[0] != undefined && data[2][0].run == true) {
+        if (firstFrame == true) {
+          camera.lookAt(30, -5, 10) //This is the first position the camera will look at
+          console.log("First frame")
+          console.log(data[0][0].id)
+        }
         //Here we update the cars position every frame
       }
       else if (data[2][0].run == false && last_check == true) {
         //Here we can execute the last frame of the simulation
         last_check = false;
       }
+      firstFrame = false;
       // console.log(cars)
       //await console.log(cars[0])
     }
@@ -190,10 +191,10 @@ var render = async function () {
   stats.update() //We update the stats
   requestAnimationFrame(render);
   renderer.render(scene, camera);
-  if(cam1 == true){
+  if (cam1 == true) {
     //nada, jeje
   }
-  else if(cam2 == true){
+  else if (cam2 == true) {
     //Camara cenital
     camera.position.x = 15;
     camera.position.z = 15;
@@ -201,12 +202,12 @@ var render = async function () {
     //camera.lookAt(0, -150, 0)
     //camera.rotateX(-Math.PI/2);
   }
-  else if(cam3 == true){
+  else if (cam3 == true) {
     //We set the camera to follow the car
     camera.position.x = cars[actCar].position.x;
     camera.position.z = cars[actCar].position.z;
     camera.position.y = actY;
-    camera.rotateX(-Math.PI/2);
+    camera.rotateX(-Math.PI / 2);
     camera.lookAt(cars[actCar].position.x, cars[actCar].position.y, cars[actCar].position.z)
   }
 };
