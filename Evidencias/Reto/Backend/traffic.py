@@ -76,9 +76,9 @@ class Car(Agent):
             return
         
         direccion = self.model.space.get_heading(self.pos, self.closedList[self.contadorNodos].pos)
-        print(direccion)
+        print(self.color, "hacia", self.siguiente.pos, ":", direccion)
         #seguimiento de ruta creada
-        if self.model.space.get_distance(self.pos, self.closedList[self.contadorNodos].pos) > 5:
+        if self.model.space.get_distance(self.pos, self.closedList[self.contadorNodos].pos) > 35:
             if self.pos[0] >= 0 and self.pos[0] < self.model.width and self.pos[1] >= 0 and self.pos[1] < self.model.height:
                 self.siguiente = self.closedList[self.contadorNodos]
                 siguiente = self.pos + direccion * self.speed * self.contador
@@ -93,7 +93,7 @@ class Car(Agent):
         else:
             self.anterior = self.closedList[self.contadorNodos]
             self.contadorNodos += 1
-            self.contador = 0
+            self.contador = 0.2
             
     #funcion auxiliar de aStar para encontrar las adyacencias de un nodo
     def encontrar_adyacentes(self, actual):
@@ -141,6 +141,7 @@ class Car(Agent):
                 #distancia_neigh = auto.model.space.get_distance(auto.pos, auto.siguiente.pos)
                 #distancia_self = self.model.space.get_distance(self.pos, self.siguiente.pos)
                 #if distancia_neigh < distancia_self:
+                print("detecto a", auto.color)
                 autos.append(auto)
             #elif auto.anterior == self.siguiente:
                 #distancia_autos = self.model.space.get_distance(self.pos, auto.pos)
@@ -171,7 +172,7 @@ class Car(Agent):
             distancia_auto_self = self.model.space.get_distance(self.pos, auto.pos)
             #print("distancia de", self.color, "hacia a", auto.color)
             #print(distancia_auto_self)
-            if distancia_auto_self <= menor and distancia_auto_objetivo < distancia_self_objetivo:
+            if distancia_auto_self <= menor and distancia_auto_objetivo < distancia_self_objetivo and distancia_auto_self < 35:
                 auto_menor = auto
                 menor = distancia_auto_self
         
@@ -186,6 +187,7 @@ class Car(Agent):
     
     #funcion para desacelerar
     def decelerate(self, car_ahead):
+        print("DEBERIA FRENAAAR por", car_ahead.color)
         return self.speed[0] - (car_ahead.speed[0] * 0.5)
 
 #definicion del agente nodo.
