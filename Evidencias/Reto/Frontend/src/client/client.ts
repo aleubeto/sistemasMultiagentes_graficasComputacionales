@@ -22,6 +22,8 @@ fetch(baseURL + "/games", {
 });
 
 //Here we create all the paths to the assets
+const floorPath = 'img/Floor.png'
+const songPath = 'sounds/Song.mp3'
 
 
 //We create an array to store the cars generated with the GLTFLoader
@@ -32,6 +34,8 @@ const car: THREE.Group | null = null; //The car starts being a null
 var carsNumber: number = 0;
 //We create a variable to know which car the camera is focusing
 var actCar: number = 0;
+//We create a variable to keep track of 'Y' positions when we use the sky camera
+var actY: number = 6;
 
 //Boolean for first frame
 var firstFrame = true
@@ -104,7 +108,7 @@ function doKeyDown(evt: { keyCode: any }) {
       cam2 = false
       cam3 = true
     break;
-    //Cámara 3: robot anterior
+    //Cámara 3: carro anterior
     case 37:
       if(actCar == 0){
         actCar = carsNumber - 1;
@@ -113,7 +117,7 @@ function doKeyDown(evt: { keyCode: any }) {
         actCar--;
       }
     break;
-    //Cámara 3: robot anterior
+    //Cámara 3: carrp anterior
     case 39:
       if(actCar == carsNumber - 1){
         actCar = 0;
@@ -161,7 +165,7 @@ var render = async function () {
 
     if (gameLink != null) { // if the game has been created
       var res = await fetch(baseURL + gameLink); // get the game state
-      var data = await res.json(); // parse JSON to JS object that contains the positions of the 10 robots in every step
+      var data = await res.json(); // parse JSON to JS object that contains the positions of the cars
 
       if (firstFrame == true) {
         camera.lookAt(30, -5, 10) //This is the first position the camera will look at
@@ -170,41 +174,41 @@ var render = async function () {
 
       firstFrame = false;
 
-      //If the robots array position is not undefined we update the position of the robots
-      if (robots[0] != undefined && pallets[0] != undefined && boxes[0] != undefined && data[4][0].run == true) {
+      //If the cars array position is not undefined we update the position of the car
+      if (cars[0] != undefined && data[2][0].run == true) {
         //Here we update the cars position every frame
       }
-      else if (data[4][0].run == false && last_check == true) {
+      else if (data[2][0].run == false && last_check == true) {
         //Here we can execute the last frame of the simulation
         last_check = false;
       }
-      // console.log(robots)
-      //await console.log(robots[0])
+      // console.log(cars)
+      //await console.log(cars[0])
     }
     previous_time = now;
   }
   stats.update() //We update the stats
   requestAnimationFrame(render);
   renderer.render(scene, camera);
-  // if(cam1 == true){
-  //   //nada, jeje
-  // }
-  // else if(cam2 == true){
-  //   //Camara cenital
-  //   camera.position.x = 15;
-  //   camera.position.z = 15;
-  //   camera.position.y = 13;
-  //   //camera.lookAt(0, -150, 0)
-  //   //camera.rotateX(-Math.PI/2);
-  // }
-  // else if(cam3 == true){
-  //   //We set the camera to follow the robot
-  //   camera.position.x = robots[actRobot].position.x;
-  //   camera.position.z = robots[actRobot].position.z;
-  //   camera.position.y = actY;
-  //   camera.rotateX(-Math.PI/2);
-  //   camera.lookAt(robots[actRobot].position.x, robots[actRobot].position.y, robots[actRobot].position.z)
-  // }
+  if(cam1 == true){
+    //nada, jeje
+  }
+  else if(cam2 == true){
+    //Camara cenital
+    camera.position.x = 15;
+    camera.position.z = 15;
+    camera.position.y = 13;
+    //camera.lookAt(0, -150, 0)
+    //camera.rotateX(-Math.PI/2);
+  }
+  else if(cam3 == true){
+    //We set the camera to follow the car
+    camera.position.x = cars[actCar].position.x;
+    camera.position.z = cars[actCar].position.z;
+    camera.position.y = actY;
+    camera.rotateX(-Math.PI/2);
+    camera.lookAt(cars[actCar].position.x, cars[actCar].position.y, cars[actCar].position.z)
+  }
 };
 
 // Functions that are useful
