@@ -36,7 +36,8 @@ class Car(Agent):
         #creacion de una ruta con aStar
         self.aStar(inicial, final)
         self.anterior = self.inicial
-        self.siguiente = self.closedList[1]
+        self.destino = self.closedList[1]
+        self.proyeccion = self.final.pos
         """
         ##print(self.color)
         for nodo in self.closedList:
@@ -76,20 +77,24 @@ class Car(Agent):
             return
         
         direccion = self.model.space.get_heading(self.pos, self.closedList[self.contadorNodos].pos)
-        print(self.color, "hacia", self.siguiente.pos, ":", direccion)
+        print(self.color, "hacia", self.destino.pos, ":", direccion)
         #seguimiento de ruta creada
         if self.model.space.get_distance(self.pos, self.closedList[self.contadorNodos].pos) > 37:
             if self.pos[0] >= 0 and self.pos[0] < self.model.width and self.pos[1] >= 0 and self.pos[1] < self.model.height:
-                self.siguiente = self.closedList[self.contadorNodos]
+                self.destino = self.closedList[self.contadorNodos]
                 siguiente = self.pos + direccion * self.speed * self.contador
+                self.proyeccion = siguiente + direccion * self.speed * self.contador
                 ###print(self.pos)
                 ##print(siguiente)
                 #if self.model.space.out_of_bounds(siguiente):
-                #    siguiente = self.siguiente.pos
+                #    siguiente = self.destino.pos
                 #    self.contadorNodos += 1
                 #    self.contador = 0
                 self.model.space.move_agent(self, siguiente)
-                self.contador += 0.1
+                if self.contadorNodos == 1:
+                    self.contador += 0.025
+                else:    
+                    self.contador += 0.1
         else:
             self.anterior = self.closedList[self.contadorNodos]
             self.contadorNodos += 1
@@ -129,45 +134,45 @@ class Car(Agent):
     def detectar_autos(self):
         autos = []
         for auto in self.model.autos:
-            #if auto.anterior == self.siguiente:
+            #if auto.anterior == self.destino:
             #    distancia = self.model.space.get_distance(self.pos, auto.pos)
             #    if distancia < 10:
             #        return auto
-            #if auto.siguiente == self.siguiente:
+            #if auto.destino == self.destino:
             #    auto.decelerate(self)
             #    self.decelerate(auto)
                 
-            if (auto.anterior == self.siguiente or auto.siguiente == self.siguiente) and self != auto:
-                #distancia_neigh = auto.model.space.get_distance(auto.pos, auto.siguiente.pos)
-                #distancia_self = self.model.space.get_distance(self.pos, self.siguiente.pos)
+            if (auto.anterior == self.destino or auto.destino == self.destino) and self != auto:
+                #distancia_neigh = auto.model.space.get_distance(auto.pos, auto.destino.pos)
+                #distancia_self = self.model.space.get_distance(self.pos, self.destino.pos)
                 #if distancia_neigh < distancia_self:
                 print("detecto a", auto.color)
                 autos.append(auto)
-            #elif auto.anterior == self.siguiente:
+            #elif auto.anterior == self.destino:
                 #distancia_autos = self.model.space.get_distance(self.pos, auto.pos)
-                #distancia_objetivo = self.model.space.get_distance(self.pos, self.siguiente.pos)
+                #distancia_objetivo = self.model.space.get_distance(self.pos, self.destino.pos)
                 #if distancia_objetivo > distancia_autos:
                 #autos.append(auto)
         #for neighbor in self.model.space.get_neighbors(self.pos, 5, False):
         #    if type(neighbor) == Car:
-        #        if neighbor.siguiente == self.siguiente:
-        #            distancianeigh = neighbor.model.space.get_distance(neighbor.pos, neighbor.siguiente.pos)
-        #            distanciaself = self.model.space.get_distance(self.pos, self.siguiente.pos)
+        #        if neighbor.destino == self.destino:
+        #            distancianeigh = neighbor.model.space.get_distance(neighbor.pos, neighbor.destino.pos)
+        #            distanciaself = self.model.space.get_distance(self.pos, self.destino.pos)
         #            if distancianeigh < distanciaself:
         #                return neighbor
-        #        elif neighbor.anterior == self.siguiente:
+        #        elif neighbor.anterior == self.destino:
         #                return neighbor
         return autos
     
     def car_ahead(self):
-        #print("distancia de", self.color, "hacia el nodo", self.siguiente.unique_id)
-        distancia_self_objetivo = self.model.space.get_distance(self.pos, self.siguiente.pos)
+        #print("distancia de", self.color, "hacia el nodo", self.destino.unique_id)
+        distancia_self_objetivo = self.model.space.get_distance(self.pos, self.destino.pos)
         #print(distancia_self_objetivo)
         menor = distancia_self_objetivo
         auto_menor = None
         for auto in self.detectar_autos():
-            distancia_auto_objetivo = auto.model.space.get_distance(auto.pos, self.siguiente.pos)
-            #print("distancia de", auto.color, "hacia el nodo", self.siguiente.unique_id)
+            distancia_auto_objetivo = auto.model.space.get_distance(auto.pos, self.destino.pos)
+            #print("distancia de", auto.color, "hacia el nodo", self.destino.unique_id)
             #print(distancia_auto_objetivo)
             distancia_auto_self = self.model.space.get_distance(self.pos, auto.pos)
             #print("distancia de", self.color, "hacia a", auto.color)
