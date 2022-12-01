@@ -36,6 +36,14 @@ var carsNumber: number = 0;
 var actCar: number = 0;
 //We create a variable to keep track of 'Y' positions when we use the sky camera
 var actY: number = 6;
+//We create a global array to keep track of the cars IDs, last frame
+var globalCarsIds: number[] = [];
+//We create a global array to keep track of the cars IDs in every frame
+var actCarsIds: number[] = [];
+//We create a global boolean to know if the cars are the same as the last frame
+var changedCars: boolean = false;
+
+modelToVariable(0, 0, 0, 1, 'models/Car.glb', car!) //We load the car model
 
 //Boolean for first frame
 var firstFrame = true
@@ -173,16 +181,36 @@ var render = async function () {
       if (data[0] != undefined && data[2][0].run == true) {
         if (firstFrame == true) {
           camera.lookAt(30, -5, 10) //This is the first position the camera will look at
-          console.log("First frame")
-          console.log(data[0][0].id)
+          //We set the array with the cars IDs
+          for (var i = 0; i < data[0].length; i++) {
+            globalCarsIds.push(data[0][i].id);
+          }
+          firstFrame = false;
         }
         //Here we update the cars position every frame
+        //We set the array with the cars IDs
+        actCarsIds = [];
+        for (var i = 0; i < data[0].length; i++) {
+          actCarsIds.push(data[0][i].id);
+        }
+        //We compare globalCarsIds with actCarsIds
+        changedCars = !compareArrays(globalCarsIds, actCarsIds); //If the cars are the same, changedCars is false
+        //We empty the cars ids array to update it
+        globalCarsIds = [];
+        for (var i = 0; i < data[0].length; i++) {
+          cars[i].position.x = data[0][i].position[0];
+          cars[i].position.y = data[0][i].position[1];
+          cars[i].position.z = data[0][i].position[2];
+          cars[i].rotation.x = data[0][i].rotation[0];
+          cars[i].rotation.y = data[0][i].rotation[1];
+          cars[i].rotation.z = data[0][i].rotation[2];
+          globalCarsIds.push(data[0][i].id);
+        }
       }
       else if (data[2][0].run == false && last_check == true) {
         //Here we can execute the last frame of the simulation
         last_check = false;
       }
-      firstFrame = false;
       // console.log(cars)
       //await console.log(cars[0])
     }
@@ -271,8 +299,6 @@ async function modelToVariable(x: number, y: number, z: number, scale: number, m
         l.shadow.mapSize.height = 2048 //We set the height of the shadow map to 2048
       }
     })
-    //We add the model to the scene
-    scene.add(model)
   })
 }
 
