@@ -28,8 +28,6 @@ const songPath = 'sounds/Song.mp3'
 
 //We create an array to store the cars generated with the GLTFLoader
 const cars: THREE.Group[] = []; //The array can be empty
-//We create a variable that will save a car model
-const car: THREE.Group | null = null; //The car starts being a null
 //We create a variable to keep track of how many cars are in the actual frame
 var carsNumber: number = 0;
 //We create a variable to know which car the camera is focusing
@@ -43,7 +41,31 @@ var actCarsIds: number[] = [];
 //We create a global boolean to know if the cars are the same as the last frame
 var changedCars: boolean = false;
 
-modelToVariable(0, 0, 0, 1, 'models/Car.glb', car!) //We load the car model
+//We load the model
+const car = loadModel('models/Car.glb',0.0025,0,0,0)
+car.then((car) => {
+  //We add the car to the array
+  cars.push(car)
+  //We add the car to the scene
+  scene.add(car)
+  //We add the car to the global array
+  globalCarsIds.push(0)
+  //We add the car to the actual array
+  actCarsIds.push(0)
+  //We add the car to the scene
+  //scene.add(car)
+  //We add the car to the global array
+  globalCarsIds.push(0)
+  //We add the car to the actual array
+  actCarsIds.push(0)
+  //We add the car to the scene
+})
+//If not we catch the error
+.catch((error) => {
+  console.log(error)
+})
+
+
 
 //Boolean for first frame
 var firstFrame = true
@@ -62,10 +84,11 @@ container.appendChild(stats.dom) //Add the stats to the body of the html
 const scene = new THREE.Scene()
 scene.background = new THREE.Color(0x0e1231)
 //Add an axes helper to the scene
-const axesHelper = new THREE.AxesHelper(1000)
+const axesHelper = new THREE.AxesHelper(1)
 scene.add(axesHelper)
 
 //We add models to the scene
+
 //Here we can add the static models of the scene, like buildings and stuff.
 
 
@@ -77,9 +100,9 @@ const camera = new THREE.PerspectiveCamera(
 )
 
 //These are the camera first positions
-camera.position.x = 2;
-camera.position.z = 28;
-camera.position.y = 8;
+camera.position.x = 0;
+camera.position.z = 5;
+camera.position.y = 2;
 
 const renderer = new THREE.WebGLRenderer({ canvas: canvas })
 renderer.physicallyCorrectLights = true
@@ -176,41 +199,76 @@ var render = async function () {
       var data = await res.json(); // parse JSON to JS object that contains the positions of the cars
 
       //console.log(data[0][0].id);
-
-      //If the cars array position is not undefined we update the position of the car
-      if (data[0] != undefined && data[2][0].run == true) {
-        if (firstFrame == true) {
-          camera.lookAt(30, -5, 10) //This is the first position the camera will look at
-          //We set the array with the cars IDs
-          for (var i = 0; i < data[0].length; i++) {
-            globalCarsIds.push(data[0][i].id);
-          }
-          firstFrame = false;
-        }
-        //Here we update the cars position every frame
+      if (firstFrame == true) {
+        //camera.lookAt(30, -5, 10) //This is the first position the camera will look at
         //We set the array with the cars IDs
-        actCarsIds = [];
-        for (var i = 0; i < data[0].length; i++) {
-          actCarsIds.push(data[0][i].id);
+        for (var i = 0; i < await data[0].length; i++) {//We fill the array with the cars IDs
+          globalCarsIds.push(await data[0][i].id);
+          console.log("Cars array created");
         }
-        //We compare globalCarsIds with actCarsIds
-        changedCars = !compareArrays(globalCarsIds, actCarsIds); //If the cars are the same, changedCars is false
-        //We empty the cars ids array to update it
-        globalCarsIds = [];
-        for (var i = 0; i < data[0].length; i++) {
-          cars[i].position.x = data[0][i].position[0];
-          cars[i].position.y = data[0][i].position[1];
-          cars[i].position.z = data[0][i].position[2];
-          cars[i].rotation.x = data[0][i].rotation[0];
-          cars[i].rotation.y = data[0][i].rotation[1];
-          cars[i].rotation.z = data[0][i].rotation[2];
-          globalCarsIds.push(data[0][i].id);
-        }
+        //We create the array of cars
+        // console.log(cars);
+        // We position the cars
+        // for (var i = 0; i < data[0].length; i++) {
+        //   //We update the position of the car
+        //   cars[i].position.x = await data[0][i].x;
+        //   cars[i].position.z = await data[0][i].y;
+        //   cars[i].position.y = 0;
+        //   // //We update the rotation of the car
+        //   // cars[i].rotation.x = data[0][i].rx;
+        //   // cars[i].rotation.z = data[0][i].rz;
+        //   // cars[i].rotation.y = data[0][i].ry;
+        // }
+        firstFrame = false;
       }
-      else if (data[2][0].run == false && last_check == true) {
-        //Here we can execute the last frame of the simulation
-        last_check = false;
-      }
+      // console.log(cars)
+      //If the cars array position is not undefined we update the position of the car
+      // if (data[0] != undefined && data[2][0].run == true && cars[0] != undefined) {
+      //   console.log("Here");
+      //   //Here we update the cars position every frame
+      //   //We set the array with the cars IDs
+      //   actCarsIds = [];
+      //   for (var i = 0; i < await data[0].length; i++) {
+      //     actCarsIds.push(await data[0][i].id);
+      //   }
+      //   //We compare globalCarsIds with actCarsIds
+      //   changedCars = !compareArrays(globalCarsIds, actCarsIds); //If the cars are the same, changedCars is false
+
+      //   //If the cars are the same, we update the position of the cars
+      //   if (changedCars == false) {
+      //     // for (var i = 0; i < await data[0].length; i++) {
+      //     //   //We update the position of the car
+      //     //   cars[i].position.x = await data[0][i].x;
+      //     //   cars[i].position.z = await data[0][i].y;
+      //     //   cars[i].position.y = 0;
+      //     //   // //We update the rotation of the car
+      //     //   // cars[i].rotation.x = data[0][i].rx;
+      //     //   // cars[i].rotation.z = data[0][i].rz;
+      //     //   // cars[i].rotation.y = data[0][i].ry;
+      //     // }
+      //   }
+      //   //If the cars are not the same, we update the cars array
+      //   else {
+      //     await modelToArray(0,0,0,1,'models/Car.glb',cars)
+      //     //We update the position of the cars
+      //     // for (var i = 0; i < await data[0].length; i++) {
+      //     //   //We update the position of the car
+      //     //   cars[i].position.x = await data[0][i].x;
+      //     //   cars[i].position.z = await data[0][i].Y;
+      //     //   cars[i].position.y = 0;
+      //     //   // //We update the rotation of the car
+      //     //   // cars[i].rotation.x = data[0][i].rx;
+      //     //   // cars[i].rotation.z = data[0][i].rz;
+      //     //   // cars[i].rotation.y = data[0][i].ry;
+      //     // }
+      //     //We update the globalCarsIds array
+      //     globalCarsIds = actCarsIds;
+      //   }
+      // }
+      // else if (data[2][0].run == false && last_check == true) {
+      //   //Here we can execute the last frame of the simulation
+      //   last_check = false;
+      // }
       // console.log(cars)
       //await console.log(cars[0])
     }
@@ -242,100 +300,18 @@ var render = async function () {
 
 // Functions that are useful
 
-//Function to import GLTF model and save it in an array
-async function modelToArray(x: number, y: number, z: number, scale: number, modelPath: string, array: THREE.Group[]) {
-  const loader = new GLTFLoader()
-  loader.load(modelPath, async (gltf) => { //We load the model
-    //We get the model from the gltf object
-    const model = gltf.scene
-    //We scale the model
-    model.scale.set(scale, scale, scale)
-    //We set the model position
-    model.position.set(x, y, z)
-    //We add the model to the array
-    array.push(model)
-    gltf.scene.traverse(function (child) { //We traverse the model
-      if ((child as THREE.Mesh).isMesh) { //If the child is a mesh we set the shadow properties
-        const m = child as THREE.Mesh //We cast the child to a mesh
-        m.receiveShadow = true //We set the receiveShadow property to true
-        m.castShadow = true //We set the castShadow property to true
-      }
-      if ((child as THREE.Light).isLight) { //If the child is a light we set the shadow properties
-        const l = child as THREE.Light //We cast the child to a light
-        l.castShadow = true //We set the castShadow property to true
-        l.shadow.bias = -0.003 //We set the bias property to -0.003
-        l.shadow.mapSize.width = 2048 //We set the width of the shadow map to 2048
-        l.shadow.mapSize.height = 2048 //We set the height of the shadow map to 2048
-      }
-    })
-    //We add the model to the scene
-    scene.add(model)
-  })
-}
+  // Load a glTF resource
+  async function loadModel(path: string, scale: number, x: number, y: number, z: number) {
+    const loader = new GLTFLoader();
+    // console.log('===== start loadGltf async')
+    let gltf = await loader.loadAsync(path)
+    // console.log('========== end loadGltf')
+    const model = gltf.scene;
+    //scene.add(model);
+    model.scale.set(scale, scale, scale);
+    return model;
+  }
 
-//Function to import GLTF model and assign it to a variable
-async function modelToVariable(x: number, y: number, z: number, scale: number, modelPath: string, variable: THREE.Group) {
-  const loader = new GLTFLoader()
-  loader.load(modelPath, async (gltf) => { //We load the model
-    //We get the model from the gltf object
-    const model = gltf.scene
-    //We scale the model
-    model.scale.set(scale, scale, scale)
-    //We set the model position
-    model.position.set(x, y, z)
-    //We add the model to the variable
-    variable = model
-    gltf.scene.traverse(function (child) { //We traverse the model
-      if ((child as THREE.Mesh).isMesh) { //If the child is a mesh we set the shadow properties
-        const m = child as THREE.Mesh //We cast the child to a mesh
-        m.receiveShadow = true //We set the receiveShadow property to true
-        m.castShadow = true //We set the castShadow property to true
-      }
-      if ((child as THREE.Light).isLight) { //If the child is a light we set the shadow properties
-        const l = child as THREE.Light //We cast the child to a light
-        l.castShadow = true //We set the castShadow property to true
-        l.shadow.bias = -0.003 //We set the bias property to -0.003
-        l.shadow.mapSize.width = 2048 //We set the width of the shadow map to 2048
-        l.shadow.mapSize.height = 2048 //We set the height of the shadow map to 2048
-      }
-    })
-  })
-}
-
-async function addModel(x: number, y: number, z: number, scale: number, path: string) {
-  //We create a new GLTFLoader
-  const loader = new GLTFLoader()
-  //We load the model
-  loader.load(
-    //We pass the path to the model
-    path,
-    //We pass the function that will be executed after the model is loaded
-    async function (gltf) {
-      //We get the model from the gltf object
-      const model = gltf.scene
-      //We set the model position
-      model.position.set(x, y, z)
-      //We set the model scale
-      model.scale.set(scale, scale, scale)
-      gltf.scene.traverse(function (child) {
-        if ((child as THREE.Mesh).isMesh) {
-          const m = child as THREE.Mesh
-          m.receiveShadow = true
-          m.castShadow = true
-        }
-        if ((child as THREE.Light).isLight) {
-          const l = child as THREE.Light
-          l.castShadow = true
-          l.shadow.bias = -0.003
-          l.shadow.mapSize.width = 2048
-          l.shadow.mapSize.height = 2048
-        }
-      })
-      //We add the model to the scene
-      scene.add(model)
-    },
-  )
-}
 
 //We create a function to add a light to the scene
 function addLight(x: number, y: number, z: number) {
