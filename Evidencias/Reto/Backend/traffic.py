@@ -33,17 +33,17 @@ class Car(Agent):
         #creacion de una ruta con aStar
         self.aStar(inicial, final)
         """
-        print(self.color)
+        #print(self.color)
         for nodo in self.closedList:
-            print(nodo.unique_id, nodo.pos)
+            #print(nodo.unique_id, nodo.pos)
         """
     
     #step del agente auto
     def step(self):
-        print("Comence en ", self.inicial.unique_id, " y voy a ", self.final.unique_id)
-        print("Aqui auto", self.color, "actualmente estoy en", self.pos, "y mi camino es")
-        for nodo in self.closedList:
-            print(nodo.unique_id, nodo.pos)
+        #print("Comence en ", self.inicial.unique_id, " y voy a ", self.final.unique_id)
+        #print("Aqui auto", self.color, "actualmente estoy en", self.pos, "y mi camino es")
+        #for nodo in self.closedList:
+            #print(nodo.unique_id, nodo.pos)
         
         #deteccion de auto delantero
         car_ahead = self.car_ahead()
@@ -69,9 +69,9 @@ class Car(Agent):
         #seguimiento de ruta creada
         if self.model.space.get_distance(self.pos, self.closedList[self.contadorNodos].pos) > 0.1:
             if self.pos[0] >= 0 and self.pos[0] < self.model.width and self.pos[1] >= 0 and self.pos[1] < self.model.height:
-                self.pos += (self.closedList[self.contadorNodos].pos - self.pos) * self.speed * self.contador
-                #print(self.pos)
-                self.model.space.move_agent(self, self.pos)
+                siguiente = self.pos + (self.closedList[self.contadorNodos].pos - self.pos) * self.speed * self.contador
+                ##print(self.pos)
+                self.model.space.move_agent(self, siguiente)
                 self.contador += 0.1
         else:
             self.contadorNodos += 1
@@ -240,9 +240,12 @@ class Street(Model):
     def step(self):
         #cada 60 steps genera un nuevo auto en un nodo de inicio aleatorio con direccion
         #a un nodo final aleatorio
-        if self.schedule.steps % 60 == 0:
+        if self.schedule.steps % 10 == 0:
             entrada = self.random.randrange(0, 22, 2)
-            car = Car(self, self.nodos[entrada].pos, np.array([0.1, 0.1]), self.nodos[entrada], self.nodos[self.random.randrange(1, 23, 2)])
+            salida = self.random.randrange(1, 23, 2)
+            #print("entrada asignada para este:", entrada)
+            #print("salida asignada para este:", salida)
+            car = Car(self, self.nodos[entrada].pos, np.array([0.1, 0.1]), self.nodos[entrada], self.nodos[salida])
             self.space.place_agent(car, car.pos)
             self.schedule.add(car)
             
