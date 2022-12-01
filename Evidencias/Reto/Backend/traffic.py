@@ -78,7 +78,7 @@ class Car(Agent):
         direccion = self.model.space.get_heading(self.pos, self.closedList[self.contadorNodos].pos)
         print(self.color, "hacia", self.siguiente.pos, ":", direccion)
         #seguimiento de ruta creada
-        if self.model.space.get_distance(self.pos, self.closedList[self.contadorNodos].pos) > 35:
+        if self.model.space.get_distance(self.pos, self.closedList[self.contadorNodos].pos) > 37:
             if self.pos[0] >= 0 and self.pos[0] < self.model.width and self.pos[1] >= 0 and self.pos[1] < self.model.height:
                 self.siguiente = self.closedList[self.contadorNodos]
                 siguiente = self.pos + direccion * self.speed * self.contador
@@ -172,7 +172,7 @@ class Car(Agent):
             distancia_auto_self = self.model.space.get_distance(self.pos, auto.pos)
             #print("distancia de", self.color, "hacia a", auto.color)
             #print(distancia_auto_self)
-            if distancia_auto_self <= menor and distancia_auto_objetivo < distancia_self_objetivo and distancia_auto_self < 35:
+            if distancia_auto_self <= menor and distancia_auto_objetivo < distancia_self_objetivo and distancia_auto_self < 37:
                 auto_menor = auto
                 menor = distancia_auto_self
         
