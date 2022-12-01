@@ -14,37 +14,36 @@ class Car(Agent):
     #constructor del agente auto
     def __init__(self, model: Model, pos, speed, inicial, final):
         super().__init__(model.next_id(), model)
-        #propiedades basicas de posicion y velocidad
         
-        #==================================== VALORES PARA DEBUG ====================================
+        #origen y destino del auto
         self.inicial = inicial
         self.final = final
-        #==================================== VALORES PARA DEBUG ====================================
+               
+        #propiedades basicas de posicion y velocidad
         self.pos = pos
         self.speed = speed
+        
         #variables de control para seguimiento de rutas
         self.contador = 0;
         self.contadorNodos = 1;
+        
         #variables de control para algoritmo aStar
         self.openList = []
         self.closedList = []
+        
         #seleccion de color aleatorio
         self.color = self.random.choice(["Brown", "Blue", "Red", "Yellow", "Green"])
+        
         #creacion de una ruta con aStar
         self.aStar(inicial, final)
-        """
-        print(self.color)
-        for nodo in self.closedList:
-            print(nodo.unique_id, nodo.pos)
-        """
+        
+        #Variables de control para manejo de colisiones
+        self.anterior = self.inicial
+        self.destino = self.closedList[1]
+        self.proyeccion = self.final.pos
     
     #step del agente auto
     def step(self):
-        print("Comence en ", self.inicial.unique_id, " y voy a ", self.final.unique_id)
-        print("Aqui auto", self.color, "actualmente estoy en", self.pos, "y mi camino es")
-        for nodo in self.closedList:
-            print(nodo.unique_id, nodo.pos)
-        
         #deteccion de auto delantero
         car_ahead = self.car_ahead()
         
@@ -62,20 +61,28 @@ class Car(Agent):
         
         #accion cuando el agente llega a su destino (es eliminado)
         if self.contadorNodos >= len(self.closedList):
+            self.model.autos.remove(self)
             self.model.schedule.remove(self)
             self.model.space.remove_agent(self)
             return
         
+        #determinacion de vector de direccion del auto segun su destino actual
+        direccion = self.model.space.get_heading(self.pos, self.closedList[self.contadorNodos].pos)
         #seguimiento de ruta creada
-        if self.model.space.get_distance(self.pos, self.closedList[self.contadorNodos].pos) > 0.1:
+        if self.model.space.get_distance(self.pos, self.closedList[self.contadorNodos].pos) > 37:
             if self.pos[0] >= 0 and self.pos[0] < self.model.width and self.pos[1] >= 0 and self.pos[1] < self.model.height:
-                self.pos += (self.closedList[self.contadorNodos].pos - self.pos) * self.speed * self.contador
-                #print(self.pos)
-                self.model.space.move_agent(self, self.pos)
-                self.contador += 0.1
+                self.destino = self.closedList[self.contadorNodos]
+                siguiente = self.pos + direccion * self.speed * self.contador
+                self.proyeccion = siguiente + direccion * self.speed * self.contador
+                self.model.space.move_agent(self, siguiente)
+                if self.contadorNodos == 1:
+                    self.contador += 0.025
+                else:    
+                    self.contador += 0.1
         else:
+            self.anterior = self.closedList[self.contadorNodos]
             self.contadorNodos += 1
-            self.contador = 0
+            self.contador = 0.2
             
     #funcion auxiliar de aStar para encontrar las adyacencias de un nodo
     def encontrar_adyacentes(self, actual):
@@ -107,14 +114,29 @@ class Car(Agent):
             self.encontrar_adyacentes(actual)
             self.closedList.append(actual)
                 
-    #funcion de deteccion de auto delantero
+    #funcion auxiliar de car_ahead para listar todos los posibles autos que podrian generar una colision
+    def detectar_autos(self):
+        autos = []
+        for auto in self.model.autos:
+            if (auto.anterior == self.destino or auto.destino == self.destino) and self != auto:
+                autos.append(auto)
+        return autos
+    
+    #funcion car_ahead que permite determinar cual es el auto mas proximo con el que podria colisionar el
+    #vehiculo actual
     def car_ahead(self):
-        for neighbor in self.model.space.get_neighbors(self.pos, 1, False):
-            if type(neighbor) == Car:
-                if self.model.space.get_distance(self.pos, neighbor.pos) < 0.1:
-                #if neighbor.pos[0] > self.pos[0] or neighbor.pos[1] > self.pos[1]:
-                    return neighbor
-        return None
+        distancia_self_objetivo = self.model.space.get_distance(self.pos, self.destino.pos)
+        menor = distancia_self_objetivo
+        auto_menor = None
+        for auto in self.detectar_autos():
+            distancia_auto_objetivo = auto.model.space.get_distance(auto.pos, self.destino.pos)
+            distancia_auto_self = self.model.space.get_distance(self.pos, auto.pos)
+            if distancia_auto_self <= menor and distancia_auto_objetivo < distancia_self_objetivo and distancia_auto_self < 37:
+                auto_menor = auto
+                menor = distancia_auto_self
+        
+        return auto_menor
+        
     
     #funcion para acelerar
     def accelerate(self):
@@ -122,7 +144,7 @@ class Car(Agent):
     
     #funcion para desacelerar
     def decelerate(self, car_ahead):
-        return car_ahead.speed[0] - 0.1
+        return self.speed[0] - (car_ahead.speed[0] * 0.5)
 
 #definicion del agente nodo.
 #Sirve como representacion grafica del grafo y punto a seguir para los autos
@@ -148,6 +170,7 @@ class Street(Model):
         self.schedule = RandomActivation(self)
         #lista que contendra los nodos del grafo
         self.nodos = []
+        self.autos = []
         
         #grafo representado como matriz de adyacencias
         self.matrix = [
@@ -240,21 +263,23 @@ class Street(Model):
     def step(self):
         #cada 60 steps genera un nuevo auto en un nodo de inicio aleatorio con direccion
         #a un nodo final aleatorio
-        if self.schedule.steps % 60 == 0:
+        if self.schedule.steps % 5 == 0:
             entrada = self.random.randrange(0, 22, 2)
-            car = Car(self, self.nodos[entrada].pos, np.array([0.1, 0.1]), self.nodos[entrada], self.nodos[self.random.randrange(1, 23, 2)])
+            salida = self.random.randrange(1, 23, 2)
+            velocidad =self.random.random()
+            car = Car(self, self.nodos[entrada].pos, np.array([velocidad, velocidad]), self.nodos[entrada], self.nodos[salida])
             self.space.place_agent(car, car.pos)
             self.schedule.add(car)
+            self.autos.append(car)
             
         self.schedule.step()
 
 #funcion para representar graficamente a todos los agentes de la simulacion
 def car_draw(agent):
     if type(agent) == Car:
-        #color = "Blue" if agent.unique_id == 1 else "Brown"
-        return {"Shape": "rect", "w": 0.034, "h": 0.02, "Filled": "true", "Color": agent.color}
+        return {"Shape": "rect", "w": 0.01, "h": 0.01, "Filled": "true", "Color": agent.color}
     elif type(agent) == Nodo:
-        return {"Shape": "rect", "w": 0.01, "h": 0.01, "Filled": "true", "Color": "Black"}
+        return {"Shape": "rect", "w": 0.01, "h": 0.005, "Filled": "true", "Color": "Black"}
 
 #definicion del canvas visual de la simulacion
 canvas = SimpleCanvas(car_draw, 500, 500)
