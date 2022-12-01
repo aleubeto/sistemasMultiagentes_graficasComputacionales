@@ -117,7 +117,7 @@ function doKeyDown(evt: { keyCode: any }) {
         actCar--;
       }
       break;
-    //Cámara 3: carrp anterior
+    //Cámara 3: carro anterior
     case 39:
       if (actCar == carsNumber - 1) {
         actCar = 0;
@@ -356,6 +356,23 @@ function playSong() {
   var audio = new Audio(songPath);
   audio.play();
 }
+
+//Function to compare two arrays, if it is the same it returns true, if not it returns false
+function compareArrays(array1: any[], array2: any[]) {
+  //We check if the arrays have the same length
+  if (array1.length !== array2.length) {
+    return false
+  }
+  //We loop through the arrays
+  for (let i = 0; i < array1.length; i++) {
+    //We check if the elements are the same
+    if (array1[i] !== array2[i]) {
+      return false
+    }
+  }
+  return true
+}
+
 
 // GUI
 const gui = new GUI() //Dat.gui
