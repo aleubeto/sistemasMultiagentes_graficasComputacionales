@@ -35,20 +35,21 @@ class Car(Agent):
         self.color = self.random.choice(["Brown", "Blue", "Red", "Yellow", "Green"])
         #creacion de una ruta con aStar
         self.aStar(inicial, final)
-        self.anterior = inicial
+        self.anterior = self.inicial
         self.siguiente = self.closedList[1]
         """
-        #print(self.color)
+        ##print(self.color)
         for nodo in self.closedList:
-            #print(nodo.unique_id, nodo.pos)
+            ##print(nodo.unique_id, nodo.pos)
         """
     
     #step del agente auto
     def step(self):
-        #print("Comence en ", self.inicial.unique_id, " y voy a ", self.final.unique_id)
-        #print("Aqui auto", self.color, "actualmente estoy en", self.pos, "y mi camino es")
+        #print("estamos hablando de", self.color)
+        ##print("Comence en ", self.inicial.unique_id, " y voy a ", self.final.unique_id)
+        ##print("Aqui auto", self.color, "actualmente estoy en", self.pos, "y mi camino es")
         #for nodo in self.closedList:
-            #print(nodo.unique_id, nodo.pos)
+            ##print(nodo.unique_id, nodo.pos)
         
         #deteccion de auto delantero
         car_ahead = self.car_ahead()
@@ -62,7 +63,7 @@ class Car(Agent):
         elif new_speed <= 0.0:
             new_speed = 0.0
         
-        #print(new_speed)
+        ##print(new_speed)
          
         #asignacion de velocidad
         self.speed = np.array([new_speed, new_speed])
@@ -79,8 +80,8 @@ class Car(Agent):
             if self.pos[0] >= 0 and self.pos[0] < self.model.width and self.pos[1] >= 0 and self.pos[1] < self.model.height:
                 self.siguiente = self.closedList[self.contadorNodos]
                 siguiente = self.pos + (self.closedList[self.contadorNodos].pos - self.pos) * self.speed * self.contador
-                ##print(self.pos)
-                print(siguiente)
+                ###print(self.pos)
+                ##print(siguiente)
                 if self.model.space.out_of_bounds(siguiente):
                     siguiente = self.siguiente.pos
                     self.contadorNodos += 1
@@ -130,11 +131,11 @@ class Car(Agent):
             #    distancia = self.model.space.get_distance(self.pos, auto.pos)
             #    if distancia < 10:
             #        return auto
-            if auto.siguiente == self.siguiente:
-                auto.decelerate(self)
-                self.decelerate(auto)
+            #if auto.siguiente == self.siguiente:
+            #    auto.decelerate(self)
+            #    self.decelerate(auto)
                 
-            if auto.anterior == self.siguiente or auto.siguiente == self.siguiente:
+            if (auto.anterior == self.siguiente or auto.siguiente == self.siguiente) and self != auto:
                 #distancia_neigh = auto.model.space.get_distance(auto.pos, auto.siguiente.pos)
                 #distancia_self = self.model.space.get_distance(self.pos, self.siguiente.pos)
                 #if distancia_neigh < distancia_self:
@@ -156,16 +157,24 @@ class Car(Agent):
         return autos
     
     def car_ahead(self):
+        #print("distancia de", self.color, "hacia el nodo", self.siguiente.unique_id)
         distancia_self_objetivo = self.model.space.get_distance(self.pos, self.siguiente.pos)
-        menor = self.model.space.get_distance(self.pos, self.siguiente.pos)
+        #print(distancia_self_objetivo)
+        menor = distancia_self_objetivo
         auto_menor = None
         for auto in self.detectar_autos():
-            distancia_objetivo = auto.model.space.get_distance(auto.pos, self.siguiente.pos)
+            distancia_auto_objetivo = auto.model.space.get_distance(auto.pos, self.siguiente.pos)
+            #print("distancia de", auto.color, "hacia el nodo", self.siguiente.unique_id)
+            #print(distancia_auto_objetivo)
             distancia_auto_self = self.model.space.get_distance(self.pos, auto.pos)
-            if distancia_auto_self < menor and distancia_objetivo < distancia_self_objetivo:
+            #print("distancia de", self.color, "hacia a", auto.color)
+            #print(distancia_auto_self)
+            if distancia_auto_self <= menor and distancia_auto_objetivo < distancia_self_objetivo:
                 auto_menor = auto
                 menor = distancia_auto_self
         
+        #if auto_menor != None:
+            #print(auto_menor.color)
         return auto_menor
         
     
@@ -175,7 +184,7 @@ class Car(Agent):
     
     #funcion para desacelerar
     def decelerate(self, car_ahead):
-        return self.speed[0] - (car_ahead.speed[0] * 0.5) - 0.05
+        return self.speed[0] - (car_ahead.speed[0] * 0.5)
 
 #definicion del agente nodo.
 #Sirve como representacion grafica del grafo y punto a seguir para los autos
@@ -294,12 +303,13 @@ class Street(Model):
     def step(self):
         #cada 60 steps genera un nuevo auto en un nodo de inicio aleatorio con direccion
         #a un nodo final aleatorio
-        if self.schedule.steps % 10 == 0:
-            entrada = self.random.randrange(0, 22, 2)
-            salida = self.random.randrange(1, 23, 2)
+        if self.schedule.steps % 5 == 0:
+            entrada = 8 #entrada = self.random.randrange(0, 22, 2)
+            salida = 5 #salida = self.random.randrange(1, 23, 2)
             velocidad =self.random.random()
-            #print("entrada asignada para este:", entrada)
-            #print("salida asignada para este:", salida)
+            ##print("entrada asignada para este:", entrada)
+            ##print("salida asignada para este:", salida)
+            #print("nace un auto")
             car = Car(self, self.nodos[entrada].pos, np.array([velocidad, velocidad]), self.nodos[entrada], self.nodos[salida])
             self.space.place_agent(car, car.pos)
             self.schedule.add(car)
