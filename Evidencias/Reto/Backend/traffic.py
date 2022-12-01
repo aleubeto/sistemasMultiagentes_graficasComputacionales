@@ -75,17 +75,19 @@ class Car(Agent):
             self.model.space.remove_agent(self)
             return
         
+        direccion = self.model.space.get_heading(self.pos, self.closedList[self.contadorNodos].pos)
+        print(direccion)
         #seguimiento de ruta creada
-        if self.model.space.get_distance(self.pos, self.closedList[self.contadorNodos].pos) > 0.05:
+        if self.model.space.get_distance(self.pos, self.closedList[self.contadorNodos].pos) > 5:
             if self.pos[0] >= 0 and self.pos[0] < self.model.width and self.pos[1] >= 0 and self.pos[1] < self.model.height:
                 self.siguiente = self.closedList[self.contadorNodos]
-                siguiente = self.pos + (self.closedList[self.contadorNodos].pos - self.pos) * self.speed * self.contador
+                siguiente = self.pos + direccion * self.speed * self.contador
                 ###print(self.pos)
                 ##print(siguiente)
-                if self.model.space.out_of_bounds(siguiente):
-                    siguiente = self.siguiente.pos
-                    self.contadorNodos += 1
-                    self.contador = 0
+                #if self.model.space.out_of_bounds(siguiente):
+                #    siguiente = self.siguiente.pos
+                #    self.contadorNodos += 1
+                #    self.contador = 0
                 self.model.space.move_agent(self, siguiente)
                 self.contador += 0.1
         else:
@@ -304,8 +306,8 @@ class Street(Model):
         #cada 60 steps genera un nuevo auto en un nodo de inicio aleatorio con direccion
         #a un nodo final aleatorio
         if self.schedule.steps % 5 == 0:
-            entrada = 8 #entrada = self.random.randrange(0, 22, 2)
-            salida = 5 #salida = self.random.randrange(1, 23, 2)
+            entrada = self.random.randrange(0, 22, 2)
+            salida = self.random.randrange(1, 23, 2)
             velocidad =self.random.random()
             ##print("entrada asignada para este:", entrada)
             ##print("salida asignada para este:", salida)
