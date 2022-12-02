@@ -45,6 +45,8 @@ def queryState(id):
         g["y"] = agent.pos[1]
         
         if type(agent) == Car:    #Add to car array
+            g["x_next"] = agent.destino.pos[0]
+            g["y_next"] = agent.destino.pos[1]
             cars.append(g)
         elif type(agent) == Nodo: #Add to node array
             nodes.append(g)
