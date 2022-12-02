@@ -282,10 +282,10 @@ def car_draw(agent):
         return {"Shape": "rect", "w": 0.01, "h": 0.005, "Filled": "true", "Color": "Black"}
 
 #definicion del canvas visual de la simulacion
-canvas = SimpleCanvas(car_draw, 500, 500)
-
-model_params = {}
-
-server = ModularServer(Street, [canvas], "Traffic", model_params)
-server.port = 8522
-server.launch()
+#canvas = SimpleCanvas(car_draw, 500, 500)
+#
+#model_params = {}
+#
+#server = ModularServer(Street, [canvas], "Traffic", model_params)
+#server.port = 8522
+#server.launch()
