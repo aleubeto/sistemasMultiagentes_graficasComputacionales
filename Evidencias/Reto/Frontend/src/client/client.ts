@@ -40,16 +40,17 @@ var globalCarsIds: number[] = [];
 var actCarsIds: number[] = [];
 //We create a global boolean to know if the cars are the same as the last frame
 var changedCars: boolean = false;
+var x: number = 0;
+var z: number = 0;
+var x_next: number = 0;
+var z_next: number = 0;
 
 //We load the model
-loadModel('models/Car.glb', 0.0025, 0, 0, 0, cars).then((array) => {
-  carsNumber = 10;
-  // //We create a loop to add the cars to the scene
-  // for (let i = 0; i < carsNumber; i++) {
-  //   scene.add(cars[i]);
-  // }
-  console.log(cars)
-});
+//loadModel('models/Car.glb', 0.0025, 0, 0, 0, cars)
+// for (let i = 0; i < carsNumber; i++) {
+//   loadModel('models/Car2.glb', 1, i, 0, 0, cars/*, Math.PI / 2*/);
+// }
+// console.log(cars)
 // car.then((car) => {
 //   //We add the car to the array
 //   cars.push(car)
@@ -211,21 +212,24 @@ var render = async function () {
         //We set the array with the cars IDs
         for (var i = 0; i < await data[0].length; i++) {//We fill the array with the cars IDs
           globalCarsIds.push(await data[0][i].id);
-          console.log("Cars array created");
+          console.log("Cars " + i + " ID: " + globalCarsIds[i]);
         }
         //We create the array of cars
+        for (var i = 0; i < await data[0].length; i++) {
+          // console.log(data[0][i].x);
+          // console.log(data[0][i].y);
+          // console.log(data[0][i].x_next);
+          // console.log(data[0][i].y_next);
+          x = await data[0][i].x;
+          z = await data[0][i].y;
+          x_next = await data[0][i].x_next;
+          z_next = await data[0][i].y_next;
+          console.log("x: " + x + " z: " + z + " x_next: " + x_next + " z_next: " + z_next);
+          //We load the model
+          await loadModel('models/Car2.glb',10000, x, 0, z, cars/*, Math.PI / 2*/);
+        }
         // console.log(cars);
         // We position the cars
-        // for (var i = 0; i < data[0].length; i++) {
-        //   //We update the position of the car
-        //   cars[i].position.x = await data[0][i].x;
-        //   cars[i].position.z = await data[0][i].y;
-        //   cars[i].position.y = 0;
-        //   // //We update the rotation of the car
-        //   // cars[i].rotation.x = data[0][i].rx;
-        //   // cars[i].rotation.z = data[0][i].rz;
-        //   // cars[i].rotation.y = data[0][i].ry;
-        // }
         firstFrame = false;
       }
       // console.log(cars)
@@ -307,20 +311,29 @@ var render = async function () {
 
 // Functions that are useful
 
-  // Load a glTF resource
-  async function loadModel(path: string, scale: number, x: number, y: number, z: number, array: THREE.Group[]) {
-    const loader = new GLTFLoader();
-    // console.log('===== start loadGltf async')
-    let gltf = await loader.loadAsync(path)
-    // console.log('========== end loadGltf')
-    const model = gltf.scene;
-    //scene.add(model);
-    model.scale.set(scale, scale, scale);
-    model.position.set(x, y, z);
-    array = []
-    array.push(model)
-    return array
+// Load a glTF resource
+async function loadModel(path: string, scale: number, x: number, y: number, z: number, array: THREE.Group[], rotation: number = 0) {
+  const loader = new GLTFLoader();
+  // console.log('===== start loadGltf async')
+  let gltf = await loader.loadAsync(path).then((gltf) => {
+    console.log('===== loadGltf async done')
+    console.log(gltf.scene)
+    gltf.scene.scale.set(scale, scale, scale);
+    gltf.scene.position.set(x, y, z);
+    if (rotation != 0) {
+      gltf.scene.rotateY(rotation);
+    }
+    scene.add(gltf.scene);
+    array.push(gltf.scene);
+    console.log('===== loadGltf async end')
   }
+  )
+    //We catch the error
+    .catch((error) => {
+      console.log(error);
+    });
+  return gltf;
+}
 
 //We create a function to add a light to the scene
 function addLight(x: number, y: number, z: number) {
