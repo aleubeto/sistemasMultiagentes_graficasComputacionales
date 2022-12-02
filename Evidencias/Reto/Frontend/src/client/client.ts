@@ -28,6 +28,19 @@ const songPath = 'sounds/Song.mp3'
 const carPath = 'models/Car.glb'
 const archPath = 'models/Arch.glb'
 
+//WE create a texture
+function createTexture(path: string) {
+  const texture = new THREE.TextureLoader().load(path)
+  texture.wrapS = THREE.RepeatWrapping
+  texture.wrapT = THREE.RepeatWrapping
+  texture.magFilter = THREE.NearestFilter
+  //texture.repeat.set(10, 10)
+  return texture
+}
+
+const concreteTexture = createTexture('img/Concrete.png')
+const marmolTexture = createTexture('img/Marmol.png')
+const asphaltTexture = createTexture('img/Asphalt.png')
 
 //We create an array to store the cars generated with the GLTFLoader
 var cars: THREE.Group[] = []; //The array can be empty
@@ -88,41 +101,44 @@ const stats = Stats() //Stats
 container.appendChild(stats.dom) //Add the stats to the body of the html
 
 const scene = new THREE.Scene()
-scene.background = new THREE.Color(0x0e1231)
 //Add an axes helper to the scene
 const axesHelper = new THREE.AxesHelper(180)
-scene.add(axesHelper)
+//scene.add(axesHelper)
+//We change the background color of the scene to light blue
+scene.background = new THREE.Color(0x87ceeb)
+//We add a texture to the background
+function addBackground() {
+  const loader = new THREE.CubeTextureLoader()
+  const texture = loader.load([
+    'img/px.jpg',//right
+    'img/nx.jpg',//left
+    'img/py.jpg',//top
+    'img/ny.png',//bottom
+    'img/pz.jpg',//front
+    'img/nz.jpg',//back
+  ])
+  scene.background = texture
+}
 
-//We add a cube to the scene with a for loop
-// function addCube(x:number,y:number,z:number) {
-//   const geometry = new THREE.BoxGeometry(1, 1, 1)
-//   const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-//   const cube = new THREE.Mesh(geometry, material)
-//   scene.add(cube)
-//   cube.position.x = x
-//   cube.position.y = y
-//   cube.position.z = z
-// }
-
-// addCube(0.5,0.5,0.5)
+addBackground()
 
 //We add models to the scene
 
 //Here we can add the static models of the scene, like buildings and stuff
-addModel(87, 5, 55, 0.6, archPath, -Math.PI / 3)
+addModel(87, 4, 55, 0.5, archPath, -Math.PI / 3)
 
-const road1: number[][] = [[90.622,1.585],[94.329,1.721],[91.099,38.503],[87.435,38.154]]
-const road2: number[][] = [[128.353,1.465],[131.169,4.111],[98.957,42.941],[96.408,40.173]]
-const road3: number[][] = [[176.16,20.491],[177.989,23.823],[104.591,50.407],[102.582,46.941]]
-const road4: number[][] = [[178.044,58.276],[177.862,62.112],[106.398,59.087],[106.245,55.074]]
-const road5: number[][] = [[173.614,115.479],[170.737,118.024],[100.126,66.821],[103.02,64.223]]
-const road6: number[][] = [[109.987,117.077],[106.094,117.768],[92.291,71.466],[96.109,70.577]]
-const road7: number[][] = [[82.237,117.517],[78.407,117.14],[84.071,72.443],[87.932,72.73]]
-const road8: number[][] = [[38.615,118.593],[35.248,117.086],[75.642,68.172],[79.095,69.975]]
-const road9: number[][] = [[2.54,88.206],[1.611,84.849],[71.395,60.181],[72.465,63.863]]
-const road10: number[][] = [[2.04,52.163],[2.125,48.563],[70.038,51.043],[70.315,54.819]]
-const road11: number[][] = [[17.033,4.006],[19.862,1.521],[76.158,41.044],[73.657,43.544]]
-const road12: number[][] = [[67.542,2.178],[71.258,0.978],[82.871,38.019],[79.054,38.889]]
+const road1: number[][] = [[90.622, 1.585], [94.329, 1.721], [91.099, 38.503], [87.435, 38.154]]
+const road2: number[][] = [[128.353, 1.465], [131.169, 4.111], [98.957, 42.941], [96.408, 40.173]]
+const road3: number[][] = [[176.16, 20.491], [177.989, 23.823], [104.591, 50.407], [102.582, 46.941]]
+const road4: number[][] = [[178.044, 58.276], [177.862, 62.112], [106.398, 59.087], [106.245, 55.074]]
+const road5: number[][] = [[173.614, 115.479], [170.737, 118.024], [100.126, 66.821], [103.02, 64.223]]
+const road6: number[][] = [[109.987, 117.077], [106.094, 117.768], [92.291, 71.466], [96.109, 70.577]]
+const road7: number[][] = [[82.237, 117.517], [78.407, 117.14], [84.071, 72.443], [87.932, 72.73]]
+const road8: number[][] = [[38.615, 118.593], [35.248, 117.086], [75.642, 68.172], [79.095, 69.975]]
+const road9: number[][] = [[2.54, 88.206], [1.611, 84.849], [71.395, 60.181], [72.465, 63.863]]
+const road10: number[][] = [[2.04, 52.163], [2.125, 48.563], [70.038, 51.043], [70.315, 54.819]]
+const road11: number[][] = [[17.033, 4.006], [19.862, 1.521], [76.158, 41.044], [73.657, 43.544]]
+const road12: number[][] = [[67.542, 2.178], [71.258, 0.978], [82.871, 38.019], [79.054, 38.889]]
 
 function createPolygon(poly: number[][]) {
   var shape = new THREE.Shape();
@@ -133,7 +149,7 @@ function createPolygon(poly: number[][]) {
 
   var geometry = new THREE.ShapeGeometry(shape);
   var material = new THREE.MeshBasicMaterial({
-    color: 0x800000
+    color: 0X7c8a88
   });
   return new THREE.Mesh(geometry, material);
 }
@@ -146,6 +162,8 @@ function doubleSideAndInclineToFloor(poly: number[][]) {
   //We elevate the polygon to be in the floor
   mesh.position.y = 0.1
   mesh.material.side = THREE.DoubleSide;
+  //From our already loaded textures we choose the one we want
+  mesh.material.map = asphaltTexture
   scene.add(mesh);
 }
 
@@ -163,7 +181,7 @@ doubleSideAndInclineToFloor(road11)
 doubleSideAndInclineToFloor(road12)
 
 //We draw and fill a circle
-function drawCircle(x: number, y: number, z: number, radius: number, color: number) {
+function drawCircle(x: number, y: number, z: number, radius: number, color: number,texture: THREE.Texture) {
   var circle = new THREE.Shape();
   circle.moveTo(0, 0);
   circle.absarc(0, 0, radius, 0, Math.PI * 2, false);
@@ -177,11 +195,13 @@ function drawCircle(x: number, y: number, z: number, radius: number, color: numb
   mesh.position.z = z
   mesh.material.side = THREE.DoubleSide;
   mesh.rotateX(Math.PI / 2)
+  //From our already loaded textures we choose the one we want
+  mesh.material.map = texture
   scene.add(mesh);
 }
 
-drawCircle(87,0.15,55,22,0x0000ff)
-drawCircle(87,0.17,55,10,0x00ff00)
+drawCircle(87, 0.15, 55, 22, 0x7c8a88,asphaltTexture)
+drawCircle(87, 0.17, 55, 7, 0xFFFFFF,concreteTexture)
 
 
 const camera = new THREE.PerspectiveCamera(
@@ -259,7 +279,7 @@ function doKeyDown(evt: { keyCode: any }) {
       break;
     //Easter egg
     case 82:
-      //playSong(); //Here we can play a song
+      playSong(); //Here we can play a song
       break;
   }
 }
@@ -302,7 +322,7 @@ var render = async function () {
           z_next = await data[0][i].y_next / 10
           carAngle = angleBetweenPoints(x, z, x_next, z_next)
           console.log("x ", x, "z ", z, "x_next: ", x_next, "z_next ", z_next/*, carAngle*/)
-          loadModel(carPath, 1, x, 0, z, cars, carAngle)
+          loadModel(carPath, 1, x, 0.35, z, cars, carAngle)
           console.log("1st frame: ", cars)
           //loadModel(carPath,10,x_next,2,z_next,cars,carAngle)
         }
@@ -329,7 +349,7 @@ var render = async function () {
           z_next = await data[0][i].y_next / 10
           carAngle = angleBetweenPoints(x, z, x_next, z_next)
           // console.log("x ",x,"z ",z,"x_next: ",x_next,"z_next ", z_next, carAngle)
-          loadModel(carPath, 1, x, 0, z, cars, carAngle)
+          loadModel(carPath, 1, x, 0.35, z, cars, carAngle)
         }
         console.log("Cars Number: ", carsNumber)
         console.log(cars)
@@ -418,19 +438,17 @@ function setFloor() {
   //We create the floor
   const floorGeometry = new THREE.PlaneGeometry(180, 120, 1, 1)
   const floorMaterial = new THREE.MeshBasicMaterial({
-    //We set the color of the floor to white
-    color: 0xffffff,
+    color: 0xa1adac,
     side: THREE.DoubleSide,
   })
   //We add a texture to the floor
   const floorTexture = new THREE.TextureLoader().load(
-    floorPath
+    'Asphalt.png'
   )
   floorTexture.wrapS = THREE.RepeatWrapping
   floorTexture.wrapT = THREE.RepeatWrapping
   floorTexture.magFilter = THREE.NearestFilter
   //floorTexture.repeat.set(90, 60)
-  floorMaterial.map = floorTexture
   const floor = new THREE.Mesh(floorGeometry, floorMaterial)
   floor.rotation.x = Math.PI / 2
   // //We move the floor 30 units to the right
@@ -490,6 +508,27 @@ async function addModel(x: number, y: number, z: number, scale: number, path: st
     //console.log('An error happened')
     //}
   )
+}
+
+//Function to add a skybox to the scene taking as parameters the path to the skybox images
+async function addSkyBox(path: string) {
+  const loader = new THREE.CubeTextureLoader()
+  const texture = loader.loadAsync(path).then((texture) => {
+    path + 'px.jpg' //Right
+    path + 'nx.jpg' //Left
+    path + 'py.jpg' //Top
+    path + 'ny.jpg' //Bottom
+    path + 'pz.jpg' //Front
+    path + 'nz.jpg' //Back
+    scene.background = texture
+  }
+  )
+    //We catch the error
+    .catch((error) => {
+      console.log(error);
+    }
+    );
+  return texture;
 }
 
 // GUI
