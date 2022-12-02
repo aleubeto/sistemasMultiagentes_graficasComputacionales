@@ -27,7 +27,7 @@ const songPath = 'sounds/Song.mp3'
 
 
 //We create an array to store the cars generated with the GLTFLoader
-const cars: THREE.Group[] = []; //The array can be empty
+var cars: THREE.Group[] = []; //The array can be empty
 //We create a variable to keep track of how many cars are in the actual frame
 var carsNumber: number = 0;
 //We create a variable to know which car the camera is focusing
@@ -42,28 +42,35 @@ var actCarsIds: number[] = [];
 var changedCars: boolean = false;
 
 //We load the model
-const car = loadModel('models/Car.glb',0.0025,0,0,0)
-car.then((car) => {
-  //We add the car to the array
-  cars.push(car)
-  //We add the car to the scene
-  scene.add(car)
-  //We add the car to the global array
-  globalCarsIds.push(0)
-  //We add the car to the actual array
-  actCarsIds.push(0)
-  //We add the car to the scene
-  //scene.add(car)
-  //We add the car to the global array
-  globalCarsIds.push(0)
-  //We add the car to the actual array
-  actCarsIds.push(0)
-  //We add the car to the scene
-})
-//If not we catch the error
-.catch((error) => {
-  console.log(error)
-})
+loadModel('models/Car.glb', 0.0025, 0, 0, 0, cars).then((array) => {
+  carsNumber = 10;
+  // //We create a loop to add the cars to the scene
+  // for (let i = 0; i < carsNumber; i++) {
+  //   scene.add(cars[i]);
+  // }
+  console.log(cars)
+});
+// car.then((car) => {
+//   //We add the car to the array
+//   cars.push(car)
+//   //We add the car to the scene
+//   scene.add(car)
+//   //We add the car to the global array
+//   globalCarsIds.push(0)
+//   //We add the car to the actual array
+//   actCarsIds.push(0)
+//   //We add the car to the scene
+//   //scene.add(car)
+//   //We add the car to the global array
+//   globalCarsIds.push(0)
+//   //We add the car to the actual array
+//   actCarsIds.push(0)
+//   //We add the car to the scene
+// })
+// //If not we catch the error
+// .catch((error) => {
+//   console.log(error)
+// })
 
 
 
@@ -301,7 +308,7 @@ var render = async function () {
 // Functions that are useful
 
   // Load a glTF resource
-  async function loadModel(path: string, scale: number, x: number, y: number, z: number) {
+  async function loadModel(path: string, scale: number, x: number, y: number, z: number, array: THREE.Group[]) {
     const loader = new GLTFLoader();
     // console.log('===== start loadGltf async')
     let gltf = await loader.loadAsync(path)
@@ -309,9 +316,11 @@ var render = async function () {
     const model = gltf.scene;
     //scene.add(model);
     model.scale.set(scale, scale, scale);
-    return model;
+    model.position.set(x, y, z);
+    array = []
+    array.push(model)
+    return array
   }
-
 
 //We create a function to add a light to the scene
 function addLight(x: number, y: number, z: number) {
