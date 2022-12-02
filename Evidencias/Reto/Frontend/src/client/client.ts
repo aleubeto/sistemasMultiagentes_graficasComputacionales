@@ -22,7 +22,7 @@ fetch(baseURL + "/games", {
 });
 
 //Here we create all the paths to the assets
-const floorPath = 'img/Floor.png'
+const floorPath = 'https://threejsfundamentals.org/threejs/resources/images/checker.png'
 const songPath = 'sounds/Song.mp3'
 
 
@@ -92,8 +92,21 @@ container.appendChild(stats.dom) //Add the stats to the body of the html
 const scene = new THREE.Scene()
 scene.background = new THREE.Color(0x0e1231)
 //Add an axes helper to the scene
-const axesHelper = new THREE.AxesHelper(1800)
+const axesHelper = new THREE.AxesHelper(180)
 scene.add(axesHelper)
+
+//We add a cube to the scene with a for loop
+// function addCube(x:number,y:number,z:number) {
+//   const geometry = new THREE.BoxGeometry(1, 1, 1)
+//   const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+//   const cube = new THREE.Mesh(geometry, material)
+//   scene.add(cube)
+//   cube.position.x = x
+//   cube.position.y = y
+//   cube.position.z = z
+// }
+
+// addCube(0.5,0.5,0.5)
 
 //We add models to the scene
 
@@ -220,13 +233,13 @@ var render = async function () {
           // console.log(data[0][i].y);
           // console.log(data[0][i].x_next);
           // console.log(data[0][i].y_next);
-          x = await data[0][i].x;
-          z = await data[0][i].y;
-          x_next = await data[0][i].x_next;
-          z_next = await data[0][i].y_next;
+          x = await (data[0][i].x)/10;
+          z = await (data[0][i].y)/10;
+          x_next = await (data[0][i].x_next)/10;
+          z_next = await (data[0][i].y_next)/10;
           console.log("x: " + x + " z: " + z + " x_next: " + x_next + " z_next: " + z_next);
           //We load the model
-          //await loadModel('models/Car2.glb',10000, x, 0, z, cars/*, Math.PI / 2*/);
+          await loadModel('models/Car2.glb',20, x, 0, z, cars, Math.PI / 2);
         }
         // console.log(cars);
         // We position the cars
@@ -359,7 +372,7 @@ function setFloor() {
   // const gridHelper = new THREE.GridHelper(60, 60)
   // scene.add(gridHelper)
   //We create the floor
-  const floorGeometry = new THREE.PlaneGeometry(30, 30, 30, 30)
+  const floorGeometry = new THREE.PlaneGeometry(180, 120, 1, 1)
   const floorMaterial = new THREE.MeshBasicMaterial({
     //We set the color of the floor to white
     color: 0xffffff,
@@ -372,14 +385,14 @@ function setFloor() {
   floorTexture.wrapS = THREE.RepeatWrapping
   floorTexture.wrapT = THREE.RepeatWrapping
   floorTexture.magFilter = THREE.NearestFilter
-  floorTexture.repeat.set(4, 4)
+  floorTexture.repeat.set(90, 60)
   floorMaterial.map = floorTexture
   const floor = new THREE.Mesh(floorGeometry, floorMaterial)
   floor.rotation.x = Math.PI / 2
   // //We move the floor 30 units to the right
-  floor.position.x = 15
+  floor.position.x = 90
   // //We move the floor 30 units to the front
-  floor.position.z = 15
+  floor.position.z = 60
   scene.add(floor)
 }
 
@@ -416,5 +429,5 @@ cameraFolder.add(camera.rotation, 'x', 0, 2 * Math.PI, 0.01) //Add the x rotatio
 cameraFolder.add(camera.rotation, 'y', 0, 2 * Math.PI, 0.01) //Add the y rotation to the dat.gui
 cameraFolder.add(camera.rotation, 'z', 0, 2 * Math.PI, 0.01) //Add the z rotation to the dat.gui
 
-//setFloor();
+setFloor();
 render();
