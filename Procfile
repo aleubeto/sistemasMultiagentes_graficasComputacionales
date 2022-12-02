@@ -1,1 +1,1 @@
-web: pip install; python Evidencias/Reto/Backend/backend.py
+web: pip install; cd Evidencias/Reto/Backend; python backend.py
