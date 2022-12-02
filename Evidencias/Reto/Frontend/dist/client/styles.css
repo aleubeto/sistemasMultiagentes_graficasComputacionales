@@ -78,6 +78,8 @@ p{
 .container{
     width: 85%;
 }
+
+
 /*Sección 1: Simulation*/
 .controls{
     border-radius: 10px 0px 0px 10px;
@@ -99,6 +101,8 @@ p{
     width: 100%;
     height: 100%;
 }
+
+
 /*Sección 2: Competencies*/
 .competencies{
     display: flex;
@@ -123,14 +127,13 @@ p{
 .card_header {
     transition: all 400ms ease;
 }
-.card_header img{
+#ic_webGL, #ic_python, #ic_ibmCloud{
     margin-bottom: 6%;
-}
-#ic_webGL{
-    height: 7vh;
-}
-#ic_python, #ic_ibmCloud{
+    transition: all 400ms ease;
     height: 8vh;
+}
+.card_header h4{
+    font-weight: lighter;
 }
 .card_0:hover{
     scale: 1.2;
@@ -144,7 +147,13 @@ p{
 }
 .card_0:hover h4{
     scale: 1.2;
+    font-weight: bolder;
 }
+.card_content p{
+    margin-top: 5%;
+}
+
+
 /*Sección 3: Credits*/
 .title{
     width: 100%;
@@ -166,6 +175,10 @@ p{
     border-radius: 10px;
     transition: all 400ms ease;
 }
+.card1_content img{
+    border-radius: 5px;
+    width: 100%;
+}
 .card_1:hover{
     scale: 1.15;
     box-shadow: 5px 5px 10px rgba(0,0,0,0.2);
@@ -178,9 +191,11 @@ p{
     height: 90%;
     align-items: center;
 }
-.card_content p{
+.card1_content p{
     margin-top: 5%;
 }
+
+
 /*Decoradores*/
 .waves {
     z-index: -1;
@@ -218,6 +233,32 @@ p{
     }
     100% {
         transform: translate(160px, -60px);
+    }
+}
+.fondoMovil1{
+    bottom: 0;
+    left: -50%;
+    opacity: 1;
+    position: fixed;
+    right: -50%;
+    top: 0;
+    z-index: -1;
+    animation: slide 3s ease-in-out infinite alternate;
+    background-image: linear-gradient(-60deg,#FF0000 50%, #00FF00 50%);
+}
+.fondoMovil2{
+    animation-direction: alternate-reverse;
+    animation-duration: 10s;
+}
+.fondoMovil3{
+    animation-duration: 11s;
+}
+@keyframes slide{
+    0%{
+        transform: translateX(-25%);
+    }
+    100%{
+        transform: translateX(25%);
     }
 }
 #shadow{
