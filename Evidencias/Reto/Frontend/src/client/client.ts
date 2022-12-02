@@ -9,7 +9,7 @@ import { GUI } from 'dat.gui'
 //We import the GLTFLoader from three.js
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
-var baseURL = "http://localhost:5000"
+var baseURL = "https://backend-server-fearless-dingo.mybluemix.net"
 var gameLink: string | null = null; //The game link can be string or null
 
 fetch(baseURL + "/games", {
@@ -457,7 +457,7 @@ function setFloor() {
   })
   //We add a texture to the floor
   const floorTexture = new THREE.TextureLoader().load(
-    'Asphalt.png'
+    'img/Asphalt.png'
   )
   floorTexture.wrapS = THREE.RepeatWrapping
   floorTexture.wrapT = THREE.RepeatWrapping
