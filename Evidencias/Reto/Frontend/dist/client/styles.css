@@ -28,7 +28,7 @@ h4{
     transition: all 400ms ease;
 }
 p{
-    font-size: 2.5vh;
+    font-size: 2.4vh;
     transition: all 400ms ease;
 }
 /* width */
@@ -113,7 +113,8 @@ p{
 .competencies{
     display: flex;
     justify-content: space-around;
-    height: 37%;
+    height: 40%;
+    margin-top: 7%;
 }
 .card_0{
     display: flex;
@@ -142,12 +143,13 @@ p{
 }
 .card_0:hover{
     scale: 1.2;
+    height: 160%;
 }
 .card_0:hover img{
     scale: 1.2;
 }
 .card_0:hover h3{
-    scale: 0.7;
+    scale: 0.6;
     font-weight: lighter;
 }
 .card_0:hover h4{
@@ -159,6 +161,9 @@ p{
     height: 90%;
     align-items: center;
     overflow: hidden;
+}
+.card_content h4{
+    margin-top: 2%;
 }
 .card_content p{
     margin-top: 5%;
@@ -173,12 +178,12 @@ p{
 .team{
     display: flex;
     justify-content: space-around;
-    height: 78%;
+    height: 68%;
 }
 .card_1{
     display: flex;
     justify-content: center;
-    width: 27%;
+    width: 23%;
     height: 100%;
     color: #0e1231;
     background-color: #f0f0f0;
@@ -198,17 +203,43 @@ p{
 }
 .card_1:hover{
     scale: 1.15;
+    height: 127%;
     box-shadow: 5px 5px 10px rgba(0,0,0,0.2);
 }
-.card_1:hover h3, .card_1:hover h4{
+.card_1:hover h3{
     color: #002F99;
+}
+.card1_content h4{
+    margin-top: 5%;
+    font-size: 2.4vh;
+    color: #5f5f5f;
+    font-weight: lighter;
 }
 .card1_content p{
     color: #5f5f5f;
 }
-
-
+.github p{
+    text-align: left;
+    background-image:url(img/icons8-github.svg);
+    background-repeat:no-repeat;
+    text-indent: 10%;
+}
+.github img{
+    vertical-align: middle;
+    width: 13%;
+    height: 13%;
+}
+.github a{
+    color: #5f5f5f;
+    transition: all 400ms ease;
+}
+.github a:hover{
+    color: #002F99;
+}
 /*Decoradores*/
+a{
+    text-decoration: none;
+}
 .waves {
     z-index: -1;
     position: fixed;
@@ -245,32 +276,6 @@ p{
     }
     100% {
         transform: translate(160px, -60px);
-    }
-}
-.fondoMovil1{
-    bottom: 0;
-    left: -50%;
-    opacity: 1;
-    position: fixed;
-    right: -50%;
-    top: 0;
-    z-index: -1;
-    animation: slide 3s ease-in-out infinite alternate;
-    background-image: linear-gradient(-60deg,#FF0000 50%, #00FF00 50%);
-}
-.fondoMovil2{
-    animation-direction: alternate-reverse;
-    animation-duration: 10s;
-}
-.fondoMovil3{
-    animation-duration: 11s;
-}
-@keyframes slide{
-    0%{
-        transform: translateX(-25%);
-    }
-    100%{
-        transform: translateX(25%);
     }
 }
 #shadow{
