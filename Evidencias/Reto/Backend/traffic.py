@@ -40,7 +40,6 @@ class Car(Agent):
         #Variables de control para manejo de colisiones
         self.anterior = self.inicial
         self.destino = self.closedList[1]
-        self.proyeccion = self.final.pos
     
     #step del agente auto
     def step(self):
@@ -73,7 +72,6 @@ class Car(Agent):
             if self.pos[0] >= 0 and self.pos[0] < self.model.width and self.pos[1] >= 0 and self.pos[1] < self.model.height:
                 self.destino = self.closedList[self.contadorNodos]
                 siguiente = self.pos + direccion * self.speed * self.contador
-                self.proyeccion = siguiente + direccion * self.speed * self.contador
                 self.model.space.move_agent(self, siguiente)
                 if self.contadorNodos == 1:
                     self.contador += 0.025
