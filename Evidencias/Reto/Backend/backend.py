@@ -1,13 +1,12 @@
-import flask
+from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
-from flask.json import jsonify
 import uuid
 from traffic import Street, Car, Nodo
 import json, logging, os, atexit
 
 games = {}
 
-app = flask.Flask(__name__)
+app = Flask(__name__, static_url_path='')
 CORS(app)
 
 # On IBM Cloud Cloud Foundry, get the port number from the environment variable PORT
