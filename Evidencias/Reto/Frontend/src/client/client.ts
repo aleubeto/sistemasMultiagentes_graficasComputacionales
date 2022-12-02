@@ -92,7 +92,7 @@ container.appendChild(stats.dom) //Add the stats to the body of the html
 const scene = new THREE.Scene()
 scene.background = new THREE.Color(0x0e1231)
 //Add an axes helper to the scene
-const axesHelper = new THREE.AxesHelper(1)
+const axesHelper = new THREE.AxesHelper(1800)
 scene.add(axesHelper)
 
 //We add models to the scene
@@ -226,12 +226,13 @@ var render = async function () {
           z_next = await data[0][i].y_next;
           console.log("x: " + x + " z: " + z + " x_next: " + x_next + " z_next: " + z_next);
           //We load the model
-          await loadModel('models/Car2.glb',10000, x, 0, z, cars/*, Math.PI / 2*/);
+          //await loadModel('models/Car2.glb',10000, x, 0, z, cars/*, Math.PI / 2*/);
         }
         // console.log(cars);
         // We position the cars
         firstFrame = false;
       }
+      console.log()
       // console.log(cars)
       //If the cars array position is not undefined we update the position of the car
       // if (data[0] != undefined && data[2][0].run == true && cars[0] != undefined) {
@@ -334,6 +335,13 @@ async function loadModel(path: string, scale: number, x: number, y: number, z: n
     });
   return gltf;
 }
+
+//Function to calculate angle between two points
+function angleBetweenPoints(x1: number, y1: number, x2: number, y2: number) {
+  var angle = Math.atan2(y2 - y1, x2 - x1);
+  return angle;
+}
+
 
 //We create a function to add a light to the scene
 function addLight(x: number, y: number, z: number) {
