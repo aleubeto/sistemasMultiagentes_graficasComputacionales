@@ -73,7 +73,7 @@ class Car(Agent):
                 self.destino = self.closedList[self.contadorNodos]
                 siguiente = self.pos + direccion * self.speed * self.contador
                 self.model.space.move_agent(self, siguiente)
-                if self.contadorNodos == 1:
+                if self.contadorNodos <= 1 or self.contadorNodos >= len(self.closedList) - 1:
                     self.contador += 0.025
                 else:    
                     self.contador += 0.1
@@ -284,6 +284,6 @@ canvas = SimpleCanvas(car_draw, 500, 500)
 
 model_params = {}
 
-# server = ModularServer(Street, [canvas], "Traffic", model_params)
-# server.port = 8522
-# server.launch()
+#server = ModularServer(Street, [canvas], "Traffic", model_params)
+#server.port = 8522
+#server.launch()
