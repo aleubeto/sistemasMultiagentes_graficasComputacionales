@@ -68,7 +68,7 @@ var carAngle: number = 0;
 // for (let i = 0; i < carsNumber; i++) {
 //   loadModel('models/Car2.glb', 1, i, 0, 0, cars/*, Math.PI / 2*/);
 // }
-// console.log(cars)
+// ////console.log(cars)
 // car.then((car) => {
 //   //We add the car to the array
 //   cars.push(car)
@@ -88,7 +88,7 @@ var carAngle: number = 0;
 // })
 // //If not we catch the error
 // .catch((error) => {
-//   console.log(error)
+//   //console.log(error)
 // })
 
 
@@ -132,13 +132,28 @@ addBackground()
 //We add models to the scene
 //Here we can add the static models of the scene, like buildings and stuff
 addModel(87, 4, 55, 0.5, archPath, -Math.PI / 3)
-addModel(0,0,10,1,treePath,0)
-addModel(0,0,20,1,tree2Path,0)
-addModel(0,0,30,1,tree3Path,0)
-addModel(0,0,40,1,building1Path,0)
-addModel(0,0,50,1,building2Path,0)
-addModel(0,0,60,0.025,beaglePath,0)
-addModel(0,0,70,1,flyDogPath,0)
+
+//Arboles
+addModel(85, 5, 20, 5, treePath, 0)
+addModel(90, 2, 90, 5, tree2Path, 0)
+addModel(72, 0, 100, 1, tree3Path, 0)
+addModel(50, 5, 40, 5, treePath, 0)
+addModel(76, 2, 87, 5, tree2Path, 0)
+addModel(105, 0, 20, 1, tree3Path, 0)
+
+// Edificios
+addModel(28, 0, 63, 10, building1Path, 0)
+addModel(25, 0, 30, 1, building2Path, Math.PI / 2)
+addModel(140, 0, 20, 10, building1Path, 0)
+addModel(150, 0, 45, 1, building2Path, Math.PI / -2)
+addModel(125, 0, 105, 10, building1Path, Math.PI / 8)
+addModel(30, 0, 95, 1, building2Path, Math.PI / 2)
+addModel(145, 0, 76, 10, building1Path, Math.PI / 4)
+addModel(58, 0, 18, 1, building2Path, Math.PI / -8)
+
+//Animales
+//addModel(0,0,60,0.025,beaglePath,0)
+//addModel(0,0,70,1,flyDogPath,0)
 
 const road1: number[][] = [[90.622, 1.585], [94.329, 1.721], [91.099, 38.503], [87.435, 38.154]]
 const road2: number[][] = [[128.353, 1.465], [131.169, 4.111], [98.957, 42.941], [96.408, 40.173]]
@@ -194,7 +209,7 @@ doubleSideAndInclineToFloor(road11)
 doubleSideAndInclineToFloor(road12)
 
 //We draw and fill a circle
-function drawCircle(x: number, y: number, z: number, radius: number, color: number,texture: THREE.Texture) {
+function drawCircle(x: number, y: number, z: number, radius: number, color: number, texture: THREE.Texture) {
   var circle = new THREE.Shape();
   circle.moveTo(0, 0);
   circle.absarc(0, 0, radius, 0, Math.PI * 2, false);
@@ -213,8 +228,8 @@ function drawCircle(x: number, y: number, z: number, radius: number, color: numb
   scene.add(mesh);
 }
 
-drawCircle(87, 0.15, 55, 22, 0x7c8a88,asphaltTexture)
-drawCircle(87, 0.17, 55, 7, 0xFFFFFF,concreteTexture)
+drawCircle(87, 0.15, 55, 22, 0x7c8a88, asphaltTexture)
+drawCircle(87, 0.17, 55, 7, 0xFFFFFF, concreteTexture)
 
 
 const camera = new THREE.PerspectiveCamera(
@@ -225,9 +240,10 @@ const camera = new THREE.PerspectiveCamera(
 )
 
 //These are the camera first positions
-camera.position.x = 0;
-camera.position.z = 5;
-camera.position.y = 2;
+camera.position.x = 90;
+camera.position.z = 60;
+camera.position.y = 50;
+camera.lookAt(90, 0, 60)
 
 const renderer = new THREE.WebGLRenderer({ canvas: canvas })
 renderer.physicallyCorrectLights = true
@@ -235,8 +251,8 @@ renderer.setSize(container.offsetWidth, container.offsetHeight)
 //htmlFrame.appendChild(renderer.domElement) //Add the renderer to the body of the html
 
 //We add a directional light to the scene
-addLight(90,20,60) //This is the sun
-addLight(0,20,120)
+addLight(90, 20, 60) //This is the sun
+addLight(0, 20, 120)
 
 const controls = new OrbitControls(camera, renderer.domElement) //OrbitControls
 //controls.addEventListener('change', render) // use if there is no animation loop. The first parameter is the event type, the second is the callback function.
@@ -305,7 +321,7 @@ function onWindowResize() {
   renderer.setSize(container.offsetWidth, container.offsetHeight)
   render()
 }
-const frame_rate = 400; // Refresh screen every 200 ms
+const frame_rate = 420; // Refresh screen every 200 ms
 var previous_time = Date.now();
 var last_check = true;
 
@@ -316,7 +332,7 @@ var render = async function () {
   now = Date.now();
   elapsed_time = now - previous_time;
 
-  //console.log("elapsed time", elapsed_time);
+  ////console.log("elapsed time", elapsed_time);
 
   if (elapsed_time >= frame_rate) {
 
@@ -326,18 +342,21 @@ var render = async function () {
 
 
       if (firstFrame == true) {
-        camera.lookAt(30, -5, 10) //This is the first position the camera will look at
+        camera.position.x = 90;
+        camera.position.z = 60;
+        camera.position.y = 50;
+        camera.lookAt(90, 0, 60)
         carsNumber = await data[0].length;
-        console.log(carsNumber)
+        //console.log(carsNumber)
         for (var i = 0; i < carsNumber; ++i) {
           x = await data[0][i].x / 10
           z = await data[0][i].y / 10
           x_next = await data[0][i].x_next / 10
           z_next = await data[0][i].y_next / 10
           carAngle = angleBetweenPoints(x, z, x_next, z_next)
-          console.log("x ", x, "z ", z, "x_next: ", x_next, "z_next ", z_next/*, carAngle*/)
+          //console.log("x ", x, "z ", z, "x_next: ", x_next, "z_next ", z_next/*, carAngle*/)
           loadModel(carPath, 1, x, 0.35, z, cars, carAngle)
-          console.log("1st frame: ", cars)
+          //console.log("1st frame: ", cars)
           //loadModel(carPath,10,x_next,2,z_next,cars,carAngle)
         }
       }
@@ -347,9 +366,9 @@ var render = async function () {
 
       //If the cars array position is not undefined we update the position of the car
       if (cars[0] != undefined && data[2][0].run == true) {
-        // console.log("Loop: ", cars)
+        // //console.log("Loop: ", cars)
         //Here we update the cars position every frame
-        console.log("Here")
+        //console.log("Here")
         //We clean the scene
         for (var i = 0; i < carsNumber; ++i) {
           scene.remove(cars[i])
@@ -362,18 +381,18 @@ var render = async function () {
           x_next = await data[0][i].x_next / 10
           z_next = await data[0][i].y_next / 10
           carAngle = angleBetweenPoints(x, z, x_next, z_next)
-          // console.log("x ",x,"z ",z,"x_next: ",x_next,"z_next ", z_next, carAngle)
+          // //console.log("x ",x,"z ",z,"x_next: ",x_next,"z_next ", z_next, carAngle)
           loadModel(carPath, 1, x, 0.35, z, cars, carAngle)
         }
-        console.log("Cars Number: ", carsNumber)
-        console.log(cars)
+        //console.log("Cars Number: ", carsNumber)
+        //console.log(cars)
       }
       else if (data[2][0].run == false && last_check == true) {
         //Here we can execute the last frame of the simulation
         last_check = false;
       }
-      // console.log(cars)
-      //await console.log(cars[0])
+      // //console.log(cars)
+      //await //console.log(cars[0])
     }
     previous_time = now;
   }
@@ -385,10 +404,10 @@ var render = async function () {
   }
   else if (cam2 == true) {
     //Camara cenital
-    camera.position.x = 15;
-    camera.position.z = 15;
-    camera.position.y = 13;
-    //camera.lookAt(0, -150, 0)
+    camera.position.x = 90;
+    camera.position.z = 60;
+    camera.position.y = 50;
+    camera.lookAt(90, 0, 60)
     //camera.rotateX(-Math.PI/2);
   }
   else if (cam3 == true) {
@@ -406,10 +425,10 @@ var render = async function () {
 // Load a glTF resource
 async function loadModel(path: string, scale: number, x: number, y: number, z: number, array: THREE.Group[], rotation: number = 0) {
   const loader = new GLTFLoader();
-  // console.log('===== start loadGltf async')
+  // //console.log('===== start loadGltf async')
   let gltf = await loader.loadAsync(path).then((gltf) => {
-    console.log('===== loadGltf async done')
-    //console.log(gltf.scene)
+    //console.log('===== loadGltf async done')
+    ////console.log(gltf.scene)
     gltf.scene.scale.set(scale, scale, scale);
     gltf.scene.position.set(x, y, z);
     if (rotation != 0) {
@@ -417,12 +436,12 @@ async function loadModel(path: string, scale: number, x: number, y: number, z: n
     }
     scene.add(gltf.scene);
     array.push(gltf.scene);
-    console.log('===== loadGltf async end')
+    //console.log('===== loadGltf async end')
   }
   )
     //We catch the error
     .catch((error) => {
-      console.log(error);
+      //console.log(error);
     });
   return gltf;
 }
@@ -515,11 +534,11 @@ async function addModel(x: number, y: number, z: number, scale: number, path: st
     },
     //We pass the function that will be executed while the model is loading
     //function (xhr) {
-    //console.log((xhr.loaded / xhr.total * 100) + '% loaded')
+    ////console.log((xhr.loaded / xhr.total * 100) + '% loaded')
     //},
     //We pass the function that will be executed if there is an error loading the model
     //function (error) {
-    //console.log('An error happened')
+    ////console.log('An error happened')
     //}
   )
 }
@@ -539,7 +558,7 @@ async function addSkyBox(path: string) {
   )
     //We catch the error
     .catch((error) => {
-      console.log(error);
+      //console.log(error);
     }
     );
   return texture;
