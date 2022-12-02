@@ -23,9 +23,10 @@ fetch(baseURL + "/games", {
 
 //Here we create all the paths to the assets
 //const floorPath = 'https://threejsfundamentals.org/threejs/resources/images/checker.png'
-const floorPath = 'img/Paris.png'
+const floorPath = 'img/Floor.png'
 const songPath = 'sounds/Song.mp3'
 const carPath = 'models/Car.glb'
+const archPath = 'models/Arch.glb'
 
 
 //We create an array to store the cars generated with the GLTFLoader
@@ -36,12 +37,6 @@ var carsNumber: number = 0;
 var actCar: number = 0;
 //We create a variable to keep track of 'Y' positions when we use the sky camera
 var actY: number = 12;
-//We create a global array to keep track of the cars IDs, last frame
-var globalCarsIds: number[] = [];
-//We create a global array to keep track of the cars IDs in every frame
-var actCarsIds: number[] = [];
-//We create a global boolean to know if the cars are the same as the last frame
-var changedCars: boolean = false;
 var x: number = 0;
 var z: number = 0;
 var x_next: number = 0;
@@ -113,7 +108,80 @@ scene.add(axesHelper)
 
 //We add models to the scene
 
-//Here we can add the static models of the scene, like buildings and stuff.
+//Here we can add the static models of the scene, like buildings and stuff
+addModel(87, 5, 55, 0.6, archPath, -Math.PI / 3)
+
+const road1: number[][] = [[90.622,1.585],[94.329,1.721],[91.099,38.503],[87.435,38.154]]
+const road2: number[][] = [[128.353,1.465],[131.169,4.111],[98.957,42.941],[96.408,40.173]]
+const road3: number[][] = [[176.16,20.491],[177.989,23.823],[104.591,50.407],[102.582,46.941]]
+const road4: number[][] = [[178.044,58.276],[177.862,62.112],[106.398,59.087],[106.245,55.074]]
+const road5: number[][] = [[173.614,115.479],[170.737,118.024],[100.126,66.821],[103.02,64.223]]
+const road6: number[][] = [[109.987,117.077],[106.094,117.768],[92.291,71.466],[96.109,70.577]]
+const road7: number[][] = [[82.237,117.517],[78.407,117.14],[84.071,72.443],[87.932,72.73]]
+const road8: number[][] = [[38.615,118.593],[35.248,117.086],[75.642,68.172],[79.095,69.975]]
+const road9: number[][] = [[2.54,88.206],[1.611,84.849],[71.395,60.181],[72.465,63.863]]
+const road10: number[][] = [[2.04,52.163],[2.125,48.563],[70.038,51.043],[70.315,54.819]]
+const road11: number[][] = [[17.033,4.006],[19.862,1.521],[76.158,41.044],[73.657,43.544]]
+const road12: number[][] = [[67.542,2.178],[71.258,0.978],[82.871,38.019],[79.054,38.889]]
+
+function createPolygon(poly: number[][]) {
+  var shape = new THREE.Shape();
+  shape.moveTo(poly[0][0], poly[0][1]);
+  for (var i = 1; i < poly.length; ++i)
+    shape.lineTo(poly[i][0], poly[i][1]);
+  shape.lineTo(poly[0][0], poly[0][1]);
+
+  var geometry = new THREE.ShapeGeometry(shape);
+  var material = new THREE.MeshBasicMaterial({
+    color: 0x800000
+  });
+  return new THREE.Mesh(geometry, material);
+}
+
+//Allow the polygon be seen the 2 sides
+function doubleSideAndInclineToFloor(poly: number[][]) {
+  var mesh = createPolygon(poly);
+  //We rotate the polygon to be in the floor
+  mesh.rotateX(Math.PI / 2)
+  //We elevate the polygon to be in the floor
+  mesh.position.y = 0.1
+  mesh.material.side = THREE.DoubleSide;
+  scene.add(mesh);
+}
+
+doubleSideAndInclineToFloor(road1)
+doubleSideAndInclineToFloor(road2)
+doubleSideAndInclineToFloor(road3)
+doubleSideAndInclineToFloor(road4)
+doubleSideAndInclineToFloor(road5)
+doubleSideAndInclineToFloor(road6)
+doubleSideAndInclineToFloor(road7)
+doubleSideAndInclineToFloor(road8)
+doubleSideAndInclineToFloor(road9)
+doubleSideAndInclineToFloor(road10)
+doubleSideAndInclineToFloor(road11)
+doubleSideAndInclineToFloor(road12)
+
+//We draw and fill a circle
+function drawCircle(x: number, y: number, z: number, radius: number, color: number) {
+  var circle = new THREE.Shape();
+  circle.moveTo(0, 0);
+  circle.absarc(0, 0, radius, 0, Math.PI * 2, false);
+  var geometry = new THREE.ShapeGeometry(circle);
+  var material = new THREE.MeshBasicMaterial({
+    color: color
+  });
+  var mesh = new THREE.Mesh(geometry, material);
+  mesh.position.x = x
+  mesh.position.y = y
+  mesh.position.z = z
+  mesh.material.side = THREE.DoubleSide;
+  mesh.rotateX(Math.PI / 2)
+  scene.add(mesh);
+}
+
+drawCircle(87,0.15,55,22,0x0000ff)
+drawCircle(87,0.17,55,10,0x00ff00)
 
 
 const camera = new THREE.PerspectiveCamera(
@@ -228,13 +296,13 @@ var render = async function () {
         carsNumber = await data[0].length;
         console.log(carsNumber)
         for (var i = 0; i < carsNumber; ++i) {
-          x = await data[0][i].x/10
-          z = await data[0][i].y/10
-          x_next = await data[0][i].x_next/10
-          z_next = await data[0][i].y_next/10
-          carAngle = angleBetweenPoints(x,z,x_next,z_next)
-          console.log("x ",x,"z ",z,"x_next: ",x_next,"z_next ", z_next/*, carAngle*/)
-          loadModel(carPath,1,x,0,z,cars,carAngle)
+          x = await data[0][i].x / 10
+          z = await data[0][i].y / 10
+          x_next = await data[0][i].x_next / 10
+          z_next = await data[0][i].y_next / 10
+          carAngle = angleBetweenPoints(x, z, x_next, z_next)
+          console.log("x ", x, "z ", z, "x_next: ", x_next, "z_next ", z_next/*, carAngle*/)
+          loadModel(carPath, 1, x, 0, z, cars, carAngle)
           console.log("1st frame: ", cars)
           //loadModel(carPath,10,x_next,2,z_next,cars,carAngle)
         }
@@ -254,14 +322,14 @@ var render = async function () {
         }
         carsNumber = await data[0].length;
         cars = []
-        for (var i=0;i<carsNumber;++i){
-          x = await data[0][i].x/10
-          z = await data[0][i].y/10
-          x_next = await data[0][i].x_next/10
-          z_next = await data[0][i].y_next/10
-          carAngle = angleBetweenPoints(x,z,x_next,z_next)
+        for (var i = 0; i < carsNumber; ++i) {
+          x = await data[0][i].x / 10
+          z = await data[0][i].y / 10
+          x_next = await data[0][i].x_next / 10
+          z_next = await data[0][i].y_next / 10
+          carAngle = angleBetweenPoints(x, z, x_next, z_next)
           // console.log("x ",x,"z ",z,"x_next: ",x_next,"z_next ", z_next, carAngle)
-          loadModel(carPath,1,x,0,z,cars,carAngle)
+          loadModel(carPath, 1, x, 0, z, cars, carAngle)
         }
         console.log("Cars Number: ", carsNumber)
         console.log(cars)
@@ -328,7 +396,7 @@ async function loadModel(path: string, scale: number, x: number, y: number, z: n
 //Function to calculate angle between two points
 function angleBetweenPoints(x1: number, y1: number, x2: number, y2: number) {
   var angle = Math.atan2(y2 - y1, x2 - x1);
-  return angle+(Math.PI/2);
+  return angle + (Math.PI / 2);
 }
 
 
@@ -378,7 +446,7 @@ function playSong() {
   audio.play();
 }
 
-async function addModel(x: number, y: number, z: number, scale: number, path: string) {
+async function addModel(x: number, y: number, z: number, scale: number, path: string, rotation: number = 0) {
   //We create a new GLTFLoader
   const loader = new GLTFLoader()
   //We load the model
@@ -393,6 +461,9 @@ async function addModel(x: number, y: number, z: number, scale: number, path: st
       model.position.set(x, y, z)
       //We set the model scale
       model.scale.set(scale, scale, scale)
+      if (rotation != 0) {
+        model.rotation.y = rotation
+      }
       gltf.scene.traverse(function (child) {
         if ((child as THREE.Mesh).isMesh) {
           const m = child as THREE.Mesh
