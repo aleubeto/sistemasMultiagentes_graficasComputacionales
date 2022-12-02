@@ -22,8 +22,10 @@ fetch(baseURL + "/games", {
 });
 
 //Here we create all the paths to the assets
-const floorPath = 'https://threejsfundamentals.org/threejs/resources/images/checker.png'
+//const floorPath = 'https://threejsfundamentals.org/threejs/resources/images/checker.png'
+const floorPath = 'img/Paris.png'
 const songPath = 'sounds/Song.mp3'
+const carPath = 'models/Car3.glb'
 
 
 //We create an array to store the cars generated with the GLTFLoader
@@ -44,6 +46,7 @@ var x: number = 0;
 var z: number = 0;
 var x_next: number = 0;
 var z_next: number = 0;
+var carAngle: number = 0;
 
 //We load the model
 //loadModel('models/Car.glb', 0.0025, 0, 0, 0, cars)
@@ -221,79 +224,92 @@ var render = async function () {
 
       //console.log(data[0][0].id);
       if (firstFrame == true) {
+        carsNumber = await data[0].length;
         //camera.lookAt(30, -5, 10) //This is the first position the camera will look at
         //We set the array with the cars IDs
-        for (var i = 0; i < await data[0].length; i++) {//We fill the array with the cars IDs
+        for (var i = 0; i < carsNumber; i++) {//We fill the array with the cars IDs
           globalCarsIds.push(await data[0][i].id);
           console.log("Cars " + i + " ID: " + globalCarsIds[i]);
         }
         //We create the array of cars
-        for (var i = 0; i < await data[0].length; i++) {
-          // console.log(data[0][i].x);
-          // console.log(data[0][i].y);
-          // console.log(data[0][i].x_next);
-          // console.log(data[0][i].y_next);
-          x = await (data[0][i].x)/10;
-          z = await (data[0][i].y)/10;
-          x_next = await (data[0][i].x_next)/10;
-          z_next = await (data[0][i].y_next)/10;
-          console.log("x: " + x + " z: " + z + " x_next: " + x_next + " z_next: " + z_next);
-          //We load the model
-          await loadModel('models/Car2.glb',20, x, 0, z, cars, Math.PI / 2);
+        for (var i = 0; i < carsNumber; i++) {
+          console.log("x", data[0][i].x);
+          console.log("y", data[0][i].y);
+          console.log("x_next", data[0][i].x_next);
+          console.log("z_next", data[0][i].y_next);
+          x = await (data[0][i].x) / 10;
+          z = await (data[0][i].y) / 10;
+          // x_next = await (data[0][i].x_next) / 10;
+          // z_next = await (data[0][i].y_next) / 10;
+          // carAngle = angleBetweenPoints(x, z, x_next, z_next);
+          // console.log("Car " + i + " angle: " + carAngle);console.log("x: " + x + " z: " + z + " x_next: " + x_next + " z_next: " + z_next);
+          
+          // //We load the model
+          await loadModel(carPath, 10, x, 2.8, z, cars);
         }
         // console.log(cars);
         // We position the cars
         firstFrame = false;
       }
-      console.log()
-      // console.log(cars)
+      //console.log(await data[0])
+      //console.log(cars)
       //If the cars array position is not undefined we update the position of the car
-      // if (data[0] != undefined && data[2][0].run == true && cars[0] != undefined) {
-      //   console.log("Here");
-      //   //Here we update the cars position every frame
-      //   //We set the array with the cars IDs
-      //   actCarsIds = [];
-      //   for (var i = 0; i < await data[0].length; i++) {
-      //     actCarsIds.push(await data[0][i].id);
-      //   }
-      //   //We compare globalCarsIds with actCarsIds
-      //   changedCars = !compareArrays(globalCarsIds, actCarsIds); //If the cars are the same, changedCars is false
-
-      //   //If the cars are the same, we update the position of the cars
-      //   if (changedCars == false) {
-      //     // for (var i = 0; i < await data[0].length; i++) {
-      //     //   //We update the position of the car
-      //     //   cars[i].position.x = await data[0][i].x;
-      //     //   cars[i].position.z = await data[0][i].y;
-      //     //   cars[i].position.y = 0;
-      //     //   // //We update the rotation of the car
-      //     //   // cars[i].rotation.x = data[0][i].rx;
-      //     //   // cars[i].rotation.z = data[0][i].rz;
-      //     //   // cars[i].rotation.y = data[0][i].ry;
-      //     // }
-      //   }
-      //   //If the cars are not the same, we update the cars array
-      //   else {
-      //     await modelToArray(0,0,0,1,'models/Car.glb',cars)
-      //     //We update the position of the cars
-      //     // for (var i = 0; i < await data[0].length; i++) {
-      //     //   //We update the position of the car
-      //     //   cars[i].position.x = await data[0][i].x;
-      //     //   cars[i].position.z = await data[0][i].Y;
-      //     //   cars[i].position.y = 0;
-      //     //   // //We update the rotation of the car
-      //     //   // cars[i].rotation.x = data[0][i].rx;
-      //     //   // cars[i].rotation.z = data[0][i].rz;
-      //     //   // cars[i].rotation.y = data[0][i].ry;
-      //     // }
-      //     //We update the globalCarsIds array
-      //     globalCarsIds = actCarsIds;
-      //   }
-      // }
-      // else if (data[2][0].run == false && last_check == true) {
-      //   //Here we can execute the last frame of the simulation
-      //   last_check = false;
-      // }
+      if (await data[0] != undefined && await data[2][0].run == true && cars[0] != undefined) {
+        carsNumber = await data[0].length;
+        //console.log("Here");
+        //Here we update the cars position every frame
+        //We set the array with the cars IDs
+        actCarsIds = [];
+        for (var i = 0; i < carsNumber; i++) {
+          actCarsIds.push(await data[0][i].id);
+        }
+        console.log("actCarsIds: " + actCarsIds);
+        //We compare globalCarsIds with actCarsIds
+        changedCars = !compareArrays(globalCarsIds, actCarsIds); //If the cars are the same, changedCars is false
+        console.log("Changed cars: " + changedCars);
+        //If the cars are the same, we update the position of the cars with the same array
+        if (changedCars == false) {
+          console.log("Cars are the same");
+          for (var i = 0; i < carsNumber; i++) {
+            x = await (data[0][i].x) / 10;
+            z = await (data[0][i].y) / 10;
+            x_next = await (data[0][i].x_next) / 10;
+            z_next = await (data[0][i].y_next) / 10;
+            carAngle = angleBetweenPoints(x, z, x_next, z_next);
+            console.log("Car ", i, " ",  cars[i])
+            // console.log("Car " + i + " angle: " + carAngle);
+            // console.log("x: " + x + " z: " + z + " x_next: " + x_next + " z_next: " + z_next);
+            // cars[i].position.set(x, 2.8, z);
+            // cars[i].rotation.y = carAngle;
+          }
+        }
+        //If the cars are not the same, we update the cars array
+        else {
+          console.log("Cars are not the same");
+          //We delete the cars
+          for (var i = 0; i < carsNumber; i++) {
+            scene.remove(cars[i]);
+          }
+          //We create the array of cars
+          for (var i = 0; i < carsNumber; i++) {
+            x = await (data[0][i].x) / 10;
+            z = await (data[0][i].y) / 10;
+            x_next = await (data[0][i].x_next) / 10;
+            z_next = await (data[0][i].y_next) / 10;
+            carAngle = angleBetweenPoints(x, z, x_next, z_next);
+            // console.log("Car " + i + " angle: " + carAngle);
+            // console.log("x: " + x + " z: " + z + " x_next: " + x_next + " z_next: " + z_next);
+            //We load the model
+            await loadModel(carPath, 10, x, 2.8, z, cars);
+          }
+          //We update the globalCarsIds array
+          globalCarsIds = actCarsIds;
+        }
+      }
+      else if (data[2][0].run == false && last_check == true) {
+        //Here we can execute the last frame of the simulation
+        last_check = false;
+      }
       // console.log(cars)
       //await console.log(cars[0])
     }
@@ -385,7 +401,7 @@ function setFloor() {
   floorTexture.wrapS = THREE.RepeatWrapping
   floorTexture.wrapT = THREE.RepeatWrapping
   floorTexture.magFilter = THREE.NearestFilter
-  floorTexture.repeat.set(90, 60)
+  //floorTexture.repeat.set(90, 60)
   floorMaterial.map = floorTexture
   const floor = new THREE.Mesh(floorGeometry, floorMaterial)
   floor.rotation.x = Math.PI / 2
