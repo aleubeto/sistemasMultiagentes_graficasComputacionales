@@ -3,11 +3,16 @@ from flask_cors import CORS
 from flask.json import jsonify
 import uuid
 from traffic import Street, Car, Nodo
+import json, logging, os, atexit
 
 games = {}
 
 app = flask.Flask(__name__)
 CORS(app)
+
+# On IBM Cloud Cloud Foundry, get the port number from the environment variable PORT
+# When running this app on the local machine, default the port to 8000
+port = int(os.getenv('PORT', 8000))
 
 @app.route("/", methods=["GET"])
 def sayhello():
@@ -56,4 +61,4 @@ def queryState(id):
     result.append(model_array)
     return jsonify(result)
 
-app.run()
+app.run(app.run(host='0.0.0.0', port=port, debug=True)
