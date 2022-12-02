@@ -27,6 +27,13 @@ const floorPath = 'img/Floor.png'
 const songPath = 'sounds/Song.mp3'
 const carPath = 'models/Car.glb'
 const archPath = 'models/Arch.glb'
+const building1Path = 'models/B1.glb'
+const building2Path = 'models/B2.glb'
+const beaglePath = 'models/Beagle.glb'
+const flyDogPath = 'models/FlyDog.glb'
+const treePath = 'models/Tree.glb'
+const tree2Path = 'models/Tree2.glb'
+const tree3Path = 'models/Tree3.glb'
 
 //WE create a texture
 function createTexture(path: string) {
@@ -123,9 +130,15 @@ function addBackground() {
 addBackground()
 
 //We add models to the scene
-
 //Here we can add the static models of the scene, like buildings and stuff
 addModel(87, 4, 55, 0.5, archPath, -Math.PI / 3)
+addModel(0,0,10,1,treePath,0)
+addModel(0,0,20,1,tree2Path,0)
+addModel(0,0,30,1,tree3Path,0)
+addModel(0,0,40,1,building1Path,0)
+addModel(0,0,50,1,building2Path,0)
+addModel(0,0,60,0.025,beaglePath,0)
+addModel(0,0,70,1,flyDogPath,0)
 
 const road1: number[][] = [[90.622, 1.585], [94.329, 1.721], [91.099, 38.503], [87.435, 38.154]]
 const road2: number[][] = [[128.353, 1.465], [131.169, 4.111], [98.957, 42.941], [96.408, 40.173]]
@@ -222,7 +235,8 @@ renderer.setSize(container.offsetWidth, container.offsetHeight)
 //htmlFrame.appendChild(renderer.domElement) //Add the renderer to the body of the html
 
 //We add a directional light to the scene
-addLight(15, 10, 15) //This is the sun
+addLight(90,20,60) //This is the sun
+addLight(0,20,120)
 
 const controls = new OrbitControls(camera, renderer.domElement) //OrbitControls
 //controls.addEventListener('change', render) // use if there is no animation loop. The first parameter is the event type, the second is the callback function.
