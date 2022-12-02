@@ -25,7 +25,7 @@ fetch(baseURL + "/games", {
 //const floorPath = 'https://threejsfundamentals.org/threejs/resources/images/checker.png'
 const floorPath = 'img/Paris.png'
 const songPath = 'sounds/Song.mp3'
-const carPath = 'models/Car3.glb'
+const carPath = 'models/Car.glb'
 
 
 //We create an array to store the cars generated with the GLTFLoader
@@ -35,7 +35,7 @@ var carsNumber: number = 0;
 //We create a variable to know which car the camera is focusing
 var actCar: number = 0;
 //We create a variable to keep track of 'Y' positions when we use the sky camera
-var actY: number = 6;
+var actY: number = 12;
 //We create a global array to keep track of the cars IDs, last frame
 var globalCarsIds: number[] = [];
 //We create a global array to keep track of the cars IDs in every frame
@@ -203,7 +203,7 @@ function onWindowResize() {
   renderer.setSize(container.offsetWidth, container.offsetHeight)
   render()
 }
-const frame_rate = 250; // Refresh screen every 200 ms
+const frame_rate = 400; // Refresh screen every 200 ms
 var previous_time = Date.now();
 var last_check = true;
 
@@ -220,91 +220,51 @@ var render = async function () {
 
     if (gameLink != null) { // if the game has been created
       var res = await fetch(baseURL + gameLink); // get the game state
-      var data = await res.json(); // parse JSON to JS object that contains the positions of the cars
+      var data = await res.json(); // parse JSON to JS object that contains the positions of the car
 
-      //console.log(data[0][0].id);
+
       if (firstFrame == true) {
+        camera.lookAt(30, -5, 10) //This is the first position the camera will look at
         carsNumber = await data[0].length;
-        //camera.lookAt(30, -5, 10) //This is the first position the camera will look at
-        //We set the array with the cars IDs
-        for (var i = 0; i < carsNumber; i++) {//We fill the array with the cars IDs
-          globalCarsIds.push(await data[0][i].id);
-          console.log("Cars " + i + " ID: " + globalCarsIds[i]);
+        console.log(carsNumber)
+        for (var i = 0; i < carsNumber; ++i) {
+          x = await data[0][i].x/10
+          z = await data[0][i].y/10
+          x_next = await data[0][i].x_next/10
+          z_next = await data[0][i].y_next/10
+          carAngle = angleBetweenPoints(x,z,x_next,z_next)
+          console.log("x ",x,"z ",z,"x_next: ",x_next,"z_next ", z_next/*, carAngle*/)
+          loadModel(carPath,1,x,0,z,cars,carAngle)
+          console.log("1st frame: ", cars)
+          //loadModel(carPath,10,x_next,2,z_next,cars,carAngle)
         }
-        //We create the array of cars
-        for (var i = 0; i < carsNumber; i++) {
-          console.log("x", data[0][i].x);
-          console.log("y", data[0][i].y);
-          console.log("x_next", data[0][i].x_next);
-          console.log("z_next", data[0][i].y_next);
-          x = await (data[0][i].x) / 10;
-          z = await (data[0][i].y) / 10;
-          // x_next = await (data[0][i].x_next) / 10;
-          // z_next = await (data[0][i].y_next) / 10;
-          // carAngle = angleBetweenPoints(x, z, x_next, z_next);
-          // console.log("Car " + i + " angle: " + carAngle);console.log("x: " + x + " z: " + z + " x_next: " + x_next + " z_next: " + z_next);
-          
-          // //We load the model
-          await loadModel(carPath, 10, x, 2.8, z, cars);
-        }
-        // console.log(cars);
-        // We position the cars
-        firstFrame = false;
       }
-      //console.log(await data[0])
-      //console.log(cars)
+
+      firstFrame = false;
+
+
       //If the cars array position is not undefined we update the position of the car
-      if (await data[0] != undefined && await data[2][0].run == true && cars[0] != undefined) {
-        carsNumber = await data[0].length;
-        //console.log("Here");
+      if (cars[0] != undefined && data[2][0].run == true) {
+        // console.log("Loop: ", cars)
         //Here we update the cars position every frame
-        //We set the array with the cars IDs
-        actCarsIds = [];
-        for (var i = 0; i < carsNumber; i++) {
-          actCarsIds.push(await data[0][i].id);
+        console.log("Here")
+        //We clean the scene
+        for (var i = 0; i < carsNumber; ++i) {
+          scene.remove(cars[i])
         }
-        console.log("actCarsIds: " + actCarsIds);
-        //We compare globalCarsIds with actCarsIds
-        changedCars = !compareArrays(globalCarsIds, actCarsIds); //If the cars are the same, changedCars is false
-        console.log("Changed cars: " + changedCars);
-        //If the cars are the same, we update the position of the cars with the same array
-        if (changedCars == false) {
-          console.log("Cars are the same");
-          for (var i = 0; i < carsNumber; i++) {
-            x = await (data[0][i].x) / 10;
-            z = await (data[0][i].y) / 10;
-            x_next = await (data[0][i].x_next) / 10;
-            z_next = await (data[0][i].y_next) / 10;
-            carAngle = angleBetweenPoints(x, z, x_next, z_next);
-            console.log("Car ", i, " ",  cars[i])
-            // console.log("Car " + i + " angle: " + carAngle);
-            // console.log("x: " + x + " z: " + z + " x_next: " + x_next + " z_next: " + z_next);
-            // cars[i].position.set(x, 2.8, z);
-            // cars[i].rotation.y = carAngle;
-          }
+        carsNumber = await data[0].length;
+        cars = []
+        for (var i=0;i<carsNumber;++i){
+          x = await data[0][i].x/10
+          z = await data[0][i].y/10
+          x_next = await data[0][i].x_next/10
+          z_next = await data[0][i].y_next/10
+          carAngle = angleBetweenPoints(x,z,x_next,z_next)
+          // console.log("x ",x,"z ",z,"x_next: ",x_next,"z_next ", z_next, carAngle)
+          loadModel(carPath,1,x,0,z,cars,carAngle)
         }
-        //If the cars are not the same, we update the cars array
-        else {
-          console.log("Cars are not the same");
-          //We delete the cars
-          for (var i = 0; i < carsNumber; i++) {
-            scene.remove(cars[i]);
-          }
-          //We create the array of cars
-          for (var i = 0; i < carsNumber; i++) {
-            x = await (data[0][i].x) / 10;
-            z = await (data[0][i].y) / 10;
-            x_next = await (data[0][i].x_next) / 10;
-            z_next = await (data[0][i].y_next) / 10;
-            carAngle = angleBetweenPoints(x, z, x_next, z_next);
-            // console.log("Car " + i + " angle: " + carAngle);
-            // console.log("x: " + x + " z: " + z + " x_next: " + x_next + " z_next: " + z_next);
-            //We load the model
-            await loadModel(carPath, 10, x, 2.8, z, cars);
-          }
-          //We update the globalCarsIds array
-          globalCarsIds = actCarsIds;
-        }
+        console.log("Cars Number: ", carsNumber)
+        console.log(cars)
       }
       else if (data[2][0].run == false && last_check == true) {
         //Here we can execute the last frame of the simulation
@@ -347,7 +307,7 @@ async function loadModel(path: string, scale: number, x: number, y: number, z: n
   // console.log('===== start loadGltf async')
   let gltf = await loader.loadAsync(path).then((gltf) => {
     console.log('===== loadGltf async done')
-    console.log(gltf.scene)
+    //console.log(gltf.scene)
     gltf.scene.scale.set(scale, scale, scale);
     gltf.scene.position.set(x, y, z);
     if (rotation != 0) {
@@ -368,7 +328,7 @@ async function loadModel(path: string, scale: number, x: number, y: number, z: n
 //Function to calculate angle between two points
 function angleBetweenPoints(x1: number, y1: number, x2: number, y2: number) {
   var angle = Math.atan2(y2 - y1, x2 - x1);
-  return angle;
+  return angle+(Math.PI/2);
 }
 
 
@@ -418,22 +378,48 @@ function playSong() {
   audio.play();
 }
 
-//Function to compare two arrays, if it is the same it returns true, if not it returns false
-function compareArrays(array1: any[], array2: any[]) {
-  //We check if the arrays have the same length
-  if (array1.length !== array2.length) {
-    return false
-  }
-  //We loop through the arrays
-  for (let i = 0; i < array1.length; i++) {
-    //We check if the elements are the same
-    if (array1[i] !== array2[i]) {
-      return false
-    }
-  }
-  return true
+async function addModel(x: number, y: number, z: number, scale: number, path: string) {
+  //We create a new GLTFLoader
+  const loader = new GLTFLoader()
+  //We load the model
+  loader.load(
+    //We pass the path to the model
+    path,
+    //We pass the function that will be executed after the model is loaded
+    async function (gltf) {
+      //We get the model from the gltf object
+      const model = gltf.scene
+      //We set the model position
+      model.position.set(x, y, z)
+      //We set the model scale
+      model.scale.set(scale, scale, scale)
+      gltf.scene.traverse(function (child) {
+        if ((child as THREE.Mesh).isMesh) {
+          const m = child as THREE.Mesh
+          m.receiveShadow = true
+          m.castShadow = true
+        }
+        if ((child as THREE.Light).isLight) {
+          const l = child as THREE.Light
+          l.castShadow = true
+          l.shadow.bias = -0.003
+          l.shadow.mapSize.width = 2048
+          l.shadow.mapSize.height = 2048
+        }
+      })
+      //We add the model to the scene
+      scene.add(model)
+    },
+    //We pass the function that will be executed while the model is loading
+    //function (xhr) {
+    //console.log((xhr.loaded / xhr.total * 100) + '% loaded')
+    //},
+    //We pass the function that will be executed if there is an error loading the model
+    //function (error) {
+    //console.log('An error happened')
+    //}
+  )
 }
-
 
 // GUI
 const gui = new GUI() //Dat.gui
