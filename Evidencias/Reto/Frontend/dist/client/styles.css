@@ -9,22 +9,26 @@ html {
 }
 body{
     align-items: center;
-    color: #f0f0f0;
+    color: #fff;
     background-color: #002F99;
     overflow-x: hidden;
 }
 h2{
     font-size: 10vh;
+    transition: all 400ms ease;
 }
 h3{
     font-size: 3.5vh;
+    transition: all 400ms ease;
 }
 h4{
     font-size: 2.7vh;
     margin-bottom: 1.5vh;
+    transition: all 400ms ease;
 }
 p{
     font-size: 2.5vh;
+    transition: all 400ms ease;
 }
 /* width */
 ::-webkit-scrollbar {
@@ -43,11 +47,18 @@ p{
     background: #555;
 }
 /*Contenedores*/
-.section{
+.section_0{
     height: 100vh;
     width: 100vw;
     display: flex;
     align-items: center;
+}
+.section_1{
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
 }
 #simulation{
     height: 90%;
@@ -58,6 +69,10 @@ p{
     box-shadow: 0px 1px 10px rgba(0,0,0,0.2);
 }
 #credits{
+    height: 80%;
+}
+#competencies{
+    color: #191919;
     height: 80%;
 }
 .container{
@@ -84,7 +99,53 @@ p{
     width: 100%;
     height: 100%;
 }
-/*Sección 2: Credits*/
+/*Sección 2: Competencies*/
+.competencies{
+    display: flex;
+    justify-content: space-around;
+    height: 60%;
+}
+.card_0{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 23%;
+    height: 100%;
+    color: #0e1231;
+    background-color: #fff;
+    box-shadow: 0px 1px 10px rgba(0,0,0,0.2);
+    border-radius: 10px;
+    transition: all 400ms ease;
+}
+.card_header{
+    text-align: center;
+}
+.card_header {
+    transition: all 400ms ease;
+}
+.card_header img{
+    margin-bottom: 6%;
+}
+#ic_webGL{
+    height: 7vh;
+}
+#ic_python, #ic_ibmCloud{
+    height: 8vh;
+}
+.card_0:hover{
+    scale: 1.2;
+}
+.card_0:hover img{
+    scale: 1.2;
+}
+.card_0:hover h3{
+    scale: 0.7;
+    font-weight: lighter;
+}
+.card_0:hover h4{
+    scale: 1.2;
+}
+/*Sección 3: Credits*/
 .title{
     width: 100%;
     margin-bottom: 10vh;
@@ -94,7 +155,7 @@ p{
     justify-content: space-around;
     height: 55%;
 }
-.card{
+.card_1{
     display: flex;
     justify-content: center;
     width: 28%;
@@ -105,13 +166,20 @@ p{
     border-radius: 10px;
     transition: all 400ms ease;
 }
-.card:hover{
+.card_1:hover{
     scale: 1.15;
     box-shadow: 5px 5px 10px rgba(0,0,0,0.2);
+}
+.card_1:hover h3, .card_1:hover h4{
+    color: #002F99;
 }
 .card_content{
     width: 90%;
     height: 90%;
+    align-items: center;
+}
+.card_content p{
+    margin-top: 5%;
 }
 /*Decoradores*/
 .waves {
